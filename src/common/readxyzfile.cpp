@@ -46,7 +46,7 @@ bool ReadXYZFile::getValuesFromFile(string filename, vector<Atom> & molecule){
    }
 	molecule.resize(Natoms);
 	getDataAtoms(XYZFile,molecule);
-	sortingAtoms(molecule);
+   //sortingAtoms(molecule);
 	open_without_problems = statusAllData(molecule);
 
 	XYZFile.close();
