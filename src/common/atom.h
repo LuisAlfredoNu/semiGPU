@@ -19,6 +19,7 @@ public:
 	string atomSymbol;
 	vector<double> atomCoordinates; 
 	double atomWeight;
+  int atomValenceElectrons;
 	bool statusData;
 
 /***************************************************************************************/ 
@@ -32,6 +33,7 @@ public:
 /* Assign name and letter to type of element */
 	void setAtomSymbol(string);
 	void setAtomNumber(int);
+
 
 /***************************************************************************************/  
 /***************************************************************************************/  
@@ -49,5 +51,7 @@ private:
 	int convertAtomSymbol2AtomNumber(string);
 /* Assign atomic weight to the element  */
 	double setAtomWeight(int);
+/* Assign number of electron of valence */
+  int setAtomValenceElectrons(int);
 };
 #endif // _ATOM_H_
