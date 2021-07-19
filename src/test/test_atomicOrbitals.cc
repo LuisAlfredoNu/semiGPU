@@ -18,50 +18,46 @@ using std::vector;
 #include "atomicOrbitals.h"
 
 int main (int argc, char *argv[]){
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for  Class AtomicOrbital  " << endl;
-	cout << "              Class ListAtomicOrbitals " << endl;
-	cout << "********************************************************" << endl << endl;
+  cout << endl << "********************************************************" << endl;
+  cout << " Testing for  Class AtomicOrbital  " << endl;
+  cout << "              Class ListAtomicOrbitals " << endl;
+  cout << "********************************************************" << endl << endl;
 
-	if(argc>1){
-		cout << "File for read: "<<argv[1]<<endl;
+  string fileName = "filetest_numbers_xyz.xyz";
 
-		ReadXYZFile reader;
-		vector<Atom> molecule;
+  cout << "File for read: "<<fileName<<endl;
 
-		bool statusAllData = reader.getValuesFromFile(argv[1],molecule);
+  ReadXYZFile reader;
+  vector<Atom> molecule;
 
-    if (statusAllData) {
-      cout << "List of atoms " << endl;
-      for (Atom atom : molecule){
-        cout << atom.atomSymbol << " " ;
-      }
-      cout << endl ;
-      ListAtomicOrbitals infoAOs;
-      infoAOs.setOrbitals(molecule);
+  bool statusAllData = reader.getValuesFromFile(fileName.c_str(),molecule);
 
-      cout << "Size of infoAOs " << infoAOs.orbital.size() << endl;
-
-      cout << "indexAO  indexAtom  element  angular momentum" << endl; 
-      for (int i=0; i< infoAOs.orbital.size() ; i++) {
-        cout << setw(4) << infoAOs.orbital[i].indexAO ;
-        cout << setw(9) << infoAOs.orbital[i].nAtom ; 
-        cout << setw(12) << infoAOs.orbital[i].element ; 
-        cout << setw(9) << "   { " << infoAOs.orbital[i].angularMomentum[0];
-        cout << ", " << infoAOs.orbital[i].angularMomentum[1] ; 
-        cout << ", " << infoAOs.orbital[i].angularMomentum[2] << " }" << endl; 
-
-      }
-      return EXIT_SUCCESS;
-    } else {
-      cout << "Problem to read file" << endl;
-      return EXIT_FAILURE;
+  if (statusAllData) {
+    cout << "List of atoms " << endl;
+    for (Atom atom : molecule){
+      cout << atom.atomSymbol << " " ;
     }
+    cout << endl ;
+    ListAtomicOrbitals infoAOs;
+    infoAOs.setOrbitals(molecule);
 
-	}else { 
-		cout << "Dont input file in arguments " << endl << endl;
-		return EXIT_FAILURE;
-	}
+    cout << "Size of infoAOs " << infoAOs.orbital.size() << endl;
+
+    cout << "indexAO  indexAtom  element  angular momentum" << endl; 
+    for (unsigned int i=0; i< infoAOs.orbital.size() ; i++) {
+      cout << setw(4) << infoAOs.orbital[i].indexAO ;
+      cout << setw(9) << infoAOs.orbital[i].nAtom ; 
+      cout << setw(12) << infoAOs.orbital[i].element ; 
+      cout << setw(9) << "   { " << infoAOs.orbital[i].angularMomentum[0];
+      cout << ", " << infoAOs.orbital[i].angularMomentum[1] ; 
+      cout << ", " << infoAOs.orbital[i].angularMomentum[2] << " }" << endl; 
+
+    }
+    return EXIT_SUCCESS;
+  } else {
+    cout << "Problem to read file" << endl;
+    return EXIT_FAILURE;
+  }
 }
 
 

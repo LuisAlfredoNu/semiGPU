@@ -21,7 +21,7 @@ class AtomicOrbital{
    // Methods
   void setNAtom(int);
   void setElement(int);
-  void setAngularMomentum(int (&am)[3]);
+  void setAngularMomentum(int *);
   void setIndexAO(int);
 
   int nAtom;
@@ -50,7 +50,7 @@ class ListAtomicOrbitals{
   void setOrbitals(const vector<Atom> &);
  private:
   int setNumberValenceOrbitals(const int &);
-  vector<int> setEachAngularMomentum(int type );
+  void setEachAngularMomentum(int, int* );
 };
 
 

@@ -13,7 +13,9 @@ using std::vector;
 AtomicOrbital::AtomicOrbital(){
   nAtom = 0;
   element = 0;
-  angularMomentum = {0,0,0};
+  angularMomentum[0]=0;
+  angularMomentum[1]=0;
+  angularMomentum[2]=0;
   indexAO = 0;
 }
 
@@ -25,8 +27,10 @@ void AtomicOrbital::setElement(int value){
   element = value;
 }
 
-void AtomicOrbital::setAngularMomentum(vector<int> value){
-  angularMomentum = value;
+void AtomicOrbital::setAngularMomentum(int value[3]){
+  for(int i=0;i<3;i++){
+    angularMomentum[i] = value[i];
+  }
 }
 
 void AtomicOrbital::setIndexAO(int value){
@@ -51,11 +55,13 @@ void ListAtomicOrbitals::setOrbitals(const vector<Atom> &molecule){
 
   orbital.resize(totalOrbitals);
 
+  int angularMomentum[3];
+
   for (int i = 0; i < moleculeSize; i++ ) {
     if (molecule[i].atomNumber <= 2) {
       orbital[indexAO].setNAtom(i);
       orbital[indexAO].setElement(molecule[i].atomNumber);
-      int angularMomentum[3] = setEachAngularMomentum(0);
+      setEachAngularMomentum(0,angularMomentum);
       orbital[indexAO].setAngularMomentum(angularMomentum);
       orbital[indexAO].setIndexAO(indexAO);
       indexAO++;
@@ -65,7 +71,7 @@ void ListAtomicOrbitals::setOrbitals(const vector<Atom> &molecule){
       for (int ii = 0; ii < setNumberValenceOrbitals(molecule[i].atomNumber); ii++ ){
         orbital[indexAO].setNAtom(i);
         orbital[indexAO].setElement(molecule[i].atomNumber);
-        vector<int> angularMomentum = setEachAngularMomentum(ii);
+        setEachAngularMomentum(ii,angularMomentum);
         orbital[indexAO].setAngularMomentum(angularMomentum);
         orbital[indexAO].setIndexAO(indexAO);
         indexAO++;
@@ -93,19 +99,27 @@ int ListAtomicOrbitals::setNumberValenceOrbitals(const int &atomNumber){
   return -1;
 }
 /***************************************************************************************/ 
-vector<int> ListAtomicOrbitals::setEachAngularMomentum(int type){
-    vector<int> angularMomentum = {0,0,0};
+void ListAtomicOrbitals::setEachAngularMomentum(int type, int angularMomentum[3]){
     if (type == 0) {
-      return angularMomentum;
+      angularMomentum[0] = 0;
+      angularMomentum[1] = 0;
+      angularMomentum[2] = 0;
+      return; 
     } else if (type == 1) {
-      angularMomentum = {0,0,1};
-      return angularMomentum;
+      angularMomentum[0] = 0;
+      angularMomentum[1] = 0;
+      angularMomentum[2] = 1;
+      return; 
     } else if (type == 2) {
-      angularMomentum = {0,1,0};
-      return angularMomentum;
+      angularMomentum[0] = 0;
+      angularMomentum[1] = 1;
+      angularMomentum[2] = 0;
+      return; 
     } else if (type == 3) {
-      angularMomentum = {1,0,0};
-      return angularMomentum;
+      angularMomentum[0] = 1;
+      angularMomentum[1] = 0;
+      angularMomentum[2] = 0;
+      return; 
     }
 }
 #endif // _ATOMICORBITALS_CPP_
