@@ -9,8 +9,32 @@ class MNDOparameter{
 /***************************************************************************************/ 
 public:
    MNDOparameter();
+   double uss[109];
+   double upp[109];
+   
    double zs[109];
-   double zp[109];
+
+   double betaS[109];
+   double betaP[109];
+
+   double alpha[109];
+
+   double gss[109];
+   double gpp[109];
+   double gsp[109];
+   double gp2[109];
+   double hsp[109];
+//TODO Is posible compute this values 
+//  ref: https://arxiv.org/pdf/1806.06147v3
+   double dd2[109];
+   double dd3[109];
+   double p01[109];
+   double p02[109];
+   double p03[109];
+//TODO END
+
+   double heat[109];
+   double eisol[109];
 };
 
 #endif // _MNDO_PARAMETERS_H_
