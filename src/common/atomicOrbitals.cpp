@@ -3,6 +3,7 @@
 
 #include <iostream>
 using std::cout;
+using std::endl;
 #include <vector>
 using std::vector;
 
@@ -19,22 +20,28 @@ AtomicOrbital::AtomicOrbital(){
   indexAO = 0;
 }
 
-void AtomicOrbital::setNAtom(int value){
+void AtomicOrbital::SetNAtom(int value){
   nAtom = value;
 }
 
-void AtomicOrbital::setElement(int value){
+void AtomicOrbital::SetElement(int value){
   element = value;
 }
 
-void AtomicOrbital::setAngularMomentum(int value[3]){
+void AtomicOrbital::SetAngularMomentum(int value[3]){
   for(int i=0;i<3;i++){
     angularMomentum[i] = value[i];
   }
 }
 
-void AtomicOrbital::setIndexAO(int value){
+void AtomicOrbital::SetIndexAO(int value){
   indexAO = value;
+}
+
+void AtomicOrbital::SetCoordinates(const double (&coor)[3]){
+  coordinates[0] = coor[0];
+  coordinates[1] = coor[1];
+  coordinates[2] = coor[2];
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 
@@ -43,14 +50,14 @@ ListAtomicOrbitals::ListAtomicOrbitals(){
   statusData = true;
 }
 /***************************************************************************************/ 
-void ListAtomicOrbitals::setOrbitals(const vector<Atom> &molecule){
+void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
 
   int moleculeSize = molecule.size();
   int totalOrbitals = 0;
   int indexAO = 0;
   
   for (int i = 0; i < moleculeSize; i++ ) {
-    totalOrbitals += setNumberValenceOrbitals(molecule[i].atomNumber);
+    totalOrbitals += SetNumberValenceOrbitals(molecule[i].atomNumber);
   }
 
   orbital.resize(totalOrbitals);
@@ -59,21 +66,23 @@ void ListAtomicOrbitals::setOrbitals(const vector<Atom> &molecule){
 
   for (int i = 0; i < moleculeSize; i++ ) {
     if (molecule[i].atomNumber <= 2) {
-      orbital[indexAO].setNAtom(i);
-      orbital[indexAO].setElement(molecule[i].atomNumber);
-      setEachAngularMomentum(0,angularMomentum);
-      orbital[indexAO].setAngularMomentum(angularMomentum);
-      orbital[indexAO].setIndexAO(indexAO);
+      orbital[indexAO].SetNAtom(i);
+      orbital[indexAO].SetElement(molecule[i].atomNumber);
+      SetEachAngularMomentum(0,angularMomentum);
+      orbital[indexAO].SetAngularMomentum(angularMomentum);
+      orbital[indexAO].SetIndexAO(indexAO);
+      orbital[indexAO].SetCoordinates(molecule[i].atomCoordinates);
       indexAO++;
       continue;
     }
     if (molecule[i].atomNumber <= 18) {
-      for (int ii = 0; ii < setNumberValenceOrbitals(molecule[i].atomNumber); ii++ ){
-        orbital[indexAO].setNAtom(i);
-        orbital[indexAO].setElement(molecule[i].atomNumber);
-        setEachAngularMomentum(ii,angularMomentum);
-        orbital[indexAO].setAngularMomentum(angularMomentum);
-        orbital[indexAO].setIndexAO(indexAO);
+      for (int ii = 0; ii < SetNumberValenceOrbitals(molecule[i].atomNumber); ii++ ){
+        orbital[indexAO].SetNAtom(i);
+        orbital[indexAO].SetElement(molecule[i].atomNumber);
+        SetEachAngularMomentum(ii,angularMomentum);
+        orbital[indexAO].SetAngularMomentum(angularMomentum);
+        orbital[indexAO].SetIndexAO(indexAO);
+        orbital[indexAO].SetCoordinates(molecule[i].atomCoordinates);
         indexAO++;
       }
       continue;
@@ -81,14 +90,9 @@ void ListAtomicOrbitals::setOrbitals(const vector<Atom> &molecule){
 
   }
 
-  cout << std::endl;
-  cout << "Memory for orbital " << sizeof(AtomicOrbital) * orbital.size() << std::endl;
-  cout << "Size memory with molecule of 1000 atoms " << sizeof(AtomicOrbital) * 32 << std::endl;
-
-
 }
 /***************************************************************************************/ 
-int ListAtomicOrbitals::setNumberValenceOrbitals(const int &atomNumber){
+int ListAtomicOrbitals::SetNumberValenceOrbitals(const int &atomNumber){
   if (atomNumber <= 2) {
     return 1;
   } else if (atomNumber <= 18) {
@@ -99,7 +103,7 @@ int ListAtomicOrbitals::setNumberValenceOrbitals(const int &atomNumber){
   return -1;
 }
 /***************************************************************************************/ 
-void ListAtomicOrbitals::setEachAngularMomentum(int type, int angularMomentum[3]){
+void ListAtomicOrbitals::SetEachAngularMomentum(int type, int angularMomentum[3]){
     if (type == 0) {
       angularMomentum[0] = 0;
       angularMomentum[1] = 0;
