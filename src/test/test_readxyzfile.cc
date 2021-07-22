@@ -22,7 +22,7 @@ int main (int argc, char *argv[]){
 		ReadXYZFile reader;
 		vector<Atom> molecule;
 
-		bool statusAllData = reader.getValuesFromFile(argv[1],molecule);
+		bool statusAllData = reader.GetValuesFromFile(argv[1],molecule);
 
 		string statusanswer;
 		for(unsigned int i=0;i<molecule.size();i++){

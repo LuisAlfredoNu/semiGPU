@@ -30,7 +30,7 @@ int main (int argc, char *argv[]){
   ReadXYZFile reader;
   vector<Atom> molecule;
 
-  bool statusAllData = reader.getValuesFromFile(fileName.c_str(),molecule);
+  bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
 
   if (statusAllData) {
     cout << "List of atoms " << endl;
@@ -39,18 +39,21 @@ int main (int argc, char *argv[]){
     }
     cout << endl ;
     ListAtomicOrbitals infoAOs;
-    infoAOs.setOrbitals(molecule);
+    infoAOs.SetOrbitals(molecule);
 
     cout << "Size of infoAOs " << infoAOs.orbital.size() << endl;
 
-    cout << "indexAO  indexAtom  element  angular momentum" << endl; 
+    cout << "indexAO  indexAtom  element  angular momentum     Coordinates" << endl; 
     for (unsigned int i=0; i< infoAOs.orbital.size() ; i++) {
       cout << setw(4) << infoAOs.orbital[i].indexAO ;
       cout << setw(9) << infoAOs.orbital[i].nAtom ; 
       cout << setw(12) << infoAOs.orbital[i].element ; 
       cout << setw(9) << "   { " << infoAOs.orbital[i].angularMomentum[0];
       cout << ", " << infoAOs.orbital[i].angularMomentum[1] ; 
-      cout << ", " << infoAOs.orbital[i].angularMomentum[2] << " }" << endl; 
+      cout << ", " << infoAOs.orbital[i].angularMomentum[2] << " }" ; 
+      cout << setw(9) << "   { " << infoAOs.orbital[i].coordinates[0];
+      cout << ", " << infoAOs.orbital[i].coordinates[1] ; 
+      cout << ", " << infoAOs.orbital[i].coordinates[2] << " }" << endl; 
 
     }
     return EXIT_SUCCESS;

@@ -14,6 +14,7 @@ int main (int argc, char *argv[])
 	cout << endl << "********************************************************" << endl;
 	cout << " Testing for Atom Class " << endl;
 	cout << "********************************************************" << endl << endl;
+
 	vector<Atom> molecule (4,Atom());
 
 	double x1=1.5, y1=2.0, z1=0.5;
