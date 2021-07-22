@@ -50,7 +50,7 @@ void crossProductV3(double (&a)[3],double (&b)[3],double (&c)[3]) {
 double dotProductV3(double (&a)[3],double (&b)[3]) {
    return (a[0]*b[0]+a[1]*b[1]+a[2]*b[2]);
 }
-/***************************************************************************************/ 
+/*************************************************************************************** 
 double distancePointsV3(double (&a)[3],double (&b)[3]){
   double r = 0.0e-10;
   for (int i=0;i<3;i++) {
@@ -58,7 +58,7 @@ double distancePointsV3(double (&a)[3],double (&b)[3]){
     r *= r;
   }
   return sqrt(r);
-}
+}*/
 /* ************************************************************************** */
 double detM3x3(double (&oM)[3][3]) {
    double res=oM[0][0]*(oM[1][1]*oM[2][2]-oM[2][1]*oM[1][2]);
