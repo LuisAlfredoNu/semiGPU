@@ -17,7 +17,7 @@ public:
 	// Variables
 	int atomNumber;
 	string atomSymbol;
-	vector<double> atomCoordinates; 
+	double atomCoordinates[3]; 
 	double atomWeight;
   int atomValenceElectrons;
 	bool statusData;

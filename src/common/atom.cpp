@@ -18,7 +18,6 @@ using std::vector;
 Atom::Atom(){
 	atomNumber=0;
 	atomSymbol.clear();
-	atomCoordinates.assign(3,0.0);
 	xPosition=0.0;
 	yPosition=0.0;
 	zPosition=0.0;
@@ -39,7 +38,9 @@ void Atom::setCoordinates(vector<double> xyz_coordinates){
 	xPosition=xyz_coordinates[0];
 	yPosition=xyz_coordinates[1];
 	zPosition=xyz_coordinates[2];
-	atomCoordinates=xyz_coordinates;
+	atomCoordinates[0]=xyz_coordinates[0];
+	atomCoordinates[1]=xyz_coordinates[1];
+	atomCoordinates[2]=xyz_coordinates[3];
 }
 /***************************************************************************************/ 
 double Atom::getXCoordinate(){
