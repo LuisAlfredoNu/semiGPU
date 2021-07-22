@@ -24,7 +24,7 @@ ReadXYZFile::ReadXYZFile(){
 	begindata_pos = 0;
 }
 
-bool ReadXYZFile::getValuesFromFile(string filename, vector<Atom> & molecule){
+bool ReadXYZFile::GetValuesFromFile(string filename, vector<Atom> & molecule){
 
 	ifstream XYZFile;
 
@@ -39,22 +39,22 @@ bool ReadXYZFile::getValuesFromFile(string filename, vector<Atom> & molecule){
 		return false;
 	}
 
-	Natoms = getNumofAtoms(XYZFile);
+	Natoms = GetNumofAtoms(XYZFile);
    if(!open_without_problems){
       cout << "Error: File " << filename << " does not have the XYZ format..." << endl;
       return false;
    }
 	molecule.resize(Natoms);
-	getDataAtoms(XYZFile,molecule);
+	GetDataAtoms(XYZFile,molecule);
    //sortingAtoms(molecule);
-	open_without_problems = statusAllData(molecule);
+	open_without_problems = StatusAllData(molecule);
 
 	XYZFile.close();
 
 	return open_without_problems;
 }
 /***************************************************************************************/ 
-int ReadXYZFile::getNumofAtoms(ifstream &file){
+int ReadXYZFile::GetNumofAtoms(ifstream &file){
 
 	int numof_Atoms=0;
 
@@ -67,14 +67,14 @@ int ReadXYZFile::getNumofAtoms(ifstream &file){
 	return numof_Atoms;
 }
 /***************************************************************************************/ 
-void ReadXYZFile::getDataAtoms(ifstream &file, vector<Atom>& molecule){
+void ReadXYZFile::GetDataAtoms(ifstream &file, vector<Atom>& molecule){
 
 	int atomnumber=0;
 	string symbol;
 	vector<double> vectorposition (3);
 			
 	int i = 0;
-	if(typeDataNumOChar(file)){
+	if(TypeDataNumOChar(file)){
 		file.seekg(begindata_pos);
 		while(i < Natoms ){
 			file >> atomnumber;
@@ -103,7 +103,7 @@ void ReadXYZFile::getDataAtoms(ifstream &file, vector<Atom>& molecule){
 	}
 }
 /***************************************************************************************/ 
-bool ReadXYZFile::typeDataNumOChar(ifstream &file){
+bool ReadXYZFile::TypeDataNumOChar(ifstream &file){
 
 	bool is_number = true;
 	int number;
@@ -124,7 +124,7 @@ bool ReadXYZFile::typeDataNumOChar(ifstream &file){
 	return is_number;
 }
 /***************************************************************************************/ 
-bool ReadXYZFile::statusAllData(vector<Atom> molecule){
+bool ReadXYZFile::StatusAllData(vector<Atom> molecule){
 
 	for(int i=0;i<Natoms;i++)
 		if(!molecule[i].statusData) return false;
@@ -132,7 +132,7 @@ bool ReadXYZFile::statusAllData(vector<Atom> molecule){
 	return true;
 }
 /***************************************************************************************/ 
-void ReadXYZFile::sortingAtoms(vector<Atom>& molecule){
+void ReadXYZFile::SortingAtoms(vector<Atom>& molecule){
 
 	// Select witch axe sort firts 
 	int sizemolecule = molecule.size();

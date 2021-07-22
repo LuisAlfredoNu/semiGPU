@@ -36,8 +36,8 @@ class ReadXYZFile{
 		int Natoms;
 		bool open_without_problems;
 	/***************************************************************************************/ 
-		bool getValuesFromFile(string,vector<Atom>&);
-		void sortingAtoms(vector<Atom> &);
+		bool GetValuesFromFile(string,vector<Atom>&);
+		void SortingAtoms(vector<Atom> &);
 	
 	/***************************************************************************************/
 	/***************************************************************************************/ 
@@ -45,10 +45,10 @@ class ReadXYZFile{
 		// Variables
 		int begindata_pos;
 	/***************************************************************************************/ 
-		void getDataAtoms(ifstream &file, vector<Atom> &);
-		int getNumofAtoms(ifstream &file);
-		bool typeDataNumOChar(ifstream &file);
-		bool statusAllData(vector<Atom>);
+		void GetDataAtoms(ifstream &file, vector<Atom> &);
+		int GetNumofAtoms(ifstream &file);
+		bool TypeDataNumOChar(ifstream &file);
+		bool StatusAllData(vector<Atom>);
 
 
 	/***************************************************************************************/ 
