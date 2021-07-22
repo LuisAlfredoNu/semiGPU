@@ -365,3 +365,6 @@ bool MyMemory::AllocSymetricMatrixReal(string ptrname,const int row,\
   const int totalSize = row + row;
   return Alloc1DRealArray(ptrname,totalSize,thptr,0.0e-10);
 }
+int MyMemory::GetIndexSymetrixMatrix(const int row,const int col){
+  return row * (row + 1)/ 2 + col;
+}

@@ -74,9 +74,7 @@ public:
    /***************************************************************************************/ 
    static bool AllocSymetricMatrixReal(string ptrname,const int row, \
          double* &thptr,const double val=0.0);
-   inline int GetIndexSymetrixMatrix(const int row,const int col){
-     return row * (row + 1)/ 2 + col;
-   };
+   static int GetIndexSymetrixMatrix(const int row,const int col);
 protected:
    /* ************************************************************************** */
 };
