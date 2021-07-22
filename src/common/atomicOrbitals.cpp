@@ -7,6 +7,8 @@ using std::endl;
 #include <vector>
 using std::vector;
 
+#include "mymath.h"
+
 #include "atomicOrbitals.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
@@ -39,9 +41,9 @@ void AtomicOrbital::SetIndexAO(int value){
 }
 
 void AtomicOrbital::SetCoordinates(const double (&coor)[3]){
-  coordinates[0] = coor[0];
-  coordinates[1] = coor[1];
-  coordinates[2] = coor[2];
+  coordinates[0] = convertAngstrom2AU(coor[0]);
+  coordinates[1] = convertAngstrom2AU(coor[1]);
+  coordinates[2] = convertAngstrom2AU(coor[2]);
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 
