@@ -28,6 +28,11 @@ class Overlap{
 
   double ComputeOverlap(const AtomicOrbital,const AtomicOrbital);
  private:
+  void Overlap_SS(double&,const double&,const double&,const double&);
+  void Overlap_PS(double&,const double&,const double&,const double&,const double&);
+  void Overlap_SP(double&,const double&,const double&,const double&,const double&);
+  void Overlap_PxPy(double&,const double&,const double&,const double&,const double&);
+  void Overlap_PxPx(double&,const double&,const double&,const double&);
 
 };
 #endif // _OVERLAP_H_
