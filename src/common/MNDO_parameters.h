@@ -26,11 +26,8 @@ public:
    double hsp[109];
 //TODO Is posible compute this values 
 //  ref: https://arxiv.org/pdf/1806.06147v3
-   double dd2[109];
-   double dd3[109];
-   double p01[109];
-   double p02[109];
-   double p03[109];
+   double dd[109][2];
+   double pp[109][3];
 //TODO END
 
    double heat[109];
