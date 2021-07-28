@@ -12,12 +12,14 @@ using std::string;
 #include "atomicOrbitals.h"
 #include "mymemory.h"
 #include "mymath.h"
+#include "STO-6G.h"
 
 #include "overlap.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
 
 Overlap::Overlap(){
+  basisSTO = new STO_6G();
 }
 
 bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix){
@@ -46,8 +48,6 @@ bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* 
 }
 /***************************************************************************************/ 
 double Overlap::ComputeOverlap(const AtomicOrbital orbitalA,const AtomicOrbital orbitalB){
-
-
   int atomTypeA = orbitalA.element;
   int atomTypeB = orbitalB.element;
 
@@ -98,35 +98,35 @@ double Overlap::ComputeOverlap(const AtomicOrbital orbitalA,const AtomicOrbital 
 
   for(int gtoA = 0; gtoA < 6;gtoA++){
     for(int gtoB = 0; gtoB < 6;gtoB++){
-      a_times_b = basisSTO.value[atomTypeA].exponent[gtoA] * \
-                  basisSTO.value[atomTypeB].exponent[gtoB];
-      a_plus_b = basisSTO.value[atomTypeA].exponent[gtoA] +  \
-                 basisSTO.value[atomTypeB].exponent[gtoB];
+      a_times_b = basisSTO->value[atomTypeA].exponent[gtoA] * \
+                  basisSTO->value[atomTypeB].exponent[gtoB];
+      a_plus_b = basisSTO->value[atomTypeA].exponent[gtoA] +  \
+                 basisSTO->value[atomTypeB].exponent[gtoB];
 
       Overlap_SS(overlapGTO,a_times_b,a_plus_b,atomDistance);
 
       if (sumAngularMomentumA == 1 && sumAngularMomentumB == 0) {
-        Overlap_PS(overlapGTO,basisSTO.value[atomTypeA].exponent[gtoA],\
-            basisSTO.value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
+        Overlap_PS(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
+            basisSTO->value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
       
-        normaFactor = basisSTO.value[atomTypeA].coeffP[gtoA] * \
-                      basisSTO.value[atomTypeB].coeffS[gtoB];
+        normaFactor = basisSTO->value[atomTypeA].coeffP[gtoA] * \
+                      basisSTO->value[atomTypeB].coeffS[gtoB];
       }else if (sumAngularMomentumA == 0 && sumAngularMomentumB == 1) {
-        Overlap_SP(overlapGTO,basisSTO.value[atomTypeA].exponent[gtoA],\
-            basisSTO.value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
-        normaFactor = basisSTO.value[atomTypeA].coeffS[gtoA] * \
-                      basisSTO.value[atomTypeB].coeffP[gtoB];
+        Overlap_SP(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
+            basisSTO->value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
+        normaFactor = basisSTO->value[atomTypeA].coeffS[gtoA] * \
+                      basisSTO->value[atomTypeB].coeffP[gtoB];
       }else if (sumAngularMomentumA == 1 && sumAngularMomentumB == 1) {
         if (xyzAngularMomentumA == xyzAngularMomentumB) {
           Overlap_PxPx(overlapGTO,a_times_b,a_plus_b,rABx);
         } else{
           Overlap_PxPy(overlapGTO,a_times_b,a_plus_b,rABx,rABy);
         }
-        normaFactor = basisSTO.value[atomTypeA].coeffP[gtoA] * \
-                      basisSTO.value[atomTypeB].coeffP[gtoB];
+        normaFactor = basisSTO->value[atomTypeA].coeffP[gtoA] * \
+                      basisSTO->value[atomTypeB].coeffP[gtoB];
       } else{
-        normaFactor = basisSTO.value[atomTypeA].coeffS[gtoA] * \
-                      basisSTO.value[atomTypeB].coeffS[gtoB];
+        normaFactor = basisSTO->value[atomTypeA].coeffS[gtoA] * \
+                      basisSTO->value[atomTypeB].coeffS[gtoB];
       }
       overlapSTO += normaFactor * overlapGTO;
     }

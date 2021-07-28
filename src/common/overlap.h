@@ -21,7 +21,7 @@ class Overlap{
 /***************************************************************************************/ 
   // Variables
   // Start STO-6G data
-  STO_6G basisSTO;
+  STO_6G* basisSTO;
 /***************************************************************************************/ 
   // Methods 
   bool GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix);
