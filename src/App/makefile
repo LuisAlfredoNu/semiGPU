@@ -30,7 +30,7 @@ else
 endif
 
 CXXFLAGS       += -std=c++11 -fPIC
-OPTIMFLAGS      = -O2 -funroll-loops -falign-loops=8
+OPTIMFLAGS      = -O3 -funroll-loops -falign-loops=8 -ffast-math
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
