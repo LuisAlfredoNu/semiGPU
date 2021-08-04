@@ -47,8 +47,6 @@ inline void sort2intmin2max(int &a,int&b) {
 /* ************************************************************************** */
 double rfactorial(const int n);
 /* ************************************************************************** */
-//double distancePointsV3(double (&a)[3],double (&b)[3]);
-
 template <typename T> 
 double distancePointsV3(T a,T b){
   double r = 0.0e-10;
@@ -57,6 +55,14 @@ double distancePointsV3(T a,T b){
   }
   return sqrt(r);
 };
+/***************************************************************************************/ 
+template <typename T>
+bool sameReal(T a,T b){
+  if (std::abs(a - b) < 1e-10) {
+    return true;
+  }
+  return false;
+}
 /***************************************************************************************/ 
 template <typename T>
 T convertAngstrom2AU(T r){
