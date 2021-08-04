@@ -19,6 +19,7 @@ class AtomicOrbital{
   int nAtom;
   int element;
   int angularMomentum[3];
+  int angularMomentumInt;
   int indexAO;
   double coordinates[3];
 /***************************************************************************************/ 

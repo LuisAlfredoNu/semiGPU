@@ -31,8 +31,12 @@ void AtomicOrbital::SetElement(int value){
 }
 
 void AtomicOrbital::SetAngularMomentum(int value[3]){
+  angularMomentumInt = 0;
   for(int i=0;i<3;i++){
     angularMomentum[i] = value[i];
+    if (value[i] == 1) {
+      angularMomentumInt = i + 1;
+    }
   }
 }
 
@@ -112,9 +116,9 @@ void ListAtomicOrbitals::SetEachAngularMomentum(int type, int angularMomentum[3]
       angularMomentum[2] = 0;
       return; 
     } else if (type == 1) {
-      angularMomentum[0] = 0;
+      angularMomentum[0] = 1;
       angularMomentum[1] = 0;
-      angularMomentum[2] = 1;
+      angularMomentum[2] = 0;
       return; 
     } else if (type == 2) {
       angularMomentum[0] = 0;
@@ -122,9 +126,9 @@ void ListAtomicOrbitals::SetEachAngularMomentum(int type, int angularMomentum[3]
       angularMomentum[2] = 0;
       return; 
     } else if (type == 3) {
-      angularMomentum[0] = 1;
+      angularMomentum[0] = 0;
       angularMomentum[1] = 0;
-      angularMomentum[2] = 0;
+      angularMomentum[2] = 1;
       return; 
     }
 }
