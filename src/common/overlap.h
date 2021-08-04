@@ -1,4 +1,4 @@
-/*grep -r "STO-6G"
+/*
  * Class for compute the overlap between 2 orbitals
  * -- Develop the more basic methed: Boys
  * -- Numerical method Ref: https://doi.org/10.1016/0097-8485(78)80005-9 Ec. 29 - 33 
