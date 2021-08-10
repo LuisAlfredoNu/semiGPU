@@ -35,7 +35,7 @@ class Multipole{
   double Interaction_UzQz(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
   double Interaction_QzUz(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
   double Interaction_QpipiQpipi(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
-  double Interaction_QxQy(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
+  double Interaction_QxxQyy(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
   double Interaction_QpipiQzz(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
   double Interaction_QzzQpipi(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);
   double Interaction_QzzQzz(const double& atomDistance,const AtomicOrbital&, const AtomicOrbital&);

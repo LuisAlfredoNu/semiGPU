@@ -309,7 +309,7 @@ double Multipole::Interaction_QpipiQpipi(const double& atomDistance,const Atomic
   return finalIntegral;
 }
 /***************************************************************************************/ 
-double Multipole::Interaction_QxQy(const double& atomDistance,const AtomicOrbital& orbitalA,\
+double Multipole::Interaction_QxxQyy(const double& atomDistance,const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB){
   
   double addTerm;
