@@ -95,6 +95,10 @@ fullclean: clean
 	$(info TOTAL CLEANING)
 	@cd ../common/;make clean
 
+libclean:
+	 $(info CLEANING STATIC LIB)
+	 @$(RM) -f  $(STATICLIB)
+
 list:
 	@echo $(OBJS)
 	@echo $(HEADERS)
