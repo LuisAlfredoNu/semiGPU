@@ -90,7 +90,7 @@ int main (int argc, char *argv[])
   interaction = multipole.Interaction_QpipiQpipi(atomDistance,orbitalA,orbitalB);
   cout << "multipole interaction QpipiQpipi = " << interaction << endl;
 
-  interaction = multipole.Interaction_QxQy(atomDistance,orbitalA,orbitalB);
+  interaction = multipole.Interaction_QxxQyy(atomDistance,orbitalA,orbitalB);
   cout << "multipole interaction QxQy = " << interaction << endl;
 
   interaction = multipole.Interaction_QpipiQzz(atomDistance,orbitalA,orbitalB);

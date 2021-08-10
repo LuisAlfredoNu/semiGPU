@@ -46,7 +46,7 @@ int main (int argc, char *argv[]){
     cout << "indexAO  indexAtom  element  angular momentum  int     Coordinates" << endl; 
     for (unsigned int i=0; i< infoAOs.orbital.size() ; i++) {
       cout << setw(4) << infoAOs.orbital[i].indexAO ;
-      cout << setw(9) << infoAOs.orbital[i].nAtom ; 
+      cout << setw(9) << infoAOs.orbital[i].indexAtom ; 
       cout << setw(12) << infoAOs.orbital[i].element ; 
       cout << setw(9) << "   { " << infoAOs.orbital[i].angularMomentum[0];
       cout << ", " << infoAOs.orbital[i].angularMomentum[1] ; 
