@@ -30,7 +30,7 @@ class TwoCenterIntegral{
  private:
 /***************************************************************************************/ 
   // Varaibles
-/****************************************************************  ***********************/ 
+/***************************************************************************************/ 
   // Methods
   // Diff Atom
   double IntegralTypeSS_SS(const double&,const AtomicOrbital&,const AtomicOrbital&);
@@ -47,6 +47,7 @@ class TwoCenterIntegral{
   // Same atoms
   double SelfIntegralTypeSS_SS(const int&);
   double SelfIntegralTypeSS_PP(const int&, const int (&AOsTypeInt)[4]);
+  double SelfIntegralTypePP_SS(const int&, const int (&AOsTypeInt)[4]);
   double SelfIntegralTypeSP_SP(const int&, const int (&AOsTypeInt)[4]);
   double SelfIntegralTypePP_PP(const int&, const int (&AOsTypeInt)[4]);
   // Functions for type integral

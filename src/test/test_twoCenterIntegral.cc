@@ -14,6 +14,8 @@ using std::vector;
 #include "atom.h"
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
+#include "fileutils.h"
+#include "mymath.h"
 
 #include "twocenterintegral.h"
 
@@ -28,7 +30,7 @@ int main (int argc, char *argv[])
 
   AtomicOrbital orbitalA,orbitalB,orbitalC,orbitalD;
 
-  double coorA[3] = {0.0,0.0,0.0};
+  double coorA[3] = {-1.0,-2.0,-3.0};
   int angularMomA[3] = {1,0,0};
   orbitalA.SetElement( 6);
   orbitalA.SetCoordinates(coorA);
@@ -42,7 +44,7 @@ int main (int argc, char *argv[])
   orbitalB.SetIndexAtom(0);
 
   double coorC[3] = {1.0,1.0,1.5};
-  int angularMomC[3] = {0,0,0};
+  int angularMomC[3] = {1,0,0};
   orbitalC.SetElement( 6);
   orbitalC.SetCoordinates(coorC);
   orbitalC.SetAngularMomentum(angularMomC);
@@ -67,7 +69,7 @@ int main (int argc, char *argv[])
 
   double result =  twoCIntegral.ComputeTwoCenterIntegral(orbitalA,orbitalB,orbitalC,orbitalD);
   cout << "result = " << result << endl;
-
+/* */ 
   vector<Atom> molecule (2,Atom());
 
   molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
@@ -87,20 +89,73 @@ int main (int argc, char *argv[])
 
   twoCIntegral.ComputeAllTwoCenterIntegral(AOs.orbital,all2CenterIntegral);
 
-  cout << std::fixed << setprecision(4);
+  cout << "Get Compute Data" << endl;
+  vector<double> computeData;
   for (int i=0;i<2;i++) {
     for (int j=0;j<=i;j++) {
       for (int k=0;k<10;k++) {
         for (int l=0;l<10;l++) {
-          cout << setw(12) << all2CenterIntegral[i][j][k][l];
+          computeData.push_back(all2CenterIntegral[i][j][k][l]);
         }
-        cout << endl;
       }
-        cout << endl;
     }
   }
 
-	return EXIT_SUCCESS;
+  vector<vector<string>> dataCSV;
+  bool readFile = FileUtils::ReadCSV("c2_scf_debug_twoInt.csv",dataCSV);
+
+  if (!readFile) {
+    cout << "Problem to read CSV" << endl;
+    return EXIT_FAILURE;
+  }
+
+  vector<double> refData;
+
+  cout << "Get CSV Data" << endl;
+  for (auto& row : dataCSV) {
+    for (auto& col : row ) {
+      refData.push_back(std::stod(col));
+    }
+  }
+
+
+  cout << "Compare data" << endl;
+  vector<string> listMOPAC = {"SS","SX","XX","SY","XY","YY","SZ","XZ","YZ","ZZ"};
+
+  int decimals=4;
+  cout << std::fixed << setprecision(decimals);
+  cout << setw(decimals + 8);
+  for (auto label : listMOPAC) {
+    cout << label << setw(decimals + 16);
+  }
+
+  cout << setw(-18) ;
+  int j = 0;
+  int totalErrors = 0;
+	for (int i=0;i<computeData.size();++i) {
+    if (i % 10 == 0) {
+      cout  << endl;
+      cout << listMOPAC[j];
+      ++j;
+      if (j == 10) {
+        j=0;
+      }
+    }
+    if (sameReal(computeData[i],refData[i],1.0e-4)) {
+      cout << setw(decimals + 4) << computeData[i] <<setw(2) << "O" << setw(decimals +4) << refData[i];
+    }else{
+      cout << setw(decimals + 4) << computeData[i] <<setw(2) << "X" << setw(decimals +4) << refData[i];
+      ++totalErrors;
+    }
+    cout << setw(2)<< "|";
+    if ((1+i)%100 == 0) {
+      cout << endl << "total Errors = " << totalErrors <<endl;
+      totalErrors = 0;
+    }
+  }
+  cout  << endl;
+/*  */
+  return EXIT_SUCCESS;
 }
 
 

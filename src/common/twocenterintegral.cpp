@@ -2,9 +2,6 @@
 #ifndef _TWOCENTERINTEGRAL_CPP_
 #define _TWOCENTERINTEGRAL_CPP_
 
-#include "iostream"
-using std::cout;
-using std::endl;
 #include <vector>
 using std::vector;
 
@@ -72,23 +69,27 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
   
     // If the 4 orbital are in the same atom
     if (orbitalA.indexAtom == orbitalC.indexAtom) {
-      if (pairTypeA == 0) {
-        // SS|SS ; SS|PP
-        if (pairTypeA == pairTypeB) {
+
+      if (pairTypeA == pairTypeB) {
+        // SS|SS ; SP|SP ; PP|PP
+        if (pairTypeA == 0) {
           // SS|SS
           return SelfIntegralTypeSS_SS(orbitalA.element);
-        }else{
-          // SS|PP
-          return SelfIntegralTypeSS_PP(orbitalA.element,AOsTypeInt);
-        }
-      }else{
-        // SP|SP ; PP|PP
-        if (pairTypeA == 1) {
+        }else if (pairTypeA == 1) {
           // SP|SP
           return SelfIntegralTypeSP_SP(orbitalA.element,AOsTypeInt);
         }else{
           // PP|PP
           return SelfIntegralTypePP_PP(orbitalA.element,AOsTypeInt);
+        }
+      }else{
+        // SS|PP ; PP|SS ; SS|SP ; SP|SS
+        if (pairTypeA == 0 && pairTypeB == 2) {
+          // SS|PP
+          return SelfIntegralTypeSS_PP(orbitalA.element,AOsTypeInt);
+        }else if (pairTypeA == 2 && pairTypeB == 0) {
+          // PP|SS
+          return SelfIntegralTypePP_SS(orbitalA.element,AOsTypeInt);
         }
       }
 
@@ -242,7 +243,7 @@ void TwoCenterIntegral::ComputeRotationMatrix(const double (&vecA)[3],\
   double R_ij = distancePointsV3(vecA,vecB);
 
   for (int i=0;i<3;i++) {
-    matrix[2][i] = (vecA[i] - vecB[i]) / R_ij; 
+    matrix[2][i] = (vecB[i] - vecA[i]) / R_ij; 
   }
 
   if (sameReal(matrix[2][0],0.0e-10) && sameReal(matrix[2][1],0.0e-10)) {
@@ -324,10 +325,11 @@ double TwoCenterIntegral::IntegralTypeSP_SP(const double& atomsDistance,\
   ComputeRotationMatrix(orbitalA.coordinates,orbitalC.coordinates,rotMat);
   
   double value_SPpi_SPpi = multipole->Interaction_UpiUpi(atomsDistance,orbitalA,orbitalC);
-  ApplyRotationAOs(0,0,AOsTypeInt[1],AOsTypeInt[3],value_SPpi_SPpi,rotMat);
+  value_SPpi_SPpi = ApplyRotationAOs(0,0,AOsTypeInt[1],AOsTypeInt[3],value_SPpi_SPpi,rotMat) +\
+                    ApplyRotationAOs(1,1,AOsTypeInt[1],AOsTypeInt[3],value_SPpi_SPpi,rotMat);
 
   double value_SPz_SPz = multipole->Interaction_UzUz(atomsDistance,orbitalA,orbitalC);
-  ApplyRotationAOs(2,2,AOsTypeInt[1],AOsTypeInt[3],value_SPz_SPz,rotMat);
+  value_SPz_SPz = ApplyRotationAOs(2,2,AOsTypeInt[1],AOsTypeInt[3],value_SPz_SPz,rotMat);
 
   return value_SPpi_SPpi + value_SPz_SPz;
 }
@@ -355,8 +357,13 @@ double TwoCenterIntegral::IntegralTypeSP_PP(const double& atomsDistance,\
   double value_SPpi_PzPpi = multipole->Interaction_UpiQpiz(atomsDistance,orbitalA,orbitalC);
 
   value_SPpi_PzPpi = ApplyRotationAOs(0,2,0,AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
-      value_SPpi_PzPpi,rotMat) + ApplyRotationAOs(1,2,1,AOsTypeInt[1],AOsTypeInt[2],\
-        AOsTypeInt[3],value_SPpi_PzPpi,rotMat);
+                         value_SPpi_PzPpi,rotMat) + \
+                     ApplyRotationAOs(1,2,1,AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                         value_SPpi_PzPpi,rotMat) + \
+                     ApplyRotationAOs(0,2,0,AOsTypeInt[1],AOsTypeInt[3],AOsTypeInt[2],\
+                         value_SPpi_PzPpi,rotMat) + \
+                     ApplyRotationAOs(1,2,1,AOsTypeInt[1],AOsTypeInt[3],AOsTypeInt[2],\
+                         value_SPpi_PzPpi,rotMat);
 
   return value_SPz_PpiPpi + value_SPz_PzPz + value_SPpi_PzPpi;
 }
@@ -373,55 +380,97 @@ double TwoCenterIntegral::IntegralTypePP_PP(const double& atomsDistance,\
   
   double value_PzPz_PzPz = value_qq + value_qQzz + value_Qzzq +\
                            multipole->Interaction_QzzQzz(atomsDistance,orbitalA,orbitalC);
+  //cout << "value_PzPz_PzPz = " << value_PzPz_PzPz << endl;
 
   value_PzPz_PzPz = ApplyRotationAOs(2,2,2,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
       AOsTypeInt[3],value_PzPz_PzPz,rotMat);
+  //cout << "Rot value_PzPz_PzPz = " << value_PzPz_PzPz << endl;
 
   double value_qQpipi = multipole->Interaction_qQpipi(atomsDistance,orbitalA,orbitalC);
   double value_Qpipiq = multipole->Interaction_Qpipiq(atomsDistance,orbitalA,orbitalC);
 
   double value_PpiPpi_PpiPpi = value_qq + value_qQpipi + value_Qpipiq + \
                         multipole->Interaction_QpipiQpipi(atomsDistance,orbitalA,orbitalC);
+  //cout << "value_PpiPpi_PpiPpi = " << value_PpiPpi_PpiPpi << endl;
 
   double value_PxPy_PxPy = value_PpiPpi_PpiPpi;
   
   value_PpiPpi_PpiPpi = ApplyRotationAOs(0,0,0,0,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
       AOsTypeInt[3],value_PpiPpi_PpiPpi,rotMat) + ApplyRotationAOs(1,1,1,1,\
         AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PpiPpi_PpiPpi,rotMat);
+  //cout << "Rot value_PpiPpi_PpiPpi = " << value_PpiPpi_PpiPpi << endl;
 
   double value_PzPz_PpiPpi = value_qq + value_qQpipi + value_Qzzq + \
                              multipole->Interaction_QzzQpipi(atomsDistance,orbitalA,orbitalC);
+  //cout << "value_PzPz_PpiPpi = " << value_PzPz_PpiPpi << endl;
 
-  value_PzPz_PpiPpi = ApplyRotationAOs(0,0,0,0,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
-      AOsTypeInt[3],value_PzPz_PpiPpi,rotMat) + ApplyRotationAOs(1,1,1,1,\
-        AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PzPz_PpiPpi,rotMat);
+
+  value_PzPz_PpiPpi = \
+            ApplyRotationAOs(2,2,0,0,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PzPz_PpiPpi,rotMat) +\
+            ApplyRotationAOs(2,2,1,1,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PzPz_PpiPpi,rotMat);
+
+  //cout << "Rot value_PzPz_PpiPpi = " << value_PzPz_PpiPpi << endl;
 
   double value_PpiPpi_PzPz = value_qq + value_Qpipiq + value_qQzz + \
                              multipole->Interaction_QpipiQzz(atomsDistance,orbitalA,orbitalC);
+  //cout << "value_PpiPpi_PzPz= " << value_PpiPpi_PzPz << endl;
 
-  value_PpiPpi_PzPz = ApplyRotationAOs(0,0,0,0,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
-      AOsTypeInt[3],value_PpiPpi_PzPz,rotMat) + ApplyRotationAOs(1,1,1,1,\
-        AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PpiPpi_PzPz,rotMat);
+
+  value_PpiPpi_PzPz = \
+            ApplyRotationAOs(0,0,2,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPpi_PzPz,rotMat) +\
+            ApplyRotationAOs(1,1,2,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPpi_PzPz,rotMat);
+  //cout << "Rot value_PpiPpi_PzPz= " << value_PpiPpi_PzPz << endl;
 
   double value_PpiPz_PpiPz = multipole->Interaction_QpizQpiz(atomsDistance,orbitalA,orbitalC); 
+  //cout << "value_PpiPz_PpiPz = " << value_PpiPz_PpiPz << endl;
 
-  value_PpiPz_PpiPz = ApplyRotationAOs(0,0,0,0,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
-      AOsTypeInt[3],value_PpiPz_PpiPz,rotMat) + ApplyRotationAOs(1,1,1,1,\
-        AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PpiPz_PpiPz,rotMat);
+  value_PpiPz_PpiPz = \
+            ApplyRotationAOs(0,2,0,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(0,2,0,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[3],AOsTypeInt[2],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(0,2,0,2,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(0,2,0,2,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[3],AOsTypeInt[2],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(1,2,1,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(1,2,1,2,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[3],AOsTypeInt[2],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(1,2,1,2,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[2],AOsTypeInt[3],\
+                value_PpiPz_PpiPz,rotMat) +\
+            ApplyRotationAOs(1,2,1,2,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[3],AOsTypeInt[2],\
+                value_PpiPz_PpiPz,rotMat) ;
+  //cout << "Rot value_PpiPz_PpiPz = " << value_PpiPz_PpiPz << endl;
 
   double value_PxPx_PyPy = value_qq + value_qQpipi + value_Qpipiq + \
                         multipole->Interaction_QxxQyy(atomsDistance,orbitalA,orbitalC);
+  //cout << "value_PxPx_PyPy = " << value_PxPx_PyPy << endl;
   
   value_PxPy_PxPy = (value_PxPy_PxPy - value_PxPx_PyPy) * 0.5;
+  //cout << "value_PxPy_PxPy = " << value_PxPy_PxPy << endl;
+
 
   value_PxPx_PyPy = ApplyRotationAOs(0,0,1,1,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
       AOsTypeInt[3],value_PxPx_PyPy,rotMat) + ApplyRotationAOs(1,1,0,0,\
         AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PxPx_PyPy,rotMat);
+  //cout << "Rot value_PxPx_PyPy = " << value_PxPx_PyPy << endl;
 
-  value_PxPy_PxPy = ApplyRotationAOs(0,1,0,1,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],\
-      AOsTypeInt[3],value_PxPx_PyPy,rotMat) + ApplyRotationAOs(1,1,0,0,\
-        AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],value_PxPx_PyPy,rotMat);
+  value_PxPy_PxPy = \
+      ApplyRotationAOs(0,1,0,1,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
+          value_PxPy_PxPy,rotMat) + \
+      ApplyRotationAOs(0,1,0,1,AOsTypeInt[0],AOsTypeInt[1],AOsTypeInt[3],AOsTypeInt[2],\
+          value_PxPy_PxPy,rotMat) +\
+      ApplyRotationAOs(0,1,0,1,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[2],AOsTypeInt[3],\
+          value_PxPy_PxPy,rotMat) + \
+      ApplyRotationAOs(0,1,0,1,AOsTypeInt[1],AOsTypeInt[0],AOsTypeInt[3],AOsTypeInt[2],\
+          value_PxPy_PxPy,rotMat);
 
+  //cout << "Rot value_PxPy_PxPy = " << value_PxPy_PxPy << endl;
   return value_PzPz_PzPz + value_PpiPpi_PpiPpi + value_PzPz_PpiPpi + value_PpiPpi_PzPz + \
     value_PpiPz_PpiPz + value_PxPx_PyPy + value_PxPy_PxPy;
 }
@@ -432,6 +481,14 @@ double TwoCenterIntegral::SelfIntegralTypeSS_SS(const int& element){
 /***************************************************************************************/ 
 double TwoCenterIntegral::SelfIntegralTypeSS_PP(const int& element,const int (&AOsTypeInt)[4]){
   if (AOsTypeInt[2] == AOsTypeInt[3]) {
+    return parameter->gsp[element];
+  }else{
+    return 0.0e-10;
+  }
+}
+/***************************************************************************************/ 
+double TwoCenterIntegral::SelfIntegralTypePP_SS(const int& element,const int (&AOsTypeInt)[4]){
+  if (AOsTypeInt[0] == AOsTypeInt[1]) {
     return parameter->gsp[element];
   }else{
     return 0.0e-10;
