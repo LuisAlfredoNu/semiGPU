@@ -65,6 +65,14 @@ bool sameReal(T a,T b){
 }
 /***************************************************************************************/ 
 template <typename T>
+bool sameReal(T a,T b,T diff){
+  if (std::abs(a - b) < diff) {
+    return true;
+  }
+  return false;
+}
+/***************************************************************************************/ 
+template <typename T>
 void swapValues(T& a,T& b){
   T c = a;
   a = b;
