@@ -25,8 +25,11 @@ class TwoCenterIntegral{
   // All data for 2 center integral
   static bool Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,\
       double**** &all2CenterIntegral);
+  static bool Dealloc4AllTwoCenterIntegral(const vector<Atom>& molecule,\
+      double**** &all2CenterIntegral);
   void ComputeAllTwoCenterIntegral(const vector<AtomicOrbital>& infoAOs,\
       double**** &all2CenterIntegral);
+  static double GetValueFromArray(const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,double**** const &all2CenterIntegral);
  private:
 /***************************************************************************************/ 
   // Varaibles

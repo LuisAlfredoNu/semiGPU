@@ -54,6 +54,39 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
   return dataStatus;
 }
 /***************************************************************************************/ 
+bool TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(const vector<Atom>& molecule,\
+    double**** &all2CenterIntegral){
+
+  int NAtoms = molecule.size();
+  bool dataStatus = false;
+  for (int i=0;i<NAtoms;i++) {
+    for (int j=0;j <= i;j++) {
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
+        // Dealloc for H-H pair
+        dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],1);
+        continue;
+      }
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
+        // Dealloc for X-X pair
+        dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],10);
+        continue;
+      }else{
+        // Dealloc for H-X pair
+        dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],1);
+        continue;
+      }
+    }
+  }
+  // Dealloc for the second atom
+  for (int i=0;i < NAtoms;i++) {
+    delete[] all2CenterIntegral[i];
+  }
+  // Dealloc for each atom
+  delete[] all2CenterIntegral;
+
+  return dataStatus;
+}
+/***************************************************************************************/ 
 double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,\
     const AtomicOrbital& orbitalD){
@@ -168,6 +201,49 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const vector<AtomicOrbital>&
     if (infoAOs[i].element > 1) {
       i+=3;
     }
+  }
+}
+/***************************************************************************************/ 
+double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
+    const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,const AtomicOrbital& orbitalD,\
+     double**** const  &all2CenterIntegral){
+  if (orbitalA.indexAtom == orbitalB.indexAtom && orbitalC.indexAtom == orbitalD.indexAtom) {
+    int angularMomA = orbitalA.angularMomentumInt;
+    int angularMomB = orbitalB.angularMomentumInt;
+    int angularMomC = orbitalC.angularMomentumInt;
+    int angularMomD = orbitalD.angularMomentumInt;
+
+    if (angularMomA > angularMomB) {
+      swapValues(angularMomA,angularMomB);
+    }
+    if (angularMomC > angularMomD) {
+      swapValues(angularMomC,angularMomD);
+    }
+
+    int indexAtomA = orbitalA.indexAtom;
+    int indexAtomC = orbitalC.indexAtom;
+    if (indexAtomA < indexAtomC) {
+      swapValues(indexAtomA,indexAtomC);
+    }
+
+    unsigned short MOPACsort[4][4];
+    MOPACsort[0][0] = 0;
+    MOPACsort[0][1] = 1;
+    MOPACsort[1][1] = 2;
+    MOPACsort[0][2] = 3;
+    MOPACsort[1][2] = 4;
+    MOPACsort[2][2] = 5;
+    MOPACsort[0][3] = 6;
+    MOPACsort[1][3] = 7;
+    MOPACsort[2][3] = 8;
+    MOPACsort[3][3] = 9;
+    return all2CenterIntegral[indexAtomA]\
+                             [indexAtomC]\
+                             [MOPACsort[angularMomA][angularMomB]]\
+                             [MOPACsort[angularMomC][angularMomD]];
+
+  }else{
+    return 0.0e-10;
   }
 }
 /***************************************************************************************/ 

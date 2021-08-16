@@ -155,6 +155,23 @@ int main (int argc, char *argv[])
   }
   cout  << endl;
 /*  */
+ 
+  cout << "Test for all possible bielectronic  integral" << endl;
+  cout << "get 0,0,0,0 = " << TwoCenterIntegral::GetValueFromArray(AOs.orbital[0],AOs.orbital[0],AOs.orbital[0],AOs.orbital[0],all2CenterIntegral) << endl;
+
+  cout << "orbital size = " << AOs.orbital.size() << endl;
+  for (int i=0;i<8;i++) {
+    for (int j=0;j<8;j++) {
+      for (int k=0;k<8;k++) {
+        for (int l=0;l<8;l++) {
+          TwoCenterIntegral::GetValueFromArray(AOs.orbital[i],AOs.orbital[j],AOs.orbital[k],AOs.orbital[l],all2CenterIntegral);
+        }
+      }
+    }
+  }
+
+  cout << "Dealloc array of all2CenterIntegral" << endl;
+  TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   return EXIT_SUCCESS;
 }
 
