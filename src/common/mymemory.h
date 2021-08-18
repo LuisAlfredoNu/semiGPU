@@ -72,9 +72,13 @@ public:
    static bool AppendTo1DRealArray(string ptrname,const int n,double* &thptr,double thenewval);
    /* ************************************************************************** */
    /***************************************************************************************/ 
-   static bool AllocSymetricMatrixReal(string ptrname,const int row, \
+   static bool AllocSymmetricMatrixReal(string ptrname,const int row, \
          double* &thptr,const double val=0.0);
-   static int GetIndexSymetrixMatrix(const int row,const int col);
+   /***************************************************************************************/ 
+   static int GetIndexSymmetricMatrix(const int row,const int col);
+   /***************************************************************************************/
+   static bool DeallocSymmetricMatrixReal(double* &thptr);
+
 protected:
    /* ************************************************************************** */
 };

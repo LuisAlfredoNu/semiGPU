@@ -359,12 +359,15 @@ bool MyMemory::AppendTo1DRealArray(string ptrname,const int n,double* &thptr,dou
    }
    return res;
 }
-bool MyMemory::AllocSymetricMatrixReal(string ptrname,const int row,\
+bool MyMemory::AllocSymmetricMatrixReal(string ptrname,const int row,\
       double* &thptr,const double val){
 
-  const int totalSize = row + row;
-  return Alloc1DRealArray(ptrname,totalSize,thptr,0.0e-10);
+  const int totalSize = row * (row+1) / 2 ;
+  return Alloc1DRealArray(ptrname,totalSize,thptr,val);
 }
-int MyMemory::GetIndexSymetrixMatrix(const int row,const int col){
+int MyMemory::GetIndexSymmetricMatrix(const int row,const int col){
   return row * (row + 1)/ 2 + col;
+}
+bool MyMemory::DeallocSymmetricMatrixReal(double* &thptr){
+  return Dealloc1DRealArray(thptr);
 }
