@@ -77,8 +77,8 @@ int main (int argc, char *argv[])
   molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
   molecule[1].setAtomNumber(6);
 
-  ListAtomicOrbitals AOs;
-  AOs.SetOrbitals(molecule);
+  ListAtomicOrbitals infoAOs;
+  infoAOs.SetOrbitals(molecule);
 
   double**** all2CenterIntegral = NULL;
   if (TwoCenterIntegral::Alloc4AllTwoCenterIntegral(molecule,all2CenterIntegral)){
@@ -87,7 +87,7 @@ int main (int argc, char *argv[])
     cout << "Bad Alloc" << endl;
   }
 
-  twoCIntegral.ComputeAllTwoCenterIntegral(AOs.orbital,all2CenterIntegral);
+  twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
 
   cout << "Get Compute Data" << endl;
   vector<double> computeData;
@@ -157,14 +157,19 @@ int main (int argc, char *argv[])
 /*  */
  
   cout << "Test for all possible bielectronic  integral" << endl;
-  cout << "get 0,0,0,0 = " << TwoCenterIntegral::GetValueFromArray(AOs.orbital[0],AOs.orbital[0],AOs.orbital[0],AOs.orbital[0],all2CenterIntegral) << endl;
+  cout << "get 0,0,0,0 = ";
+  cout << TwoCenterIntegral::GetValueFromArray(\
+      infoAOs.orbital[0],infoAOs.orbital[0],\
+      infoAOs.orbital[0],infoAOs.orbital[0],all2CenterIntegral) << endl;
 
-  cout << "orbital size = " << AOs.orbital.size() << endl;
+  cout << "orbital size = " << infoAOs.orbital.size() << endl;
   for (int i=0;i<8;i++) {
     for (int j=0;j<8;j++) {
       for (int k=0;k<8;k++) {
         for (int l=0;l<8;l++) {
-          TwoCenterIntegral::GetValueFromArray(AOs.orbital[i],AOs.orbital[j],AOs.orbital[k],AOs.orbital[l],all2CenterIntegral);
+          TwoCenterIntegral::GetValueFromArray(infoAOs.orbital[i],\
+              infoAOs.orbital[j],infoAOs.orbital[k],infoAOs.orbital[l],\
+              all2CenterIntegral);
         }
       }
     }
