@@ -42,7 +42,7 @@ else
   CXXFLAGS     += -DDEBUG=0 -Wall -pedantic $(OPTIMFLAGS)
 endif
 
-INCDEFS        :=  -include localdefs.h
+INCDEFS        :=  -include ../common/globaldefs.h
 
 # FILES
 CPPOBJS=$(patsubst %.cpp,%.o,$(wildcard *.cpp))
