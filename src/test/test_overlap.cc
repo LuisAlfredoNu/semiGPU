@@ -116,8 +116,8 @@ int main (int argc, char *argv[])
 
   vector<AtomicOrbital> infoOrbitalsB (8,AtomicOrbital());
 
-  double coorAAA[3] = { 0.00000, 0.00000, 0.00000};  
-  double coorBBB[3] = { 1.00000, 1.00000, 1.00000};
+  double coorAAA[3] = {-0.30000,-0.30000,-0.30000};  
+  double coorBBB[3] = { 0.30000, 0.20000, 0.50000};
   infoOrbitalsB[0].SetElement(6);
   infoOrbitalsB[0].SetCoordinates(coorAAA);
   angularMomentumA[0] = 0;

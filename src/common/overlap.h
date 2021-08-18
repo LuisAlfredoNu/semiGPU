@@ -26,7 +26,7 @@ class Overlap{
   // Methods 
   bool GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix);
 
-  double ComputeOverlap(const AtomicOrbital,const AtomicOrbital);
+  double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
  private:
   void Overlap_SS(double&,const double&,const double&,const double&);
   void Overlap_PS(double&,const double&,const double&,const double&,const double&);

@@ -27,7 +27,7 @@ bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* 
   string ovMtx = "overlapMatrix";
   int NOrbitals = infoOrbitals.size();
 
-  bool correctAlloc = MyMemory::AllocSymetricMatrixReal(ovMtx,NOrbitals,overlapMatrix);
+  bool correctAlloc = MyMemory::AllocSymmetricMatrixReal(ovMtx,NOrbitals,overlapMatrix);
 
   if (! correctAlloc) {
     return false;
@@ -40,14 +40,14 @@ bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* 
       // TODO 
       // - Checar si regresar un array 1D o convertir AllocSymetricMatrixReal a un array 2D
       overlapValue = ComputeOverlap(infoOrbitals[i],infoOrbitals[j]);
-      overlapMatrix[MyMemory::GetIndexSymetrixMatrix(i,j)] = overlapValue;
+      overlapMatrix[MyMemory::GetIndexSymmetricMatrix(i,j)] = overlapValue;
     }
   }
 
   return true;
 }
 /***************************************************************************************/ 
-double Overlap::ComputeOverlap(const AtomicOrbital orbitalA,const AtomicOrbital orbitalB){
+double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
   int atomTypeA = orbitalA.element;
   int atomTypeB = orbitalB.element;
 
@@ -80,13 +80,8 @@ double Overlap::ComputeOverlap(const AtomicOrbital orbitalA,const AtomicOrbital 
   double atomDistance = distancePointsV3(orbitalA.coordinates,orbitalB.coordinates);
   double rABx = 0.0, rABy = 0.0;
 
-  if (xyzAngularMomentumA == xyzAngularMomentumB) {
-    rABx = orbitalA.coordinates[xyzAngularMomentumA] -  \
-                  orbitalB.coordinates[xyzAngularMomentumA] ;
-  }else{
-    rABx = orbitalA.coordinates[xyzAngularMomentumA] - orbitalB.coordinates[xyzAngularMomentumA] ;
-    rABy = orbitalA.coordinates[xyzAngularMomentumB] - orbitalB.coordinates[xyzAngularMomentumB] ;
-  }
+  rABx = orbitalA.coordinates[xyzAngularMomentumA] - orbitalB.coordinates[xyzAngularMomentumA] ;
+  rABy = orbitalA.coordinates[xyzAngularMomentumB] - orbitalB.coordinates[xyzAngularMomentumB] ;
 
   double overlapSTO = 0.0e-10;
   double overlapGTO = 0.0;
@@ -107,13 +102,16 @@ double Overlap::ComputeOverlap(const AtomicOrbital orbitalA,const AtomicOrbital 
 
       if (sumAngularMomentumA == 1 && sumAngularMomentumB == 0) {
         Overlap_PS(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
-            basisSTO->value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
+                              basisSTO->value[atomTypeB].exponent[gtoB],\
+                              a_plus_b,rABx);
       
         normaFactor = basisSTO->value[atomTypeA].coeffP[gtoA] * \
                       basisSTO->value[atomTypeB].coeffS[gtoB];
       }else if (sumAngularMomentumA == 0 && sumAngularMomentumB == 1) {
         Overlap_SP(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
-            basisSTO->value[atomTypeB].exponent[gtoB],a_plus_b,rABx);
+                              basisSTO->value[atomTypeB].exponent[gtoB],\
+                              a_plus_b,rABy);
+
         normaFactor = basisSTO->value[atomTypeA].coeffS[gtoA] * \
                       basisSTO->value[atomTypeB].coeffP[gtoB];
       }else if (sumAngularMomentumA == 1 && sumAngularMomentumB == 1) {
