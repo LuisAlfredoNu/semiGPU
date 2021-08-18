@@ -43,7 +43,7 @@ int main (int argc, char *argv[]){
 
     cout << "Size of infoAOs " << infoAOs.orbital.size() << endl;
 
-    cout << "indexAO  indexAtom  element  angular momentum  int     Coordinates" << endl; 
+    cout << "indexAO  indexAtom  element  angular momentum  int  Core   Coordinates" << endl; 
     for (unsigned int i=0; i< infoAOs.orbital.size() ; i++) {
       cout << setw(4) << infoAOs.orbital[i].indexAO ;
       cout << setw(9) << infoAOs.orbital[i].indexAtom ; 
@@ -52,6 +52,7 @@ int main (int argc, char *argv[]){
       cout << ", " << infoAOs.orbital[i].angularMomentum[1] ; 
       cout << ", " << infoAOs.orbital[i].angularMomentum[2] << " }" ;
       cout << setw(6) << infoAOs.orbital[i].angularMomentumInt;
+      cout << setw(6) << infoAOs.orbital[i].GetCoreCharge();
       cout << setw(7) << "   { " << infoAOs.orbital[i].coordinates[0];
       cout << ", " << infoAOs.orbital[i].coordinates[1] ; 
       cout << ", " << infoAOs.orbital[i].coordinates[2] << " }" << endl; 

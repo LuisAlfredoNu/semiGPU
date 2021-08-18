@@ -21,15 +21,15 @@ AtomicOrbital::AtomicOrbital(){
   angularMomentum[2]=0;
   indexAO = 0;
 }
-
+/***************************************************************************************/ 
 void AtomicOrbital::SetIndexAtom(int value){
   indexAtom = value;
 }
-
+/***************************************************************************************/ 
 void AtomicOrbital::SetElement(int value){
   element = value;
 }
-
+/***************************************************************************************/ 
 void AtomicOrbital::SetAngularMomentum(int value[3]){
   angularMomentumInt = 0;
   for(int i=0;i<3;i++){
@@ -39,15 +39,25 @@ void AtomicOrbital::SetAngularMomentum(int value[3]){
     }
   }
 }
-
+/***************************************************************************************/ 
 void AtomicOrbital::SetIndexAO(int value){
   indexAO = value;
 }
-
+/***************************************************************************************/ 
 void AtomicOrbital::SetCoordinates(const double (&coor)[3]){
   coordinates[0] = convertAngstrom2AU(coor[0]);
   coordinates[1] = convertAngstrom2AU(coor[1]);
   coordinates[2] = convertAngstrom2AU(coor[2]);
+}
+/***************************************************************************************/ 
+int AtomicOrbital::GetCoreCharge() const {
+  if (element < 2) {
+    return element;
+  }else if (element < 11 ) {
+    return element - 2 ;
+  }else if (element < 19) {
+    return element - 10;
+  }
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 

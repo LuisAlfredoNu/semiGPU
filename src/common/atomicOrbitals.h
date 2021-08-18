@@ -30,6 +30,7 @@ class AtomicOrbital{
   void SetAngularMomentum(int *);
   void SetIndexAO(int);
   void SetCoordinates(const double (&coor)[3]);
+  int GetCoreCharge() const;
 
  private:
 
