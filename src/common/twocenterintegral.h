@@ -15,8 +15,6 @@ class TwoCenterIntegral{
   TwoCenterIntegral(MNDOparameter&);
 /***************************************************************************************/ 
   // Varaibles
-  MNDOparameter* parameter;
-  Multipole* multipole;
 /*********************W******************************************************************/ 
   // Methods
   double ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA,\
@@ -27,12 +25,16 @@ class TwoCenterIntegral{
       double**** &all2CenterIntegral);
   static bool Dealloc4AllTwoCenterIntegral(const vector<Atom>& molecule,\
       double**** &all2CenterIntegral);
-  void ComputeAllTwoCenterIntegral(const vector<AtomicOrbital>& infoAOs,\
+  void ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& infoAOs,\
       double**** &all2CenterIntegral);
-  static double GetValueFromArray(const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,double**** const &all2CenterIntegral);
+  static double GetValueFromArray(const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,double**** all2CenterIntegral);
+/***************************************************************************************/
+/***************************************************************************************/ 
  private:
 /***************************************************************************************/ 
   // Varaibles
+  MNDOparameter* parameter;
+  Multipole* multipole;
 /***************************************************************************************/ 
   // Methods
   // Diff Atom

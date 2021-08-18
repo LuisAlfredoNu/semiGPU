@@ -172,33 +172,33 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
   return integralValue;
 }
 /***************************************************************************************/ 
-void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const vector<AtomicOrbital>& infoAOs,\
+void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& infoAOs,\
     double**** &all2CenterIntegral){
 
-  int totalAOs = infoAOs.size();
+  int totalAOs = infoAOs.orbital.size();
   int indexOfAtomA,indexOfAtomB;
   for (int i=0;i < totalAOs;++i) {
     for (int j=0;j <= i;++j) {
-      indexOfAtomA = infoAOs[i].indexAtom;
-      indexOfAtomB = infoAOs[j].indexAtom;
-      if (infoAOs[i].element == infoAOs[j].element ) {
+      indexOfAtomA = infoAOs.orbital[i].indexAtom;
+      indexOfAtomB = infoAOs.orbital[j].indexAtom;
+      if (infoAOs.orbital[i].element == infoAOs.orbital[j].element ) {
         // Compute for X-X or H-H
-        if (infoAOs[i].element == 1) {
+        if (infoAOs.orbital[i].element == 1) {
           //Compute for H-H
-          ComputePair_HH(i,j,infoAOs,\
+          ComputePair_HH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
         }else{
           //Compute for X-X
-          ComputePair_XX(i,j,infoAOs,\
+          ComputePair_XX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
         }
       }else{
         // Compute for H-X
-        ComputePair_HX(i,j,infoAOs,\
+        ComputePair_HX(i,j,infoAOs.orbital,\
             all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
       }
     }
-    if (infoAOs[i].element > 1) {
+    if (infoAOs.orbital[i].element > 1) {
       i+=3;
     }
   }
@@ -206,7 +206,7 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const vector<AtomicOrbital>&
 /***************************************************************************************/ 
 double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,const AtomicOrbital& orbitalD,\
-     double**** const  &all2CenterIntegral){
+    double**** all2CenterIntegral){
   if (orbitalA.indexAtom == orbitalB.indexAtom && orbitalC.indexAtom == orbitalD.indexAtom) {
     int angularMomA = orbitalA.angularMomentumInt;
     int angularMomB = orbitalB.angularMomentumInt;
