@@ -114,6 +114,11 @@ public:
    static void PrintMatrixNxNSymmetric(const int N, const double* m);
    /***************************************************************************************/ 
    static void PrintMatrixNxNSymmetric(const int N, const double** m);
+   /***************************************************************************************/
+   /* TODO 
+   static void PrintTwoCenterIntegralMOPACStyle(const int& atomIndexA,const int& elemntA,\
+       const int& atomIndexB,const int& elemntB,const double** m);
+      END TODO*/
 protected:
    /* ************************************************************************** */
 };
