@@ -11,6 +11,7 @@ using std::vector;
 #include "atomicOrbitals.h"
 #include "screenutils.h"
 
+#include "basematrix.h"
 #include "overlap.h"
 int main (int argc, char *argv[])
 {
@@ -102,17 +103,19 @@ int main (int argc, char *argv[])
   infoOrbitals[5].SetElement(1);
   infoOrbitals[5].SetCoordinates(coorG);
   
-  double* overlapMatrix;
-  bool doneOverlap = overlap.GetOverlapMatrix(infoOrbitals,overlapMatrix);
+  double* overlapMatrix = NULL;
+  
+  if (Overlap::Alloc4Matrix("overlapMatrix",infoOrbitals.size(),overlapMatrix)){
+    cout << "Correct Alloc: overlapMatrix" << endl;
+  }else{
+    cout << "Bad Alloc: overlapMatrix " << endl;
+  }
 
-  if (doneOverlap) {
-    cout << "Overlap Matrix done" << endl;
-    cout << "HexaHidrogen" << endl;
-    ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitals.size(),overlapMatrix);
-  } else {
-    string err = "Fail overlap test";
-    ScreenUtils::DisplayErrorMessage(err);
-  } 
+  overlap.ComputeMatrix(overlapMatrix,infoOrbitals);
+
+  cout << "Overlap Matrix done" << endl;
+  cout << "HexaHidrogen" << endl;
+  ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitals.size(),overlapMatrix);
 
   vector<AtomicOrbital> infoOrbitalsB (8,AtomicOrbital());
 
@@ -174,18 +177,21 @@ int main (int argc, char *argv[])
   angularMomentumA[2] = 1;
   infoOrbitalsB[7].SetAngularMomentum(angularMomentumA);
   
-  double* overlapMatrixB;
-   doneOverlap = overlap.GetOverlapMatrix(infoOrbitalsB,overlapMatrixB);
-
-  if (doneOverlap) {
-    cout << "Overlap Matrix done" << endl;
-    cout << "1C -> {0.0,0.0,0.0}" << endl;
-    cout << "2C -> {1.0,1.0,1.0}" << endl;
-    ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitalsB.size(),overlapMatrixB);
-  } else {
-    string err = "Fail overlap test";
-    ScreenUtils::DisplayErrorMessage(err);
+  double* overlapMatrixB = NULL;
+  
+  if (Overlap::Alloc4Matrix("overlapMatrix",infoOrbitalsB.size(),overlapMatrixB)){
+    cout << "Correct Alloc: overlapMatrixB" << endl;
+  }else{
+    cout << "Bad Alloc: overlapMatrixB " << endl;
   }
+
+  overlap.ComputeMatrix(overlapMatrixB,infoOrbitalsB);
+  
+  cout << "Overlap Matrix done" << endl;
+  cout << "1C -> {0.0,0.0,0.0}" << endl;
+  cout << "2C -> {1.0,1.0,1.0}" << endl;
+  ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitalsB.size(),overlapMatrixB);
+
 	return EXIT_SUCCESS;
 }
 

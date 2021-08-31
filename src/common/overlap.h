@@ -13,9 +13,10 @@ using std::vector;
 
 #include "STO-6G.h"
 
+#include "basematrix.h"
 #include "atomicOrbitals.h"
 /***************************************************************************************/
-class Overlap{
+class Overlap: public BaseMatrix{
  public:
   Overlap();
 /***************************************************************************************/ 
@@ -24,9 +25,9 @@ class Overlap{
   STO_6G* basisSTO;
 /***************************************************************************************/ 
   // Methods 
-  bool GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix);
-
+  void ComputeMatrix(double* &overlapMatrix,const vector<AtomicOrbital> infoAOs);
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
+
  private:
   void Overlap_SS(double&,const double&,const double&,const double&);
   void Overlap_PS(double&,const double&,const double&,const double&,const double&);

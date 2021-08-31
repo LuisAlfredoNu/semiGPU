@@ -68,7 +68,7 @@ TESTEXECS=$(patsubst %.cc,%.x,$(wildcard *.cc))
 
 TARGET=target
 
-$(TARGET): $(OBJS) $(TESTEXECS) $(STATICLIB)
+$(TARGET): $(OBJS) $(STATICLIB) $(TESTEXECS)
 	$(info LINKING: $@)
 
 $(CPPOBJS): %.o: %.cpp
@@ -84,7 +84,7 @@ $(TESTEXECS): %.x: %.o $(STATICLIB)
 	$(CXX) $(LFLAGS) $< $(lLIBS) -o $@
 
 $(STATICLIB): $(COMMONHEADERS) $(COMMONSOURCES)
-	@cd $(TOP)/../common/;make
+	@cd $(TOP)/../common/;make DEBUGVERSION=$(DEBUGVERSION)
 
 .PHONY: clean
 clean:

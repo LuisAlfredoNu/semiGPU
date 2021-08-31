@@ -8,16 +8,16 @@
 #include "MNDO_parameters.h"
 #include "overlap.h"
 
-class Hcore {
+#include "basematrix.h"
+
+class Hcore : public BaseMatrix {
  public:
   Hcore(const MNDOparameter&,const ListAtomicOrbitals&,double****);
 /***************************************************************************************/ 
   // Variables
 /***************************************************************************************/ 
   // Methods
-  static bool Alloc4HcoreMatrix(size_t Nrows,double* &hcoreMatrix);
-  static bool Dealloc4HcoreMatrix(double* &hcoreMatrix);
-  void CompueHcoreMatrix(double* &hcoreMatrix);
+  void ComputeMatrix(double* &hcoreMatrix);
 
  private:
 /***************************************************************************************/ 

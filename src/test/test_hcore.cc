@@ -17,6 +17,7 @@ using std::vector;
 #include "twocenterintegral.h"
 #include "screenutils.h"
 
+#include "basematrix.h"
 #include "hcore.h"
 
 int main (int argc, char *argv[])
@@ -54,7 +55,7 @@ int main (int argc, char *argv[])
 
   // Alloc Hcore Matrix
   double* hcoreMatrix = NULL;
-  if (Hcore::Alloc4HcoreMatrix(infoAOs.orbital.size(),hcoreMatrix)){
+  if (Hcore::Alloc4Matrix("hcoreMatrix",infoAOs.orbital.size(),hcoreMatrix)){
     cout << "Correct Alloc: hcoreMatrix" << endl;
   }else{
     cout << "Bad Alloc: hcoreMatrix " << endl;
@@ -62,14 +63,14 @@ int main (int argc, char *argv[])
   // Init Hcore
   cout << "Init and compute Hcore" << endl;
   Hcore hcore(MNDOpara,infoAOs,all2CenterIntegral);
-  hcore.CompueHcoreMatrix(hcoreMatrix);
+  hcore.ComputeMatrix(hcoreMatrix);
 
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),hcoreMatrix);
 
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   cout << "Dealloc array: hcoreMatrix" << endl;
-  Hcore::Dealloc4HcoreMatrix(hcoreMatrix);
+  Hcore::Dealloc4Matrix(hcoreMatrix);
   return EXIT_SUCCESS;
 }
 

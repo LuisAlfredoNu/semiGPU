@@ -16,30 +16,23 @@ Hcore::Hcore(const MNDOparameter& MNDOpara,const ListAtomicOrbitals& allAOs,\
   overlap = new Overlap();
 }
 /***************************************************************************************/ 
-bool Hcore::Alloc4HcoreMatrix(size_t Nrows,double* &hcoreMatrix){
-  return MyMemory::AllocSymmetricMatrixReal("HcoreMatrix",Nrows,hcoreMatrix);
-}
-/***************************************************************************************/ 
-bool Hcore::Dealloc4HcoreMatrix(double* &hcoreMatrix){
-  return MyMemory::DeallocSymmetricMatrixReal(hcoreMatrix);
-}
-/***************************************************************************************/ 
-void Hcore::CompueHcoreMatrix(double* &hcoreMatrix){
+void Hcore::ComputeMatrix(double* &hcoreMatrix){
   for (size_t i=0;i<infoAOs->orbital.size();++i) {
     for (size_t j=0;j <= i ;++j) {
       // Diagonal elements
       if ( i == j ) {
-        hcoreMatrix[MyMemory::GetIndexSymmetricMatrix(i,j)] = \
-                              ComputeDiagonal(infoAOs->orbital[i]);
+          AssignValue2Matrix(i,j,ComputeDiagonal(infoAOs->orbital[i]),hcoreMatrix);
         continue;
       }
       // Non diagonal element, same atom
       if (infoAOs->orbital[i].indexAtom == infoAOs->orbital[j].indexAtom) {
-        hcoreMatrix[MyMemory::GetIndexSymmetricMatrix(i,j)] = \
-                   ComputeNonDiagonalSameAtom(infoAOs->orbital[i],infoAOs->orbital[j]);
+        AssignValue2Matrix(i,j,\
+                  ComputeNonDiagonalSameAtom(infoAOs->orbital[i],infoAOs->orbital[j]),\
+                  hcoreMatrix);
       }else{
-        hcoreMatrix[MyMemory::GetIndexSymmetricMatrix(i,j)] = \
-                   ComputeNonDiagonalDiffAtom(infoAOs->orbital[i],infoAOs->orbital[j]);
+        AssignValue2Matrix(i,j,\
+                  ComputeNonDiagonalDiffAtom(infoAOs->orbital[i],infoAOs->orbital[j]),\
+                  hcoreMatrix);
       }
     }
   }

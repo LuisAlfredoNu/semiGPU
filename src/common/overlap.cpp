@@ -2,9 +2,6 @@
 #define _OVERLAP_CPP_
 
 
-#include <iostream>
-using std::cout;
-using std::endl;
 #include <string>
 using std::string;
 #include <cmath>
@@ -21,7 +18,7 @@ using std::string;
 Overlap::Overlap(){
   basisSTO = new STO_6G();
 }
-
+/*
 bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix){
   
   string ovMtx = "overlapMatrix";
@@ -45,6 +42,15 @@ bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* 
   }
 
   return true;
+}
+/***************************************************************************************/ 
+void Overlap::ComputeMatrix(double* &overlapMatrix,const vector<AtomicOrbital> infoAOs){
+
+  for (size_t i=0;i<infoAOs.size();++i) {
+    for (size_t j=0;j<=i;++j) {
+      AssignValue2Matrix(i,j,ComputeOverlap(infoAOs[i],infoAOs[j]),overlapMatrix);
+    }
+  }
 }
 /***************************************************************************************/ 
 double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
