@@ -5,20 +5,28 @@
 #define _BASEMATRIX_H_
 
 #include <string>
+using std::string;
 
 class BaseMatrix {
  public:
   BaseMatrix();
+  BaseMatrix(size_t);
 /***************************************************************************************/ 
   // Variables
+  size_t matrixSize_;
+  // Matrix container
+  double* matrixHold_;
 /***************************************************************************************/ 
   // Methods
-  static bool Alloc4Matrix(string matrixName,size_t Nrows,double* &matrixHold);
-  static bool Dealloc4Matrix(double* &matrixHold);
-  virtual void ComputeMatrix(double* &);
+  bool Alloc4Matrix(string matrixName);
+  bool Dealloc4Matrix();
+  void ComputeMatrix();
+/***************************************************************************************/ 
  protected:
-  void AssignValue2Matrix(const size_t &i,const size_t &j,const double &value,\
-       double* &matrixHold);
+  virtual double ComputeElementMatrix(const size_t &i,const size_t &j);
+/***************************************************************************************/ 
+ private:
+  void AssignValue2Matrix(const size_t &i,const size_t &j,const double &value);
 };
 
 #endif // _BASEMATRIX_H_ 

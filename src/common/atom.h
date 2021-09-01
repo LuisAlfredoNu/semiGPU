@@ -26,6 +26,7 @@ public:
 /* Assing values to coordinates X,Y,Z */
 	void setCoordinates(double,double,double);
 	void setCoordinates(vector<double>);
+	void setCoordinates(double (&)[3]);
 /* Get the Value of the atom */
 	double getXCoordinate();
 	double getYCoordinate();

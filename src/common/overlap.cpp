@@ -14,43 +14,17 @@ using std::string;
 #include "overlap.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-
-Overlap::Overlap(){
+Overlap::Overlap() : BaseMatrix(){
   basisSTO = new STO_6G();
 }
-/*
-bool Overlap::GetOverlapMatrix(const vector<AtomicOrbital> infoOrbitals,double* &overlapMatrix){
-  
-  string ovMtx = "overlapMatrix";
-  int NOrbitals = infoOrbitals.size();
-
-  bool correctAlloc = MyMemory::AllocSymmetricMatrixReal(ovMtx,NOrbitals,overlapMatrix);
-
-  if (! correctAlloc) {
-    return false;
-  }
-
-  double overlapValue = 0.0;
-  
-  for (int i=0;i<NOrbitals;i++) {
-    for (int j=0;j <= i;j++) {
-      // TODO 
-      // - Checar si regresar un array 1D o convertir AllocSymetricMatrixReal a un array 2D
-      overlapValue = ComputeOverlap(infoOrbitals[i],infoOrbitals[j]);
-      overlapMatrix[MyMemory::GetIndexSymmetricMatrix(i,j)] = overlapValue;
-    }
-  }
-
-  return true;
+/***************************************************************************************/ 
+Overlap::Overlap(ListAtomicOrbitals infoAOs) : BaseMatrix(infoAOs.orbital.size()){
+  basisSTO = new STO_6G();
+  infoAOs_ = &infoAOs;
 }
 /***************************************************************************************/ 
-void Overlap::ComputeMatrix(double* &overlapMatrix,const vector<AtomicOrbital> infoAOs){
-
-  for (size_t i=0;i<infoAOs.size();++i) {
-    for (size_t j=0;j<=i;++j) {
-      AssignValue2Matrix(i,j,ComputeOverlap(infoAOs[i],infoAOs[j]),overlapMatrix);
-    }
-  }
+double Overlap::ComputeElementMatrix(const size_t i,const size_t j){
+  return ComputeOverlap(infoAOs_->orbital[i],infoAOs_->orbital[j]);
 }
 /***************************************************************************************/ 
 double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
@@ -138,8 +112,8 @@ double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital
   return overlapSTO;
 }
 /***************************************************************************************/ 
-void Overlap::Overlap_SS(double& overlapGTO,const double& a_times_b,const double& a_plus_b,const double& atomDistance){
-  
+void Overlap::Overlap_SS(double& overlapGTO,const double& a_times_b,const double& a_plus_b,\
+     const double& atomDistance){
   overlapGTO = 2.0 * sqrt(a_times_b)/a_plus_b;
   overlapGTO = sqrt(overlapGTO);
   overlapGTO = overlapGTO * overlapGTO * overlapGTO;

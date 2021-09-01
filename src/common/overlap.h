@@ -19,13 +19,17 @@ using std::vector;
 class Overlap: public BaseMatrix{
  public:
   Overlap();
+  // Constructor only to create a overlap matrix
+  Overlap(ListAtomicOrbitals);
 /***************************************************************************************/ 
   // Variables
   // Start STO-6G data
   STO_6G* basisSTO;
+  ListAtomicOrbitals *infoAOs_;
+
 /***************************************************************************************/ 
   // Methods 
-  void ComputeMatrix(double* &overlapMatrix,const vector<AtomicOrbital> infoAOs);
+  int ComputeElementMatrix(const size_t i,const size_t j);
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
 
  private:

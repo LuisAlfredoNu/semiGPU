@@ -81,116 +81,72 @@ int main (int argc, char *argv[])
   cout << " Overlap between C-2p_x C-2p_z with 1 Angstrom distance" << endl;
   cout << " Expected value = -0.130419 " << endl; 
   cout << "  Compute value = " << overlapValue << endl << endl;
+ 
   
-  vector<AtomicOrbital> infoOrbitals (6,AtomicOrbital());
-
+  
+  vector<Atom> molecule (6,Atom());
+  for (auto mol : molecule) {
+    mol.setAtomNumber(1);
+  }
   double coorA[3] = { 0.00000, 0.00000, 0.00000};  
-  infoOrbitals[0].SetElement(1);
-  infoOrbitals[0].SetCoordinates(coorA);
   double coorB[3] = { 0.98320, 0.00000, 0.00000};
-  infoOrbitals[1].SetElement(1);
-  infoOrbitals[1].SetCoordinates(coorB);
   double coorC[3] = { 1.47480,-0.85148, 0.00000};
-  infoOrbitals[2].SetElement(1);
-  infoOrbitals[2].SetCoordinates(coorC);
   double coorD[3] = { 0.98320,-1.70290, 0.00000};
-  infoOrbitals[3].SetElement(1);
-  infoOrbitals[3].SetCoordinates(coorD);
   double coorF[3] = { 0.00000,-1.70290, 0.00000};
-  infoOrbitals[4].SetElement(1);
-  infoOrbitals[4].SetCoordinates(coorF);
   double coorG[3] = {-0.49160,-0.85148, 0.00000};
-  infoOrbitals[5].SetElement(1);
-  infoOrbitals[5].SetCoordinates(coorG);
+
+  molecule[0].setCoordinates(coorA);
+  molecule[1].setCoordinates(coorB);
+  molecule[2].setCoordinates(coorC);
+  molecule[3].setCoordinates(coorD);
+  molecule[4].setCoordinates(coorF);
+  molecule[5].setCoordinates(coorG);
+
+  ListAtomicOrbitals infoAOs;
+  infoAOs.SetOrbitals(molecule);
   
-  double* overlapMatrix = NULL;
-  
-  if (Overlap::Alloc4Matrix("overlapMatrix",infoOrbitals.size(),overlapMatrix)){
+  Overlap overlapA(infoAOs);
+
+  if (overlapA.Alloc4Matrix("overlapMatrix")){
     cout << "Correct Alloc: overlapMatrix" << endl;
   }else{
     cout << "Bad Alloc: overlapMatrix " << endl;
   }
 
-  overlap.ComputeMatrix(overlapMatrix,infoOrbitals);
+  overlapA.ComputeMatrix();
 
   cout << "Overlap Matrix done" << endl;
   cout << "HexaHidrogen" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitals.size(),overlapMatrix);
+  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlapA.matrixHold_);
 
-  vector<AtomicOrbital> infoOrbitalsB (8,AtomicOrbital());
 
+  vector<Atom> moleculeA (2,Atom());
   double coorAAA[3] = {-1.00000,-2.00000,-3.00000};  
   double coorBBB[3] = { 1.00000, 1.00000, 1.50000};
-  infoOrbitalsB[0].SetElement(6);
-  infoOrbitalsB[0].SetCoordinates(coorAAA);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[0].SetAngularMomentum(angularMomentumA);
 
-  infoOrbitalsB[1].SetElement(6);
-  infoOrbitalsB[1].SetCoordinates(coorAAA);
-  angularMomentumA[0] = 1;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[1].SetAngularMomentum(angularMomentumA);
+  moleculeA[0].setAtomNumber(6);
+  moleculeA[0].setCoordinates(coorAAA);
+  moleculeA[1].setAtomNumber(6);
+  moleculeA[1].setCoordinates(coorBBB);
 
-  infoOrbitalsB[2].SetElement(6);
-  infoOrbitalsB[2].SetCoordinates(coorAAA);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 1;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[2].SetAngularMomentum(angularMomentumA);
 
-  infoOrbitalsB[3].SetElement(6);
-  infoOrbitalsB[3].SetCoordinates(coorAAA);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 1;
-  infoOrbitalsB[3].SetAngularMomentum(angularMomentumA);
-
-  infoOrbitalsB[4].SetElement(6);
-  infoOrbitalsB[4].SetCoordinates(coorBBB);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[4].SetAngularMomentum(angularMomentumA);
-
-  infoOrbitalsB[5].SetElement(6);
-  infoOrbitalsB[5].SetCoordinates(coorBBB);
-  angularMomentumA[0] = 1;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[5].SetAngularMomentum(angularMomentumA);
-
-  infoOrbitalsB[6].SetElement(6);
-  infoOrbitalsB[6].SetCoordinates(coorBBB);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 1;
-  angularMomentumA[2] = 0;
-  infoOrbitalsB[6].SetAngularMomentum(angularMomentumA);
-
-  infoOrbitalsB[7].SetElement(6);
-  infoOrbitalsB[7].SetCoordinates(coorBBB);
-  angularMomentumA[0] = 0;
-  angularMomentumA[1] = 0;
-  angularMomentumA[2] = 1;
-  infoOrbitalsB[7].SetAngularMomentum(angularMomentumA);
+  ListAtomicOrbitals infoAOsA;
+  infoAOsA.SetOrbitals(moleculeA);
   
-  double* overlapMatrixB = NULL;
+  Overlap overlapB(infoAOsA);
   
-  if (Overlap::Alloc4Matrix("overlapMatrix",infoOrbitalsB.size(),overlapMatrixB)){
-    cout << "Correct Alloc: overlapMatrixB" << endl;
+  if (overlapB.Alloc4Matrix("overlapMatrix")){
+    cout << "Correct Alloc: overlapMatrix" << endl;
   }else{
-    cout << "Bad Alloc: overlapMatrixB " << endl;
+    cout << "Bad Alloc: overlapMatrix " << endl;
   }
 
-  overlap.ComputeMatrix(overlapMatrixB,infoOrbitalsB);
+  overlapB.ComputeMatrix();
   
   cout << "Overlap Matrix done" << endl;
   cout << "1C -> {0.0,0.0,0.0}" << endl;
   cout << "2C -> {1.0,1.0,1.0}" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(infoOrbitalsB.size(),overlapMatrixB);
+  ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.orbital.size(),overlapB.matrixHold_);
 
 	return EXIT_SUCCESS;
 }

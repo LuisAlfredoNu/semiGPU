@@ -17,15 +17,15 @@ class Hcore : public BaseMatrix {
   // Variables
 /***************************************************************************************/ 
   // Methods
-  void ComputeMatrix(double* &hcoreMatrix);
+  double ComputeElementMatrix(const size_t i,const size_t j);
 
  private:
 /***************************************************************************************/ 
   // Varaibles
-  const MNDOparameter* parameter;
-  const ListAtomicOrbitals* infoAOs;
-  double**** all2CenterIntegral;
-  Overlap* overlap;
+  const MNDOparameter* parameter_;
+  const ListAtomicOrbitals* infoAOs_;
+  double**** all2CenterIntegral_;
+  Overlap* overlap_;
 
 /***************************************************************************************/ 
   // Methods
