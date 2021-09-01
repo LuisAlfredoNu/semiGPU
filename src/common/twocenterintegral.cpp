@@ -204,6 +204,9 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
   }
 }
 /***************************************************************************************/ 
+/*
+   Function to get the value of big array, this function have 4 arguments, each is a orbital 
+ */
 double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,const AtomicOrbital& orbitalD,\
     double**** all2CenterIntegral){
