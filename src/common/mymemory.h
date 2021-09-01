@@ -76,6 +76,7 @@ public:
          double* &thptr,const double val=0.0);
    /***************************************************************************************/ 
    static int GetIndexSymmetricMatrix(const int row,const int col);
+   static int GetIndexFullSymmetricMatrix(const int row,const int col);
    /***************************************************************************************/
    static bool DeallocSymmetricMatrixReal(double* &thptr);
 

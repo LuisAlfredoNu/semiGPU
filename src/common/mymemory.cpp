@@ -368,6 +368,13 @@ bool MyMemory::AllocSymmetricMatrixReal(string ptrname,const int row,\
 int MyMemory::GetIndexSymmetricMatrix(const int row,const int col){
   return row * (row + 1)/ 2 + col;
 }
+int MyMemory::GetIndexFullSymmetricMatrix(const int row,const int col){
+  if (row < col) {
+    return col * (col + 1)/ 2 + row;
+  }else{
+    return row * (row + 1)/ 2 + col;
+  }
+}
 bool MyMemory::DeallocSymmetricMatrixReal(double* &thptr){
   return Dealloc1DRealArray(thptr);
 }
