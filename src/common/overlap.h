@@ -29,7 +29,7 @@ class Overlap: public BaseMatrix{
 
 /***************************************************************************************/ 
   // Methods 
-  int ComputeElementMatrix(const size_t i,const size_t j);
+  double ComputeElementMatrix(const size_t &i,const size_t &j);
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
 
  private:

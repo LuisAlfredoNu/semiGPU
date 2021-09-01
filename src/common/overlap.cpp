@@ -23,7 +23,7 @@ Overlap::Overlap(ListAtomicOrbitals infoAOs) : BaseMatrix(infoAOs.orbital.size()
   infoAOs_ = &infoAOs;
 }
 /***************************************************************************************/ 
-double Overlap::ComputeElementMatrix(const size_t i,const size_t j){
+double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
   return ComputeOverlap(infoAOs_->orbital[i],infoAOs_->orbital[j]);
 }
 /***************************************************************************************/ 

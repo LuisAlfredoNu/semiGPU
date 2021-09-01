@@ -17,7 +17,7 @@ class Hcore : public BaseMatrix {
   // Variables
 /***************************************************************************************/ 
   // Methods
-  double ComputeElementMatrix(const size_t i,const size_t j);
+  double ComputeElementMatrix(const size_t &i,const size_t &j);
 
  private:
 /***************************************************************************************/ 

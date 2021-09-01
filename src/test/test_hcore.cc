@@ -39,6 +39,9 @@ int main (int argc, char *argv[])
   molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
   molecule[1].setAtomNumber(6);
 
+  cout << "Coordinates A = " << coorA[0] << "  " << coorA[1] << "  " << coorA[2] << endl;
+  cout << "Coordinates B = " << coorC[0] << "  " << coorC[1] << "  " << coorC[2] << endl;
+
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
 

@@ -16,7 +16,7 @@ Hcore::Hcore(const MNDOparameter& MNDOpara,const ListAtomicOrbitals& allAOs,\
   overlap_ = new Overlap();
 }
 /***************************************************************************************/ 
-double Hcore::ComputeElementMatrix(const size_t i,const size_t j){
+double Hcore::ComputeElementMatrix(const size_t &i,const size_t &j){
   // Diagonal elements
   if ( i == j ) {
     return ComputeDiagonal(infoAOs_->orbital[i]);
