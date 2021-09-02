@@ -18,13 +18,13 @@ Overlap::Overlap() : BaseMatrix(){
   basisSTO = new STO_6G();
 }
 /***************************************************************************************/ 
-Overlap::Overlap(ListAtomicOrbitals infoAOs) : BaseMatrix(infoAOs.orbital.size()){
+Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.orbital.size()){
   basisSTO = new STO_6G();
   infoAOs_ = &infoAOs;
 }
 /***************************************************************************************/ 
 double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
-  return ComputeOverlap(infoAOs_->orbital[i],infoAOs_->orbital[j]);
+  return ComputeOverlap(infoAOs_->orbital[(int)i],infoAOs_->orbital[(int)j]);
 }
 /***************************************************************************************/ 
 double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){

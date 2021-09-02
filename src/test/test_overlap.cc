@@ -85,8 +85,8 @@ int main (int argc, char *argv[])
   
   
   vector<Atom> molecule (6,Atom());
-  for (auto mol : molecule) {
-    mol.setAtomNumber(1);
+  for (int i=0;i<6;++i) {
+    molecule[i].setAtomNumber(1);
   }
   double coorA[3] = { 0.00000, 0.00000, 0.00000};  
   double coorB[3] = { 0.98320, 0.00000, 0.00000};
@@ -119,15 +119,23 @@ int main (int argc, char *argv[])
   cout << "HexaHidrogen" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlapA.matrixHold_);
 
+  overlapValue = overlap.ComputeOverlap(infoAOs.orbital[0],infoAOs.orbital[0]);
+
+  cout << "overlapValue = " << overlapValue << endl;
+  size_t As = 0;
+  size_t Bs = 0;
+  overlapValue = overlap.ComputeOverlap(infoAOs.orbital[As],infoAOs.orbital[Bs]);
+
+  cout << "overlapValue = " << overlapValue << endl;
 
   vector<Atom> moleculeA (2,Atom());
   double coorAAA[3] = {-1.00000,-2.00000,-3.00000};  
   double coorBBB[3] = { 1.00000, 1.00000, 1.50000};
 
   moleculeA[0].setAtomNumber(6);
-  moleculeA[0].setCoordinates(coorAAA);
+  moleculeA[0].setCoordinates(coorAAA[0],coorAAA[1],coorAAA[2]);
   moleculeA[1].setAtomNumber(6);
-  moleculeA[1].setCoordinates(coorBBB);
+  moleculeA[1].setCoordinates(coorBBB[0],coorBBB[1],coorBBB[2]);
 
 
   ListAtomicOrbitals infoAOsA;
@@ -144,8 +152,8 @@ int main (int argc, char *argv[])
   overlapB.ComputeMatrix();
   
   cout << "Overlap Matrix done" << endl;
-  cout << "1C -> {0.0,0.0,0.0}" << endl;
-  cout << "2C -> {1.0,1.0,1.0}" << endl;
+  cout << "1C -> {"<<coorAAA[0]<<","<<coorAAA[1]<<","<<coorAAA[2]<<"}" << endl;
+  cout << "2C -> {"<<coorBBB[0]<<","<<coorBBB[1]<<","<<coorBBB[2]<<"}" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.orbital.size(),overlapB.matrixHold_);
 
 	return EXIT_SUCCESS;

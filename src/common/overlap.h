@@ -20,12 +20,11 @@ class Overlap: public BaseMatrix{
  public:
   Overlap();
   // Constructor only to create a overlap matrix
-  Overlap(ListAtomicOrbitals);
+  Overlap(const ListAtomicOrbitals &);
 /***************************************************************************************/ 
   // Variables
   // Start STO-6G data
   STO_6G* basisSTO;
-  ListAtomicOrbitals *infoAOs_;
 
 /***************************************************************************************/ 
   // Methods 
@@ -33,6 +32,11 @@ class Overlap: public BaseMatrix{
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
 
  private:
+/***************************************************************************************/ 
+  // Variables
+  const ListAtomicOrbitals *infoAOs_;
+/***************************************************************************************/ 
+  // Methods 
   void Overlap_SS(double&,const double&,const double&,const double&);
   void Overlap_PS(double&,const double&,const double&,const double&,const double&);
   void Overlap_SP(double&,const double&,const double&,const double&,const double&);
