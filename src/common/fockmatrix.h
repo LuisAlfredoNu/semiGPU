@@ -4,13 +4,16 @@
 #ifndef _FOCKMATRIX_H_
 #define _FOCKMATRIX_H_
 
+#include "atomicOrbitals.h"
 #include "hcore.h"
+#include "densitymatrix.h"
+#include "twocenterintegral.h"
 
 #include "basematrix.h"
 
 class FockMatrix : public BaseMatrix {
  public:
-  FockMatrix(const Hcore &hcore,const size_t &nAOs);
+  FockMatrix(const ListAtomicOrbitals &,const Hcore &, const DensityMatrix &, double**** &);
 /***************************************************************************************/ 
   // Variables
 /***************************************************************************************/ 
@@ -19,7 +22,10 @@ class FockMatrix : public BaseMatrix {
  private:
 /***************************************************************************************/ 
   // Variables
+  const ListAtomicOrbitals* infoAOs_;
   const Hcore* hcore_;
+  const DensityMatrix* Pmatrix_;
+  double**** all2CIntegral_;
 };
 
  
