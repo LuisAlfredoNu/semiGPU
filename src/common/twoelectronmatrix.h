@@ -8,6 +8,7 @@
 
 #include "atomicOrbitals.h"
 #include "densitymatrix.h"
+#include "twocenterintegral.h"
 
 class TwoElectronMatrix {
  public:
@@ -17,8 +18,8 @@ class TwoElectronMatrix {
 /***************************************************************************************/ 
   // Methods
   static double ComputeGMatrix_UV(const AtomicOrbital &orbitalU,const AtomicOrbital &orbitalV,\
-         const ListAtomicOrbitals &infoAOs,double**** &all2CenterIntegral,\
-         const DensityMatrix &Pmatrix);
+         const ListAtomicOrbitals &infoAOs,const DensityMatrix &Pmatrix,\
+         double**** &all2CenterIntegral);
  private:
 };
 

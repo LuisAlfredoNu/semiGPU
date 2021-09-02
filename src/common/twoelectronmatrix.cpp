@@ -3,7 +3,6 @@
 
 #include "mymath.h"
 #include "mymemory.h"
-#include "twocenterintegral.h"
 
 #include "twoelectronmatrix.h"
 /***************************************************************************************/ 
@@ -14,7 +13,7 @@ TwoElectronMatrix::TwoElectronMatrix(){
 /***************************************************************************************/ 
 double TwoElectronMatrix::ComputeGMatrix_UV(const AtomicOrbital &orbitalU,\
        const AtomicOrbital &orbitalV,const ListAtomicOrbitals &infoAOs,\
-       double**** &all2CenterIntegral,const DensityMatrix &Pmatrix){
+       const DensityMatrix &Pmatrix,double**** &all2CenterIntegral){
   double value = 0.0e-10;
   double valueTmp = 0.0e-10;
 
