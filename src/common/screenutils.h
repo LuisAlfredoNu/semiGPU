@@ -110,10 +110,14 @@ public:
    /* ************************************************************************************** */
    static void PrintM2x2Comp(const char* word,const double (&m)[2][2]);
    /* ************************************************************************************** */
+   /***************************************************************************************/
+   static void PrintMatrixNxN(const int &N,const double* m);
    /***************************************************************************************/ 
-   static void PrintMatrixNxNSymmetric(const int N, const double* m);
+   static void PrintMatrixNxN(const int &N,const double** m);
    /***************************************************************************************/ 
-   static void PrintMatrixNxNSymmetric(const int N, const double** m);
+   static void PrintMatrixNxNSymmetric(const int &N, const double* m);
+   /***************************************************************************************/ 
+   static void PrintMatrixNxNSymmetric(const int &N, const double** m);
    /***************************************************************************************/
    /* TODO 
    static void PrintTwoCenterIntegralMOPACStyle(const int& atomIndexA,const int& elemntA,\
