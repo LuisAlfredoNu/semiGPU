@@ -111,6 +111,8 @@ public:
    static void PrintM2x2Comp(const char* word,const double (&m)[2][2]);
    /* ************************************************************************************** */
    /***************************************************************************************/
+   static void PrintVectorN(const int &N,const double* v);
+   /***************************************************************************************/
    static void PrintMatrixNxN(const int &N,const double* m);
    /***************************************************************************************/ 
    static void PrintMatrixNxN(const int &N,const double** m);

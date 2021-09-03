@@ -74,25 +74,25 @@ int main (int argc, char *argv[])
   cout << "hcore matrix" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,hcore.matrixHold_);
   
-  double* eigenVec;
+  double* firtsGuess;
 
-  if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,eigenVec,0.0)) {
-    cout << "Correct Alloc: eigenVec" << endl;
+  if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,firtsGuess,0.0)) {
+    cout << "Correct Alloc: firtsGuess" << endl;
   }else{
-    cout << "Bad Alloc: eigenVec " << endl;
+    cout << "Bad Alloc: firtsGuess " << endl;
   }
 
   for (int i=0;i<nAOs;++i) {
-    eigenVec[i * nAOs + i] = 1.0;
+    firtsGuess[i * nAOs + i] = 1.0;
   }
 
-  cout << "Eigen matrix" << endl;
-  ScreenUtils::PrintMatrixNxN(nAOs,eigenVec);
+  cout << "firtsGuess matrix" << endl;
+  ScreenUtils::PrintMatrixNxN(nAOs,firtsGuess);
 
 
   // Init Hcore
   cout << "Init and Compute DensityMatrix" << endl;
-  DensityMatrix Pmatrix(eigenVec,nAOs);
+  DensityMatrix Pmatrix(firtsGuess,nAOs);
   // Alloc Pmatrix Matrix
   if (Pmatrix.Alloc4Matrix("Pmatrix")){
     cout << "Correct Alloc: Pmatrix" << endl;
@@ -123,6 +123,12 @@ int main (int argc, char *argv[])
   SCFCalculation SCFcalculation(infoAOs,all2CenterIntegral,hcore,Pmatrix,Fmatrix);
 
   SCFcalculation.ComputeSCF();
+
+  cout << "EigenVal Matrix" << endl;
+  ScreenUtils::PrintVectorN(nAOs,SCFcalculation.eigenVal);
+  cout << "EigenVector Matrix" << endl;
+  ScreenUtils::PrintMatrixNxN(nAOs,SCFcalculation.eigenVec);
+
   cout << "Fock Matrix" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Fmatrix.matrixHold_); 
   

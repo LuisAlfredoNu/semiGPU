@@ -15,6 +15,11 @@ class SCFCalculation {
                  FockMatrix &);
 /***************************************************************************************/ 
   // Variables
+  // Pointer for eigenvectors and eigenvalues
+  bool goodAllocEigenVec = false;
+  bool goodAllocEigenVal = false;
+  double* eigenVec;
+  double* eigenVal;
 /***************************************************************************************/ 
   // Methods
   void ComputeSCF();
@@ -30,6 +35,7 @@ class SCFCalculation {
 /***************************************************************************************/ 
   // Methods
   void InitialGuess();
+  void GetEigenValVecOfFmatrix();
 };
 
  

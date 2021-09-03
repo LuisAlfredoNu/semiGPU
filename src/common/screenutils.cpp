@@ -324,6 +324,14 @@ void ScreenUtils::PrintM2x2Comp(const char* word,const double (&m)[2][2]) {
 }
 /* ************************************************************************************** */
 /***************************************************************************************/ 
+void ScreenUtils::PrintVectorN(const int &N,const double* v){
+  for (int i=0;i<N;i++) {
+    std::cout << std::fixed << std::setw(10) << v[i];
+  }
+    std::cout << std::endl;
+  return;
+}
+/***************************************************************************************/ 
 void ScreenUtils::PrintMatrixNxN(const int &N,const double* m){
   int index = 0;
   for (int i=0;i<N;i++) {

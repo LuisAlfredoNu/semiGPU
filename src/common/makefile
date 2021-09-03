@@ -66,6 +66,7 @@ STATICLIB="lib$(COMMONSTATICLIBNAME).a"
 # -l: LIBRARY
 	lLIBS+=#-lgfnl_util
 	lLIBS+= #-lapr-1 -laprutil-1 -llog4cxx
+	lLIBS+=-llapack -lblas
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS)
@@ -79,7 +80,7 @@ $(TARGET): $(OBJS) $(HEADERS) $(SOURCES)
 
 $(CPPOBJS): %.o: %.cpp
 	$(info compiling: $@)
-	@$(CXX) $(CXXFLAGS) -c $<  -o $@  $(IFLAGS) 
+	@$(CXX) $(CXXFLAGS) -c $<  -o $@  $(IFLAGS) $(lLIBS)
 
 .PHONY: clean
 clean:
