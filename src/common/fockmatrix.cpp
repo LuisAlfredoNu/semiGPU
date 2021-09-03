@@ -7,7 +7,8 @@
 #include "fockmatrix.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-FockMatrix::FockMatrix(const ListAtomicOrbitals &infoAOs,const Hcore &hcore,const DensityMatrix &Pmatrix,double**** &all2CenterIntegral) : BaseMatrix(infoAOs.orbital.size()){
+FockMatrix::FockMatrix(const ListAtomicOrbitals &infoAOs,const Hcore &hcore,\
+    const DensityMatrix &Pmatrix,double**** &all2CenterIntegral) : BaseMatrix(infoAOs.orbital.size()){
   infoAOs_ = &infoAOs;
   hcore_ = &hcore;
   Pmatrix_ = &Pmatrix;
