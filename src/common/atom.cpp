@@ -48,7 +48,7 @@ void Atom::setCoordinates(double (&xyz_coordinates)[3]){
 	zPosition=xyz_coordinates[2];
 	atomCoordinates[0]=xyz_coordinates[0];
 	atomCoordinates[1]=xyz_coordinates[1];
-	atomCoordinates[2]=xyz_coordinates[3];
+	atomCoordinates[2]=xyz_coordinates[2];
 }
 /***************************************************************************************/ 
 double Atom::getXCoordinate(){
