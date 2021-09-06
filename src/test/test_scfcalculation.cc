@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
   MNDOparameter MNDOpara;
 
   // Init molecule
-  string moleculeTest = "C2H6";
+  string moleculeTest = "C2";
 
   vector<Atom> molecule;
 

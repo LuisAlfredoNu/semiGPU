@@ -2,6 +2,11 @@
 #ifndef _TWOCENTERINTEGRAL_CPP_
 #define _TWOCENTERINTEGRAL_CPP_
 
+#include <iostream>
+using std::cout;
+using std::endl;
+#include "screenutils.h"
+
 #include <vector>
 using std::vector;
 
@@ -32,24 +37,43 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
       return false;
     }
   }
+  ScreenUtils::PrintScrStarLine();
   bool dataStatus = false;
+  int atomNumberA, atomNumberB ;
+
   for (int i=0;i<NAtoms;i++) {
     for (int j=0;j <= i;j++) {
-      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
+
+      atomNumberA = molecule[i].atomNumber;
+      atomNumberB = molecule[j].atomNumber;
+      // Correct order
+      /* 
+      if (atomNumberA > atomNumberB) {
+        swapValues(atomNumberA,atomNumberB);
+      }*/
+      cout << "Pair : " << molecule[i].atomNumber << " -- " << molecule[j].atomNumber << "   :   " ;
+      if (atomNumberA == 1 && atomNumberB  == 1) {
         // Alloc for H-H pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,1,all2CenterIntegral[i][j],0.0);
+        cout << "Hit 1 - 1" ; 
+        cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 1 << "]" << endl;
         continue;
       }
-      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
+      if (atomNumberA > 1 && atomNumberB > 1) {
         // Alloc for X-X pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",10,10,all2CenterIntegral[i][j],0.0);
+        cout << "Hit  X - X" ;
+        cout << "  Index : [" << i << "][" << j << "][" << 10 << "][" << 10 << "]" << endl;
         continue;
       }else{
         // Alloc for H-X pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,10,all2CenterIntegral[i][j],0.0);
+        cout << "Hit 1 - X" ;
+        cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 10 << "]" << endl;
         continue;
       }
     }
+    cout  << endl;
   }
   return dataStatus;
 }
@@ -177,27 +201,42 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
 
   int totalAOs = infoAOs.orbital.size();
   int indexOfAtomA,indexOfAtomB;
+  cout << "total AOs : " << totalAOs << endl;
   for (int i=0;i < totalAOs;++i) {
     for (int j=0;j <= i;++j) {
       indexOfAtomA = infoAOs.orbital[i].indexAtom;
       indexOfAtomB = infoAOs.orbital[j].indexAtom;
+      cout << "Compute all  atom   A : " << indexOfAtomA << "  B : " << indexOfAtomB;
+      cout << "   index   i : " << i            << "  j : " << j ;
       if (infoAOs.orbital[i].element == infoAOs.orbital[j].element ) {
         // Compute for X-X or H-H
         if (infoAOs.orbital[i].element == 1) {
           //Compute for H-H
           ComputePair_HH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
+          cout << "  Hit : pair_HH " << endl;
         }else{
           //Compute for X-X
           ComputePair_XX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
+          cout << "  Hit : pair_XX " << endl;
         }
       }else{
-        // Compute for H-X
-        ComputePair_HX(i,j,infoAOs.orbital,\
-            all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
+        // Compute for H-X or X-H
+        if (infoAOs.orbital[i].element == 1) {
+          //Compute for H-X
+          ComputePair_HX(i,j,infoAOs.orbital,\
+              all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
+          cout << "  Hit : pair_HX " << endl;
+        }else{
+          //Compute for X-H
+          ComputePair_XH(i,j,infoAOs.orbital,\
+              all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
+          cout << "  Hit : pair_XH " << endl;
+        }
       }
     }
+    cout  << endl;
     if (infoAOs.orbital[i].element > 1) {
       i+=3;
     }
@@ -211,40 +250,96 @@ double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,const AtomicOrbital& orbitalD,\
     double**** all2CenterIntegral){
   if (orbitalA.indexAtom == orbitalB.indexAtom && orbitalC.indexAtom == orbitalD.indexAtom) {
-    int angularMomA = orbitalA.angularMomentumInt;
-    int angularMomB = orbitalB.angularMomentumInt;
-    int angularMomC = orbitalC.angularMomentumInt;
-    int angularMomD = orbitalD.angularMomentumInt;
-
-    if (angularMomA > angularMomB) {
-      swapValues(angularMomA,angularMomB);
-    }
-    if (angularMomC > angularMomD) {
-      swapValues(angularMomC,angularMomD);
-    }
 
     int indexAtomA = orbitalA.indexAtom;
     int indexAtomC = orbitalC.indexAtom;
     if (indexAtomA < indexAtomC) {
       swapValues(indexAtomA,indexAtomC);
     }
+    // Possible pair X-X, X-H, H-X, H-H
+    if (orbitalA.element > 1 ) {
+      // Pair X-X or X-H
+      if (orbitalC.element > 1) {
+        // Pair X-X
+        int angularMomA = orbitalA.angularMomentumInt;
+        int angularMomB = orbitalB.angularMomentumInt;
+        int angularMomC = orbitalC.angularMomentumInt;
+        int angularMomD = orbitalD.angularMomentumInt;
 
-    unsigned short MOPACsort[4][4];
-    MOPACsort[0][0] = 0;
-    MOPACsort[0][1] = 1;
-    MOPACsort[1][1] = 2;
-    MOPACsort[0][2] = 3;
-    MOPACsort[1][2] = 4;
-    MOPACsort[2][2] = 5;
-    MOPACsort[0][3] = 6;
-    MOPACsort[1][3] = 7;
-    MOPACsort[2][3] = 8;
-    MOPACsort[3][3] = 9;
-    return all2CenterIntegral[indexAtomA]\
-                             [indexAtomC]\
-                             [MOPACsort[angularMomA][angularMomB]]\
-                             [MOPACsort[angularMomC][angularMomD]];
+        if (angularMomA > angularMomB) {
+          swapValues(angularMomA,angularMomB);
+        }
+        if (angularMomC > angularMomD) {
+          swapValues(angularMomC,angularMomD);
+        }
+        unsigned short MOPACsort[4][4];
+        MOPACsort[0][0] = 0;
+        MOPACsort[0][1] = 1;
+        MOPACsort[1][1] = 2;
+        MOPACsort[0][2] = 3;
+        MOPACsort[1][2] = 4;
+        MOPACsort[2][2] = 5;
+        MOPACsort[0][3] = 6;
+        MOPACsort[1][3] = 7;
+        MOPACsort[2][3] = 8;
+        MOPACsort[3][3] = 9;
+        //cout << " GetPairType index [" << indexAtomA << "][" << indexAtomC << "][";
+        //cout << MOPACsort[angularMomA][angularMomB] << "][" << MOPACsort[angularMomC][angularMomD] << "]" << endl;
+        return all2CenterIntegral[indexAtomA][indexAtomC]\
+               [MOPACsort[angularMomA][angularMomB]]\
+               [MOPACsort[angularMomC][angularMomD]];
+      }else{
+        // Pair X-H
+        int angularMomA = orbitalA.angularMomentumInt;
+        int angularMomB = orbitalB.angularMomentumInt;
 
+        if (angularMomA > angularMomB) {
+          swapValues(angularMomA,angularMomB);
+        }
+        unsigned short MOPACsort[4][4];
+        MOPACsort[0][0] = 0;
+        MOPACsort[0][1] = 1;
+        MOPACsort[1][1] = 2;
+        MOPACsort[0][2] = 3;
+        MOPACsort[1][2] = 4;
+        MOPACsort[2][2] = 5;
+        MOPACsort[0][3] = 6;
+        MOPACsort[1][3] = 7;
+        MOPACsort[2][3] = 8;
+        MOPACsort[3][3] = 9;
+        return all2CenterIntegral[indexAtomA][indexAtomC]\
+               [0]\
+               [MOPACsort[angularMomA][angularMomB]];
+      }
+    }else{
+      // Pair H-X or H-H
+      if (orbitalC.element > 1) {
+        // Pair H-X
+        int angularMomC = orbitalC.angularMomentumInt;
+        int angularMomD = orbitalD.angularMomentumInt;
+
+        if (angularMomC > angularMomD) {
+          swapValues(angularMomC,angularMomD);
+        }
+        unsigned short MOPACsort[4][4];
+        MOPACsort[0][0] = 0;
+        MOPACsort[0][1] = 1;
+        MOPACsort[1][1] = 2;
+        MOPACsort[0][2] = 3;
+        MOPACsort[1][2] = 4;
+        MOPACsort[2][2] = 5;
+        MOPACsort[0][3] = 6;
+        MOPACsort[1][3] = 7;
+        MOPACsort[2][3] = 8;
+        MOPACsort[3][3] = 9;
+        return all2CenterIntegral[indexAtomA][indexAtomC]\
+               [0]\
+               [MOPACsort[angularMomC][angularMomD]];
+      }else{
+        // Pair H-H
+        return all2CenterIntegral[indexAtomA][indexAtomC][0][0];
+      }
+    }
   }else{
     return 0.0e-10;
   }
@@ -266,18 +361,10 @@ void TwoCenterIntegral::ComputePair_HX(int& indexAO_A,int& indexAO_B,\
   
   int ajustIndexA,ajustIndexB,ajustIndexC,ajustIndexD;
 
-  bool swapIndexs = false;
-
-  if (infoAOs[indexAO_B].element == 1) {
-    swapValues(indexAO_A,indexAO_B);
-    swapIndexs = true;
-  }
-
   ajustIndexA = indexAO_A;
   ajustIndexB = indexAO_A;
   
   for (int i=0;i<10;i++) {
-
     ajustIndexC = listMOPACA[i] + indexAO_B;
     ajustIndexD = listMOPACB[i] + indexAO_B;
 
@@ -287,9 +374,28 @@ void TwoCenterIntegral::ComputePair_HX(int& indexAO_A,int& indexAO_B,\
   }
   
   indexAO_B += 3;
+}
+/***************************************************************************************/ 
+void TwoCenterIntegral::ComputePair_XH(int& indexAO_A,int& indexAO_B,\
+    const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
+  // List of order lik MOPAC print 
+  // SS	SX	XX	SY	XY	YY	SZ	XZ	YZ	ZZ
+  int listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
+  int listMOPACB[10] = {0,1,1,2,2,2,3,3,3,3};
+  
+  int ajustIndexA,ajustIndexB,ajustIndexC,ajustIndexD;
 
-  if (swapIndexs){
-    swapValues(indexAO_A,indexAO_B);
+  ajustIndexA = indexAO_B;
+  ajustIndexB = indexAO_B;
+  
+  for (int i=0;i<10;i++) {
+
+    ajustIndexC = listMOPACA[i] + indexAO_A;
+    ajustIndexD = listMOPACB[i] + indexAO_A;
+
+    all2CenterIntegral[0][i] = ComputeTwoCenterIntegral(\
+        infoAOs[ajustIndexA],infoAOs[ajustIndexB],\
+        infoAOs[ajustIndexC],infoAOs[ajustIndexD]);
   }
 }
 /***************************************************************************************/ 
@@ -297,8 +403,8 @@ void TwoCenterIntegral::ComputePair_XX(const int& indexAO_A,int& indexAO_B,\
        const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
   // List of order lik MOPAC print 
   // SS	SX	XX	SY	XY	YY	SZ	XZ	YZ	ZZ
-  int listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
-  int listMOPACB[10] = {0,1,1,2,2,2,3,3,3,3};
+  unsigned short listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
+  unsigned short listMOPACB[10] = {0,1,1,2,2,2,3,3,3,3};
 
   int ajustIndexA,ajustIndexB,ajustIndexC,ajustIndexD;
 

@@ -11,11 +11,14 @@ using std::string;
 #include <vector>
 using std::vector;
 
+
+#include "readxyzfile.h"
 #include "atom.h"
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
 #include "fileutils.h"
 #include "mymath.h"
+#include "screenutils.h"
 
 #include "twocenterintegral.h"
 
@@ -70,12 +73,31 @@ int main (int argc, char *argv[])
   double result =  twoCIntegral.ComputeTwoCenterIntegral(orbitalA,orbitalB,orbitalC,orbitalD);
   cout << "result = " << result << endl;
 /* */ 
-  vector<Atom> molecule (2,Atom());
 
-  molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-  molecule[0].setAtomNumber(6);
-  molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-  molecule[1].setAtomNumber(6);
+  string moleculeTest = "C2H6";
+  vector<Atom> molecule;
+
+  if (moleculeTest == "C2") {
+    molecule.push_back(Atom());
+    molecule.push_back(Atom());
+    double coorAA[3] = { 0.0, 0.0,-3.0};
+    double coorCC[3] = { 1.0, 1.0, 1.0};
+
+    molecule[0].setCoordinates(coorAA);
+    molecule[0].setAtomNumber(6);
+    molecule[1].setCoordinates(coorCC);
+    molecule[1].setAtomNumber(6);
+  }else if (moleculeTest == "CH4"){
+    string fileName = "filetest_ch4.xyz";
+      cout << "File for read: "<<fileName<<endl;
+      ReadXYZFile reader;
+      bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }else if (moleculeTest == "C2H6"){
+    string fileName = "filetest_c2h6.xyz";
+      cout << "File for read: "<<fileName<<endl;
+      ReadXYZFile reader;
+      bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
@@ -91,12 +113,33 @@ int main (int argc, char *argv[])
 
   cout << "Get Compute Data" << endl;
   vector<double> computeData;
-  for (int i=0;i<2;i++) {
+  for (int i=0;i<molecule.size();i++) {
     for (int j=0;j<=i;j++) {
-      for (int k=0;k<10;k++) {
-        for (int l=0;l<10;l++) {
-          computeData.push_back(all2CenterIntegral[i][j][k][l]);
+
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
+        for (int k=0;k<1;k++) {
+          for (int l=0;l<1;l++) {
+            computeData.push_back(all2CenterIntegral[i][j][k][l]);
+          }
         }
+        continue;
+      }
+
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
+        for (int k=0;k<10;k++) {
+          for (int l=0;l<10;l++) {
+            computeData.push_back(all2CenterIntegral[i][j][k][l]);
+          }
+        }
+        continue;
+      }
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1) {
+        for (int k=0;k<1;k++) {
+          for (int l=0;l<10;l++) {
+            computeData.push_back(all2CenterIntegral[i][j][k][l]);
+          }
+        }
+        continue;
       }
     }
   }
@@ -144,7 +187,10 @@ int main (int argc, char *argv[])
     if (sameReal(computeData[i],refData[i],1.0e-4)) {
       cout << setw(decimals + 4) << computeData[i] <<setw(2) << "O" << setw(decimals +4) << refData[i];
     }else{
-      cout << setw(decimals + 4) << computeData[i] <<setw(2) << "X" << setw(decimals +4) << refData[i];
+      cout << setw(decimals + 4) << computeData[i];
+      ScreenUtils::SetScrRedBoldFont();
+      cout<<setw(2) << "X" << setw(decimals +4) << refData[i];
+      ScreenUtils::SetScrNormalFont();
       ++totalErrors;
     }
     cout << setw(2)<< "|";
@@ -157,19 +203,34 @@ int main (int argc, char *argv[])
 /*  */
  
   cout << "Test for all possible bielectronic  integral" << endl;
-  cout << "get 0,0,0,0 = ";
+  cout << "get 0,0,4,4 = ";
   cout << TwoCenterIntegral::GetValueFromArray(\
       infoAOs.orbital[0],infoAOs.orbital[0],\
-      infoAOs.orbital[0],infoAOs.orbital[0],all2CenterIntegral) << endl;
+      infoAOs.orbital[4],infoAOs.orbital[4],all2CenterIntegral) << endl;
 
-  cout << "orbital size = " << infoAOs.orbital.size() << endl;
-  for (int i=0;i<8;i++) {
-    for (int j=0;j<8;j++) {
-      for (int k=0;k<8;k++) {
-        for (int l=0;l<8;l++) {
-          TwoCenterIntegral::GetValueFromArray(infoAOs.orbital[i],\
+  int nAOs = infoAOs.orbital.size();
+  cout << "orbital size = " << nAOs << endl;
+
+  for (int i=0;i<nAOs;i++) {
+    for (int j=0;j<nAOs;j++) {
+      for (int k=0;k<nAOs;k++) {
+        cout << " element_atomindex " << endl;
+        for (int l=0;l<nAOs;l++) {
+          cout << infoAOs.orbital[i].element << "_" << infoAOs.orbital[i].indexAtom;
+          cout << "  " ;
+          cout << infoAOs.orbital[j].element << "_" << infoAOs.orbital[j].indexAtom;
+          cout << "  " ;
+          cout << infoAOs.orbital[k].element << "_" << infoAOs.orbital[k].indexAtom;
+          cout << "  " ;
+          cout << infoAOs.orbital[l].element << "_" << infoAOs.orbital[l].indexAtom;
+          cout << "  " ;
+          cout << "[ " << setw(2) <<  i ;
+          cout << " "  << setw(2) <<  j ;
+          cout << " | "<< setw(2) <<  k ;
+          cout << " "  << setw(2) <<  l << setw(3) << " ] = "; 
+          cout << TwoCenterIntegral::GetValueFromArray(infoAOs.orbital[i],\
               infoAOs.orbital[j],infoAOs.orbital[k],infoAOs.orbital[l],\
-              all2CenterIntegral);
+              all2CenterIntegral) << endl; 
         }
       }
     }

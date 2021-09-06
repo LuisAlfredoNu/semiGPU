@@ -70,6 +70,7 @@ class TwoCenterIntegral{
   // Funtions fro compute by atoms pairs
   void ComputePair_HH(const int&,int&,const vector<AtomicOrbital>&,double**&);
   void ComputePair_HX(      int&,int&,const vector<AtomicOrbital>&,double**&);
+  void ComputePair_XH(      int&,int&,const vector<AtomicOrbital>&,double**&);
   void ComputePair_XX(const int&,int&,const vector<AtomicOrbital>&,double**&);
 };
 #endif // _TWOCENTERINTEGRAL_H_
