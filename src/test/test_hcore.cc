@@ -15,6 +15,9 @@ using std::vector;
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
 #include "twocenterintegral.h"
+#include "mymath.h"
+#include "mymemory.h"
+#include "fileutils.h"
 #include "screenutils.h"
 
 #include "basematrix.h"
@@ -32,8 +35,8 @@ int main (int argc, char *argv[])
   // Init molecule
   vector<Atom> molecule (2,Atom());
 
-  double coorA[3] = {-1.0,-2.0,-3.0};
-  double coorC[3] = {1.0,1.0,1.5};
+  double coorA[3] = { 0.0, 0.0,-3.0};
+  double coorC[3] = { 1.0, 1.0, 1.0};
   molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
   molecule[0].setAtomNumber(6);
   molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
@@ -68,6 +71,49 @@ int main (int argc, char *argv[])
   hcore.ComputeMatrix();
 
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),hcore.matrixHold_);
+
+  vector<vector<string>> dataCSV;
+  bool readFile = FileUtils::ReadCSV("c2_scf_debug_Hcore.csv",dataCSV);
+
+  if (!readFile) {
+    cout << "Problem to read CSV" << endl;
+    return EXIT_FAILURE;
+  }
+
+  vector<double> refData;
+
+  cout << "Get CSV Data" << endl;
+
+  for (size_t i=0;i<infoAOs.orbital.size();++i) {
+    for (size_t j=0;j<=i;++j) {
+      refData.push_back(std::stod(dataCSV[i][j]));
+    }
+  }
+  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),&refData[0]);
+
+  int index;
+  int totalErrors = 0;
+  int decimals=4;
+  cout << std::fixed << setprecision(decimals);
+  for (size_t i=0;i<infoAOs.orbital.size();++i) {
+    for (size_t j=0;j<=i;++j) {
+      index = MyMemory::GetIndexSymmetricMatrix(i,j);
+      if ( sameReal(hcore.matrixHold_[index],refData[index],1.0e-1) ) {
+        cout << setw(decimals + 6) << hcore.matrixHold_[index] ;
+        cout << setw(2)<< "O" << setw(decimals +6) << refData[index] << " | ";
+      }else{
+        ScreenUtils::SetScrRedBoldFont();
+        cout << setw(decimals + 6) << hcore.matrixHold_[index] ;
+        cout <<setw(2) << "X"; 
+        ScreenUtils::SetScrNormalFont();
+        cout  << setw(decimals +6) << refData[index];
+        cout   << " | ";
+        totalErrors++;
+      }
+    }
+    cout << endl;
+  }
+  cout << endl << "total Errors = " << totalErrors <<endl;
 
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);

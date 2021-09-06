@@ -11,6 +11,7 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include "readxyzfile.h"
 #include "atom.h"
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
@@ -33,22 +34,58 @@ int main (int argc, char *argv[])
   MNDOparameter MNDOpara;
 
   // Init molecule
-  vector<Atom> molecule (2,Atom());
+  string moleculeTest = "C2H6";
 
-  double coorA[3] = {-1.0,-2.0,-3.0};
-  double coorC[3] = {1.0,1.0,1.5};
-  molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-  molecule[0].setAtomNumber(6);
-  molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-  molecule[1].setAtomNumber(6);
+  vector<Atom> molecule;
 
-  cout << "Coordinates A = " << coorA[0] << "  " << coorA[1] << "  " << coorA[2] << endl;
-  cout << "Coordinates B = " << coorC[0] << "  " << coorC[1] << "  " << coorC[2] << endl;
+  if (moleculeTest == "H6") {
+    string fileName = "filetest_h6.xyz";
+    cout << "File for read: "<<fileName<<endl;
+    ReadXYZFile reader;
+    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }else if (moleculeTest == "C2") {
+
+    molecule.push_back(Atom());
+    molecule.push_back(Atom());
+    double coorA[3] = { -1.0,-2.0,-3.0};
+    double coorC[3] = {1.0,1.0,1.5};
+    molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
+    molecule[0].setAtomNumber(6);
+    molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
+    molecule[1].setAtomNumber(6);
+  }else if (moleculeTest == "CH4") {
+    string fileName = "filetest_ch4.xyz";
+    cout << "File for read: "<<fileName<<endl;
+    ReadXYZFile reader;
+    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }else if (moleculeTest == "C2H6") {
+    string fileName = "filetest_c2h6.xyz";
+    cout << "File for read: "<<fileName<<endl;
+    ReadXYZFile reader;
+    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }
+
+  cout << "Geometry :" << endl;
+  for (size_t i=0;i<molecule.size();++i) {
+    cout << setw(3)  << molecule[i].atomSymbol ;
+    cout << setw(10) << molecule[i].atomCoordinates[0] ;
+    cout << setw(10) << molecule[i].atomCoordinates[1] ;
+    cout << setw(10) << molecule[i].atomCoordinates[2] << endl ;
+  }
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
   int nAOs = infoAOs.orbital.size();
 
+  cout << "infoAOs" << endl;
+  for (size_t i=0;i<nAOs;++i) {
+    cout << "AO "<< setw(3)  << infoAOs.orbital[i].indexAO << " : ";
+    cout << setw(5) << infoAOs.orbital[i].element;
+    cout << setw(5) << infoAOs.orbital[i].angularMomentumInt;
+    cout << setw(10) << infoAOs.orbital[i].coordinates[0];
+    cout << setw(10) << infoAOs.orbital[i].coordinates[1];
+    cout << setw(10) << infoAOs.orbital[i].coordinates[2]<< endl;
+  }
   // Alloc for all 2 center integrals 
   double**** all2CenterIntegral = NULL;
   if (TwoCenterIntegral::Alloc4AllTwoCenterIntegral(molecule,all2CenterIntegral)){
@@ -57,6 +94,7 @@ int main (int argc, char *argv[])
     cout << "Bad Alloc: all2CenterIntegral " << endl;
   }
   // Init TwoCenterIntegral
+  cout << "Compute all2CenterIntegral" << endl;
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
 
@@ -70,76 +108,34 @@ int main (int argc, char *argv[])
   // Init Hcore
   cout << "Init and compute Hcore" << endl;
   hcore.ComputeMatrix();
+  /*
+  hcore.matrixHold_[1] *= -1.0 ;
+  hcore.matrixHold_[3] *= -1.0 ;
+  hcore.matrixHold_[6] *= -1.0 ;
+  */
 
   cout << "hcore matrix" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,hcore.matrixHold_);
-  
-  double* firtsGuess;
-
-  if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,firtsGuess,0.0)) {
-    cout << "Correct Alloc: firtsGuess" << endl;
-  }else{
-    cout << "Bad Alloc: firtsGuess " << endl;
-  }
-
-  for (int i=0;i<nAOs;++i) {
-    firtsGuess[i * nAOs + i] = 1.0;
-  }
-
-  cout << "firtsGuess matrix" << endl;
-  ScreenUtils::PrintMatrixNxN(nAOs,firtsGuess);
-
-
-  // Init Hcore
-  cout << "Init and Compute DensityMatrix" << endl;
-  DensityMatrix Pmatrix(firtsGuess,nAOs);
-  // Alloc Pmatrix Matrix
-  if (Pmatrix.Alloc4Matrix("Pmatrix")){
-    cout << "Correct Alloc: Pmatrix" << endl;
-  }else{
-    cout << "Bad Alloc: Pmatrix " << endl;
-  }
-  Pmatrix.ComputeMatrix();
-  for (int i=0;i<nAOs;++i) {
-    Pmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] = 1.0;
-  }
-
-  cout << "Pmatrix matrix" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Pmatrix.matrixHold_);
-
-  cout << "Init and compute FockMatrix" << endl;
-  FockMatrix Fmatrix(infoAOs,hcore,Pmatrix,all2CenterIntegral);
-  // Alloc Hcore Matrix
-  if (Fmatrix.Alloc4Matrix("Fmatrix")){
-    cout << "Correct Alloc: Fmatrix" << endl;
-  }else{
-    cout << "Bad Alloc: Fmatrix " << endl;
-  }
-  Fmatrix.ComputeMatrix();
-  cout << "Fock Matrix" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Fmatrix.matrixHold_); 
 
   cout << "Init and compute SCF" << endl;
-  SCFCalculation SCFcalculation(infoAOs,all2CenterIntegral,hcore,Pmatrix,Fmatrix);
+  SCFCalculation SCFprocess(infoAOs,all2CenterIntegral,hcore);
 
-  SCFcalculation.ComputeSCF();
+  bool goodAllocSCF = SCFprocess.AllocSCFData();
+  if (goodAllocSCF) {
+    cout << "Correct Alloc: SCFData" << endl;
+  }else{
+    cout << "Bad Alloc: SCFData " << endl;
+    return EXIT_FAILURE;
+  }
 
-  cout << "EigenVal Matrix" << endl;
-  ScreenUtils::PrintVectorN(nAOs,SCFcalculation.eigenVal);
-  cout << "EigenVector Matrix" << endl;
-  ScreenUtils::PrintMatrixNxN(nAOs,SCFcalculation.eigenVec);
+  SCFprocess.ComputeSCF();
 
-  cout << "Fock Matrix" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Fmatrix.matrixHold_); 
-  
-  cout << "Dealloc array: all2CenterIntegral" << endl;
-  TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
+  cout << "Dealloc array: SCFData" << endl;
+  SCFprocess.DeallocSCFData();
   cout << "Dealloc array: hcoreMatrix" << endl;
   hcore.Dealloc4Matrix();
-  cout << "Dealloc array: Pmatrix" << endl;
-  Pmatrix.Dealloc4Matrix();
-  cout << "Dealloc array: Fmatrix" << endl;
-  Fmatrix.Dealloc4Matrix();
+  cout << "Dealloc array: all2CenterIntegral" << endl;
+  TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   return EXIT_SUCCESS;
 }
 

@@ -17,14 +17,22 @@ double ElectronicEnergy::ComputeEnergy(const size_t &nAOs,const Hcore &hcore,\
   // and subtract the diagonal.
   for (size_t i=0;i<nAOs;++i) {
     for (size_t j=0;j<=i;++j) {
-      tmpEnergy = 0.0e-10;
-      tmpEnergy = hcore.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,j)] +\
+      tmpEnergy =   hcore.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,j)] +\
                   Fmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,j)];
       tmpEnergy *= Pmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,j)];
+      // The other half matrix
+      tmpEnergy *= 2.0;
       energy += tmpEnergy;
     }
   }
-  return energy;
+  // subtract giaonal part
+  for (size_t i=0;i<nAOs;++i) {
+    tmpEnergy =   hcore.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] +\
+                  Fmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)];
+    tmpEnergy *= Pmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)];
+      energy -= tmpEnergy;
+  }
+  return 0.5 * energy;
 }
  
 #endif // _ELECTRONICENERGY_CPP_

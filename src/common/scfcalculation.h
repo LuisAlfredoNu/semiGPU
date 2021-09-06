@@ -11,17 +11,19 @@
 
 class SCFCalculation {
  public:
-  SCFCalculation(const ListAtomicOrbitals &,double**** &,const Hcore &,DensityMatrix &,\
-                 FockMatrix &);
+  SCFCalculation(const ListAtomicOrbitals &,double**** &,const Hcore &);
 /***************************************************************************************/ 
   // Variables
   // Pointer for eigenvectors and eigenvalues
-  bool goodAllocEigenVec = false;
-  bool goodAllocEigenVal = false;
   double* eigenVec;
   double* eigenVal;
+  // Pointer to important matrixs
+  DensityMatrix* Pmatrix;
+  FockMatrix* Fmatrix;
 /***************************************************************************************/ 
   // Methods
+  bool AllocSCFData();
+  bool DeallocSCFData();
   void ComputeSCF();
  private:
 /***************************************************************************************/ 
@@ -30,12 +32,10 @@ class SCFCalculation {
   size_t nAOs_;
   double**** all2CIntegral_;
   const Hcore* hcore_;
-  DensityMatrix* Pmatrix_;
-  FockMatrix* Fmatrix_;
 /***************************************************************************************/ 
   // Methods
   void InitialGuess();
-  void GetEigenValVecOfFmatrix();
+  int GetEigenValVecOfFmatrix();
 };
 
  
