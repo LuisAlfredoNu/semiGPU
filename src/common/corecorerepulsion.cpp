@@ -29,7 +29,7 @@ double CoreCoreRepulsion::ComputeRepulsion(const MNDOparameter &parameter,\
                       infoAOs.orbital[j],infoAOs.orbital[j],all2CenterInt);
         tmp_energy *= AdjustableRepulsion(parameter,infoAOs.orbital[i],infoAOs.orbital[j]);
         energy += tmp_energy;
-        cout << "Hit " << i << " - " << j << "  pair E = " << tmp_energy <<endl;
+        //cout << "Hit " << i << " - " << j << "  pair E = " << tmp_energy <<endl;
         if (infoAOs.orbital[j].element > 1) {
           j += 3;
         }

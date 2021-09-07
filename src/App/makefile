@@ -63,6 +63,7 @@ TESTEXECS=$(patsubst %.cc,%.x,$(wildcard *.cc))
 
 # -l: LIBRARY
 	lLIBS+=-l$(COMMONSTATICLIBNAME)
+	lLIBS+=-llapack -lblas
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS) -I$(TOP)/../common/
