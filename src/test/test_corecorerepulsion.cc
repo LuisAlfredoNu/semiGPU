@@ -18,16 +18,13 @@ using std::vector;
 #include "mymemory.h"
 #include "twocenterintegral.h"
 #include "screenutils.h"
-#include "hcore.h"
-#include "densitymatrix.h"
-#include "fockmatrix.h"
 
-#include "scfcalculation.h"
+#include "corecorerepulsion.h"
 
 int main (int argc, char *argv[])
 {
 	cout << endl << "********************************************************" << endl;
-	cout << " Testing for Class SCFcalculation " << endl;
+	cout << " Testing for Class CoreCoreRepulsion " << endl;
 	cout << "********************************************************" << endl << endl;
 
   // Init MNDO parameters
@@ -99,42 +96,15 @@ int main (int argc, char *argv[])
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
 
-  Hcore hcore(MNDOpara,infoAOs,all2CenterIntegral);
-  // Alloc Hcore Matrix
-  if (hcore.Alloc4Matrix("hcoreMatrix")){
-    cout << "Correct Alloc: hcoreMatrix" << endl;
-  }else{
-    cout << "Bad Alloc: hcoreMatrix " << endl;
-  }
-  // Init Hcore
-  cout << "Init and compute Hcore" << endl;
-  hcore.ComputeMatrix();
+  cout << "Compute Core-Core Repulsion" << endl;
 
-  cout << "hcore matrix" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,hcore.matrixHold_);
+
+  double energyCoreCoreRepulsion = CoreCoreRepulsion::ComputeRepulsion(MNDOpara,infoAOs,all2CenterIntegral);
 
   ScreenUtils::PrintScrStarLine();
-  cout << "Init and compute SCF" << endl;
-  SCFCalculation SCFprocess(infoAOs,all2CenterIntegral,hcore);
-
-  bool goodAllocSCF = SCFprocess.AllocSCFData();
-  if (goodAllocSCF) {
-    cout << "Correct Alloc: SCFData" << endl;
-  }else{
-    cout << "Bad Alloc: SCFData " << endl;
-    return EXIT_FAILURE;
-  }
-
-  SCFprocess.ComputeSCF();
-  
-  ScreenUtils::PrintScrStarLine();
-  cout << "Final Energy = " << SCFprocess.finalEnergy << endl;
+  cout << "Core-Core Repulsion = " << energyCoreCoreRepulsion << endl;
   ScreenUtils::PrintScrStarLine();
 
-  cout << "Dealloc array: SCFData" << endl;
-  SCFprocess.DeallocSCFData();
-  cout << "Dealloc array: hcoreMatrix" << endl;
-  hcore.Dealloc4Matrix();
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   return EXIT_SUCCESS;

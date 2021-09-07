@@ -19,6 +19,7 @@ SCFCalculation::SCFCalculation(const ListAtomicOrbitals &infoAOs,\
   nAOs_ = infoAOs.orbital.size();
   all2CIntegral_ = all2CenterIntegral;
   hcore_ = &hcore;
+  printInfo = false;
 }
 /***************************************************************************************/ 
 bool SCFCalculation::AllocSCFData(){
@@ -64,9 +65,11 @@ void SCFCalculation::ComputeSCF(){
 
   double oldElectronicenergy = 0.0e-10 ;
   double electronicEnergy = ElectronicEnergy::ComputeEnergy(nAOs_,*hcore_,*Fmatrix,*Pmatrix);
- 
-  cout << "Electronic Energy beginning  = " << electronicEnergy << endl;
-  ScreenUtils::PrintScrStarLine();
+
+  if (printInfo) {
+    cout << "Electronic Energy beginning  = " << electronicEnergy << endl;
+    ScreenUtils::PrintScrStarLine();
+  }
   
   unsigned int maxSCFSteps = 10;
   unsigned int SCFSteps = 0;
@@ -93,30 +96,29 @@ void SCFCalculation::ComputeSCF(){
 
     energyConverge = sameReal(oldElectronicenergy,electronicEnergy,thresholdEnergy);
 
-    cout << "SCFSteps = " << SCFSteps << "  Eigen Values" << endl;
-    ScreenUtils::PrintVectorN(nAOs_,eigenVal);
-    cout << "Eigen Vectors" << endl;
-    ScreenUtils::PrintMatrixNxN(nAOs_,eigenVec);
+    if (printInfo) {
+      cout << "SCFSteps = " << SCFSteps << "  Eigen Values" << endl;
+      ScreenUtils::PrintVectorN(nAOs_,eigenVal);
+      cout << "Eigen Vectors" << endl;
+      ScreenUtils::PrintMatrixNxN(nAOs_,eigenVec);
 
-    cout << endl;
-    cout << "SCF : Pmatrix" << endl;
-    ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Pmatrix->matrixHold_);
-    cout << "SCF : Fmatrix" << endl;
-    ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Fmatrix->matrixHold_);
-    
-    cout << endl << "Electronic Energy  = " << electronicEnergy << endl;
+      cout << endl;
+      cout << "SCF : Pmatrix" << endl;
+      ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Pmatrix->matrixHold_);
+      cout << "SCF : Fmatrix" << endl;
+      ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Fmatrix->matrixHold_);
 
-    ScreenUtils::PrintScrStarLine();
+      cout << endl << "Electronic Energy  = " << electronicEnergy << endl;
+
+      ScreenUtils::PrintScrStarLine();
+    }
     SCFSteps++;
   }
-  cout << "Electronic Energy end  = " << electronicEnergy << endl;
+  if (printInfo) {
+    cout << "Electronic Energy end  = " << electronicEnergy << endl;
+  }
+  finalEnergy = electronicEnergy;
 }
-/***************************************************************************************/ 
-/*
-   Plan
-   Crear el frirts guess
-   Calcular los valores y vectores propios
- */
 /***************************************************************************************/ 
 void SCFCalculation::InitialGuess(){
   for (size_t i=0;i<nAOs_;++i) {
@@ -126,10 +128,12 @@ void SCFCalculation::InitialGuess(){
   for (size_t i=0;i<nAOs_;++i) {
     Fmatrix->matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] -= 0.5;
   }
+  if (printInfo) {
     cout << "Guess : Pmatrix" << endl;
     ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Pmatrix->matrixHold_);
     cout << "Guess : Fmatrix" << endl;
     ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Fmatrix->matrixHold_);
+  }
 }
 /***************************************************************************************/ 
 // LAPACK funtion

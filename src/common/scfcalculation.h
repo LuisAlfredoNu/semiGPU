@@ -20,6 +20,8 @@ class SCFCalculation {
   // Pointer to important matrixs
   DensityMatrix* Pmatrix;
   FockMatrix* Fmatrix;
+  // Final Energy
+  double finalEnergy;
 /***************************************************************************************/ 
   // Methods
   bool AllocSCFData();
@@ -32,6 +34,7 @@ class SCFCalculation {
   size_t nAOs_;
   double**** all2CIntegral_;
   const Hcore* hcore_;
+  bool printInfo;
 /***************************************************************************************/ 
   // Methods
   void InitialGuess();

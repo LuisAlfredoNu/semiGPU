@@ -2,11 +2,6 @@
 #ifndef _TWOCENTERINTEGRAL_CPP_
 #define _TWOCENTERINTEGRAL_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-#include "screenutils.h"
-
 #include <vector>
 using std::vector;
 
@@ -37,7 +32,6 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
       return false;
     }
   }
-  ScreenUtils::PrintScrStarLine();
   bool dataStatus = false;
   int atomNumberA, atomNumberB ;
 
@@ -46,34 +40,29 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
 
       atomNumberA = molecule[i].atomNumber;
       atomNumberB = molecule[j].atomNumber;
-      // Correct order
-      /* 
-      if (atomNumberA > atomNumberB) {
-        swapValues(atomNumberA,atomNumberB);
-      }*/
-      cout << "Pair : " << molecule[i].atomNumber << " -- " << molecule[j].atomNumber << "   :   " ;
+      //cout << "Pair : " << molecule[i].atomNumber << " -- " << molecule[j].atomNumber << "   :   " ;
       if (atomNumberA == 1 && atomNumberB  == 1) {
         // Alloc for H-H pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,1,all2CenterIntegral[i][j],0.0);
-        cout << "Hit 1 - 1" ; 
-        cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 1 << "]" << endl;
+        //cout << "Hit 1 - 1" ; 
+        //cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 1 << "]" << endl;
         continue;
       }
       if (atomNumberA > 1 && atomNumberB > 1) {
         // Alloc for X-X pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",10,10,all2CenterIntegral[i][j],0.0);
-        cout << "Hit  X - X" ;
-        cout << "  Index : [" << i << "][" << j << "][" << 10 << "][" << 10 << "]" << endl;
+        //cout << "Hit  X - X" ;
+        //cout << "  Index : [" << i << "][" << j << "][" << 10 << "][" << 10 << "]" << endl;
         continue;
       }else{
         // Alloc for H-X pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,10,all2CenterIntegral[i][j],0.0);
-        cout << "Hit 1 - X" ;
-        cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 10 << "]" << endl;
+        //cout << "Hit 1 - X" ;
+        //cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 10 << "]" << endl;
         continue;
       }
     }
-    cout  << endl;
+    //cout  << endl;
   }
   return dataStatus;
 }
@@ -201,25 +190,25 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
 
   int totalAOs = infoAOs.orbital.size();
   int indexOfAtomA,indexOfAtomB;
-  cout << "total AOs : " << totalAOs << endl;
+  //cout << "total AOs : " << totalAOs << endl;
   for (int i=0;i < totalAOs;++i) {
     for (int j=0;j <= i;++j) {
       indexOfAtomA = infoAOs.orbital[i].indexAtom;
       indexOfAtomB = infoAOs.orbital[j].indexAtom;
-      cout << "Compute all  atom   A : " << indexOfAtomA << "  B : " << indexOfAtomB;
-      cout << "   index   i : " << i            << "  j : " << j ;
+      //cout << "Compute all  atom   A : " << indexOfAtomA << "  B : " << indexOfAtomB;
+      //cout << "   index   i : " << i            << "  j : " << j ;
       if (infoAOs.orbital[i].element == infoAOs.orbital[j].element ) {
         // Compute for X-X or H-H
         if (infoAOs.orbital[i].element == 1) {
           //Compute for H-H
           ComputePair_HH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_HH " << endl;
+          //cout << "  Hit : pair_HH " << endl;
         }else{
           //Compute for X-X
           ComputePair_XX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_XX " << endl;
+          //cout << "  Hit : pair_XX " << endl;
         }
       }else{
         // Compute for H-X or X-H
@@ -227,16 +216,16 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
           //Compute for H-X
           ComputePair_HX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_HX " << endl;
+          //cout << "  Hit : pair_HX " << endl;
         }else{
           //Compute for X-H
           ComputePair_XH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_XH " << endl;
+          //cout << "  Hit : pair_XH " << endl;
         }
       }
     }
-    cout  << endl;
+    //cout  << endl;
     if (infoAOs.orbital[i].element > 1) {
       i+=3;
     }
