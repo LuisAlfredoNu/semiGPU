@@ -42,6 +42,46 @@ value[6].coeffP[2] =  0.1738967435e+00;
 value[6].coeffP[3] =  0.4180364347e+00;
 value[6].coeffP[4] =  0.4258595477e+00;
 value[6].coeffP[5] =  0.1017082955e+00;
+/***************************************************************************************/ 
+// Nytrogen 2s,2p
+value[7].exponent[0] = 0.3919880787e+02; 
+value[7].exponent[1] = 0.7758467071e+01; 
+value[7].exponent[2] = 0.2411325783e+01; 
+value[7].exponent[3] = 0.9277239437e+00; 
+value[7].exponent[4] = 0.4029111410e+00; 
+value[7].exponent[5] = 0.1846836552e+00; 
+value[7].coeffS[0] =  -0.1325278809e-01;  
+value[7].coeffS[1] =  -0.4699171014e-01;  
+value[7].coeffS[2] =  -0.3378537151e-01;  
+value[7].coeffS[3] =   0.2502417861e+00;  
+value[7].coeffS[4] =   0.5951172526e+00;  
+value[7].coeffS[5] =   0.2407061763e+00;  
+value[7].coeffP[0] =   0.3759696623e-02;
+value[7].coeffP[1] =   0.3767936984e-01;
+value[7].coeffP[2] =   0.1738967435e+00;
+value[7].coeffP[3] =   0.4180364347e+00;
+value[7].coeffP[4] =   0.4258595477e+00;
+value[7].coeffP[5] =   0.1017082955e+00;
+/***************************************************************************************/ 
+// Oxygen 2s,2p
+value[8].exponent[0] = 0.5218776196e+02;   
+value[8].exponent[1] = 0.1032932006e+02;   
+value[8].exponent[2] = 0.3210344977e+01;   
+value[8].exponent[3] = 0.1235135428e+01;   
+value[8].exponent[4] = 0.5364201581e+00;   
+value[8].exponent[5] = 0.2458806060e+00;   
+value[8].coeffS[0] =  -0.1325278809e-01;  
+value[8].coeffS[1] =  -0.4699171014e-01;  
+value[8].coeffS[2] =  -0.3378537151e-01;  
+value[8].coeffS[3] =   0.2502417861e+00;  
+value[8].coeffS[4] =   0.5951172526e+00;  
+value[8].coeffS[5] =   0.2407061763e+00;  
+value[8].coeffP[0] =   0.3759696623e-02;
+value[8].coeffP[1] =   0.3767936984e-01;
+value[8].coeffP[2] =   0.1738967435e+00;
+value[8].coeffP[3] =   0.4180364347e+00;
+value[8].coeffP[4] =   0.4258595477e+00;
+value[8].coeffP[5] =   0.1017082955e+00;
 
 };
 #endif // _STO-6G_CPP_
