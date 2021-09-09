@@ -1,6 +1,9 @@
 #ifndef _OVERLAP_CPP_
 #define _OVERLAP_CPP_
 
+#include <iostream>
+using std::cout;
+using std::endl;
 
 #include <string>
 using std::string;
@@ -23,11 +26,114 @@ Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.orbital
   infoAOs_ = &infoAOs;
 }
 /***************************************************************************************/ 
-double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
-  return ComputeOverlap(infoAOs_->orbital[(int)i],infoAOs_->orbital[(int)j]);
+double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
+  //return ComputeOverlap_Boys(orbitalA,orbitalB);
+  return ComputeOverlap_McMurchieDavidson(orbitalA,orbitalB);
 }
 /***************************************************************************************/ 
-double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
+double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
+  //return ComputeOverlap_Boys(infoAOs_->orbital[(int)i],infoAOs_->orbital[(int)j]);
+  return ComputeOverlap_McMurchieDavidson(infoAOs_->orbital[i],infoAOs_->orbital[j]);
+}
+/***************************************************************************************/ 
+double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
+       const AtomicOrbital& orbitalB){
+  // Code develop by Julio Céar Cruz Monterrosas Feb 2021.
+
+  double AB = 0.0e-10;
+  for (int i=0;i<3;++i) {
+    AB += (orbitalA.coordinates[i] - orbitalB.coordinates[i]) * \
+          (orbitalA.coordinates[i] - orbitalB.coordinates[i]);
+  }
+  int sumAngularMomentumA = orbitalA.angularMomentum[0] + orbitalA.angularMomentum[1] + \
+                            orbitalA.angularMomentum[2];
+  int sumAngularMomentumB = orbitalB.angularMomentum[0] + orbitalB.angularMomentum[1] + \
+                            orbitalB.angularMomentum[2];
+  double P,PA[3],PB[3],mu, p;
+  double alpha, beta;
+  double overlapTot,overlapFinal = 0.0e-10;
+  for (int gtoA=0;gtoA<6;++gtoA) {
+    for (int gtoB=0;gtoB<6;++gtoB) {
+      alpha = basisSTO->value[orbitalA.element].exponent[gtoA];
+      beta  = basisSTO->value[orbitalB.element].exponent[gtoB];
+      p = alpha + beta;
+      mu = alpha*beta/p;
+  
+      overlapTot = exp(-mu * AB);
+
+      for (int i=0; i<3; ++i) {
+        P  = alpha*orbitalA.coordinates[i];
+        P +=  beta*orbitalB.coordinates[i];
+        P /= p;
+        PA[i] = P - orbitalA.coordinates[i];
+        PB[i] = P - orbitalB.coordinates[i];
+        overlapTot *= OverlapMcMurchie(orbitalA.angularMomentum[i],\
+                       orbitalB.angularMomentum[i], p, PA[i], PB[i]);
+      }
+     /**/ 
+      overlapTot *= NormalizationConst(alpha,orbitalA.angularMomentum);
+      overlapTot *= NormalizationConst(beta,orbitalB.angularMomentum);
+      
+      if (sumAngularMomentumA == 0) {
+        overlapTot *= basisSTO->value[orbitalA.element].coeffS[gtoA];
+      }else{
+        overlapTot *= basisSTO->value[orbitalA.element].coeffP[gtoA];
+      }
+      if (sumAngularMomentumB == 0) {
+        overlapTot *= basisSTO->value[orbitalB.element].coeffS[gtoB];
+      }else{
+        overlapTot *= basisSTO->value[orbitalB.element].coeffP[gtoB];
+      }
+      /**/
+      overlapFinal += overlapTot ;
+    }
+  }
+  return overlapFinal;
+}
+/***************************************************************************************/ 
+double Overlap::McMurchieCoef (const int &la,const int &lb,const int &t,const double &p,const double &Xpa,const double &Xpb){
+  if (t < 0 || t > la+lb)
+    return 0.0;
+  if (t == 0) {
+    if (la == 0 && lb == 0) {
+      return 1.0;
+    }else if (la > lb){
+        return Xpa * McMurchieCoef(la-1, lb, 0, p, Xpa, Xpb) +\
+                     McMurchieCoef(la-1, lb, 1, p, Xpa, Xpb);
+    }else{
+      return Xpb * McMurchieCoef(la, lb-1, 0, p, Xpa, Xpb) + \
+                   McMurchieCoef(la, lb-1, 1, p, Xpa, Xpb);
+    }
+  } else if (t == 1){
+    return (1.0 / (2.0 * p)) * (la * McMurchieCoef(la-1, lb, 0, p, Xpa, Xpb) + \
+                                lb * McMurchieCoef(la, lb-1, 0, p, Xpa, Xpb));
+  }else{
+    return (1.0 / (2.0 * p * t)) * (la * McMurchieCoef(la-1, lb, t-1, p, Xpa, Xpb) +\
+                                    lb * McMurchieCoef(la, lb-1, t-1, p, Xpa, Xpb));
+  }
+}
+/***************************************************************************************/ 
+double Overlap::OverlapMcMurchie(const int &la,const int &lb,const double &expoTot,const double &Xpa,const double &Xpb) {
+  if (la == 0 && lb == 0){
+    return std::sqrt(M_PI/expoTot);
+  }else{
+    return std::sqrt(M_PI/expoTot) * McMurchieCoef(la, lb, 0, expoTot, Xpa, Xpb);
+  }
+}
+/***************************************************************************************/
+double Overlap::NormalizationConst(const double &alpha,const int (&angMom)[3]){
+  double norm = std::pow(2.0 * alpha/M_PI,3.0/4.0);
+  norm *= std::pow(4.0 * alpha,(double)(angMom[0]+angMom[1]+angMom[2])/2);
+  norm /= std::sqrt(\
+                    doubfact(2*angMom[0]-1) * \
+                    doubfact(2*angMom[1]-1) * \
+                    doubfact(2*angMom[2]-1)   \
+                   );
+  return norm;
+}
+/***************************************************************************************/ 
+/***************************************************************************************/ 
+double Overlap::ComputeOverlap_Boys(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
   int atomTypeA = orbitalA.element;
   int atomTypeB = orbitalB.element;
 
