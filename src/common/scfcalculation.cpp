@@ -71,7 +71,7 @@ void SCFCalculation::ComputeSCF(){
     ScreenUtils::PrintScrStarLine();
   }
   
-  unsigned int maxSCFSteps = 10;
+  unsigned int maxSCFSteps = 100;
   unsigned int SCFSteps = 0;
 
   double thresholdEnergy = 5.0e-3;
@@ -113,6 +113,7 @@ void SCFCalculation::ComputeSCF(){
       ScreenUtils::PrintScrStarLine();
     }
     SCFSteps++;
+    cout << "SCF step : " << SCFSteps << "  Energy = " << electronicEnergy << endl;
   }
   if (printInfo) {
     cout << "Electronic Energy end  = " << electronicEnergy << endl;

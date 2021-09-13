@@ -40,13 +40,13 @@ class TwoCenterIntegral{
   // Diff Atom
   double IntegralTypeSS_SS(const double&,const AtomicOrbital&,const AtomicOrbital&);
   double IntegralTypeSS_SP(const double&,const AtomicOrbital&,const AtomicOrbital&,\
-      const int (&AOsTypeInt)[4],double (&rotMat)[3][3]);
+      const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool&);
   double IntegralTypeSS_PP(const double&,const AtomicOrbital&,const AtomicOrbital&,\
-      const int (&AOsTypeInt)[4],double (&rotMat)[3][3]);
+      const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool&);
   double IntegralTypeSP_SP(const double&,const AtomicOrbital&,const AtomicOrbital&,\
       const int (&AOsTypeInt)[4],double (&rotMat)[3][3]);
   double IntegralTypeSP_PP(const double&,const AtomicOrbital&,const AtomicOrbital&,\
-      const int (&AOsTypeInt)[4],double (&rotMat)[3][3]);
+      const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool&);
   double IntegralTypePP_PP(const double&,const AtomicOrbital&,const AtomicOrbital&,\
       const int (&AOsTypeInt)[4],double (&rotMat)[3][3]);
   // Same atoms
@@ -57,7 +57,7 @@ class TwoCenterIntegral{
   double SelfIntegralTypePP_PP(const int&, const int (&AOsTypeInt)[4]);
   // Functions for type integral
   int GetPairType(const AtomicOrbital&,const AtomicOrbital&);
-  double CorrectOrderIntegral(int&,int&,int (&)[4]);
+  bool CorrectOrderIntegral(int&,int&,int (&)[4]);
 
   // Rotations
   void ComputeRotationMatrix(const double (&vecA)[3],const double (&vecB)[3],\

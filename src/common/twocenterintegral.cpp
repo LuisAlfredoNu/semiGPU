@@ -2,10 +2,6 @@
 #ifndef _TWOCENTERINTEGRAL_CPP_
 #define _TWOCENTERINTEGRAL_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 #include <vector>
 using std::vector;
 
@@ -146,7 +142,7 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
     } else { // If the two pairs are in differents atoms 
       double atomsDistance = distancePointsV3(orbitalA.coordinates,orbitalC.coordinates);
       double rotationMatrix[3][3];
-      double invertIntegral = CorrectOrderIntegral(pairTypeA,pairTypeB,AOsTypeInt);
+      bool invertIntegral = CorrectOrderIntegral(pairTypeA,pairTypeB,AOsTypeInt);
       if (pairTypeA == 0) {
         // SS|SS ; SS|SP ; SS|PP
         if (pairTypeA == pairTypeB) {
@@ -157,11 +153,11 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
           if (pairTypeB == 1) {
             // SS|SP
             integralValue = IntegralTypeSS_SP(atomsDistance,orbitalA,orbitalC,\
-                                              AOsTypeInt,rotationMatrix);
+                                              AOsTypeInt,rotationMatrix,invertIntegral);
           }else{
             // SS|PP
             integralValue = IntegralTypeSS_PP(atomsDistance,orbitalA,orbitalC,\
-                                              AOsTypeInt,rotationMatrix);
+                                              AOsTypeInt,rotationMatrix,invertIntegral);
           }
         }
       }else{
@@ -180,10 +176,10 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
         }else{
           // SP|PP
             integralValue = IntegralTypeSP_PP(atomsDistance,orbitalA,orbitalC,\
-                                              AOsTypeInt,rotationMatrix);
+                                              AOsTypeInt,rotationMatrix,invertIntegral);
         }
       }
-      return convertHartree2eV(integralValue) * invertIntegral;
+      return convertHartree2eV(integralValue);
     }
   }
   return integralValue;
@@ -194,25 +190,25 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
 
   int totalAOs = infoAOs.orbital.size();
   int indexOfAtomA,indexOfAtomB;
-  cout << "total AOs : " << totalAOs << endl;
+  //cout << "total AOs : " << totalAOs << endl;
   for (int i=0;i < totalAOs;++i) {
     for (int j=0;j <= i;++j) {
       indexOfAtomA = infoAOs.orbital[i].indexAtom;
       indexOfAtomB = infoAOs.orbital[j].indexAtom;
-      cout << "Compute all  atom   A : " << indexOfAtomA << "  B : " << indexOfAtomB;
-      cout << "   index   i : " << i            << "  j : " << j ;
+      //cout << "Compute all  atom   A : " << indexOfAtomA << "  B : " << indexOfAtomB;
+      //cout << "   index   i : " << i            << "  j : " << j ;
       if (infoAOs.orbital[i].element == infoAOs.orbital[j].element ) {
         // Compute for X-X or H-H
         if (infoAOs.orbital[i].element == 1) {
           //Compute for H-H
           ComputePair_HH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_HH " << endl;
+          //cout << "  Hit : pair_HH " << endl;
         }else{
           //Compute for X-X
           ComputePair_XX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_XX " << endl;
+          //cout << "  Hit : pair_XX " << endl;
         }
       }else{
         // Compute for X-Y, H-X or X-H
@@ -220,17 +216,17 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
           //Compute for X-Y
           ComputePair_XX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_XY " << endl;
+          //cout << "  Hit : pair_XY " << endl;
         }else if (infoAOs.orbital[i].element == 1) {
           //Compute for H-X
           ComputePair_HX(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_HX " << endl;
+          //cout << "  Hit : pair_HX " << endl;
         }else{
           //Compute for X-H
           ComputePair_XH(i,j,infoAOs.orbital,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
-          cout << "  Hit : pair_XH " << endl;
+          //cout << "  Hit : pair_XH " << endl;
         }
       }
     }
@@ -251,18 +247,22 @@ double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
 
     int indexAtomA = orbitalA.indexAtom;
     int indexAtomC = orbitalC.indexAtom;
+    
+    int angularMomA = orbitalA.angularMomentumInt;
+    int angularMomB = orbitalB.angularMomentumInt;
+    int angularMomC = orbitalC.angularMomentumInt;
+    int angularMomD = orbitalD.angularMomentumInt;
+    
     if (indexAtomA < indexAtomC) {
       swapValues(indexAtomA,indexAtomC);
+      swapValues(angularMomA,angularMomC);
+      swapValues(angularMomB,angularMomD);
     }
     // Possible pair X-X, X-H, H-X, H-H
     if (orbitalA.element > 1 ) {
       // Pair X-X or X-H
       if (orbitalC.element > 1) {
         // Pair X-X
-        int angularMomA = orbitalA.angularMomentumInt;
-        int angularMomB = orbitalB.angularMomentumInt;
-        int angularMomC = orbitalC.angularMomentumInt;
-        int angularMomD = orbitalD.angularMomentumInt;
 
         if (angularMomA > angularMomB) {
           swapValues(angularMomA,angularMomB);
@@ -475,29 +475,46 @@ double TwoCenterIntegral::IntegralTypeSS_SS(const double& atomsDistance,\
 /***************************************************************************************/ 
 double TwoCenterIntegral::IntegralTypeSS_SP(const double& atomsDistance,\
     const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalC,\
-    const int (&AOsTypeInt)[4],double (&rotMat)[3][3]){
+    const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool &invertIntegral){
  
   ComputeRotationMatrix(orbitalA.coordinates,orbitalC.coordinates,rotMat);
-  double value = multipole->Interaction_qUz(atomsDistance,orbitalA,orbitalC);
+  double value;
+  if (! invertIntegral) {
+    value = multipole->Interaction_qUz(atomsDistance,orbitalA,orbitalC);
+  }else{
+    value = multipole->Interaction_Uzq(atomsDistance,orbitalA,orbitalC);
+  }
   value = ApplyRotationAOs(2,AOsTypeInt[3],value,rotMat);
   return value;
 }
 /***************************************************************************************/ 
 double TwoCenterIntegral::IntegralTypeSS_PP(const double& atomsDistance,\
     const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalC,\
-    const int (&AOsTypeInt)[4],double (&rotMat)[3][3]){
+    const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool &invertIntegral){
   
   ComputeRotationMatrix(orbitalA.coordinates,orbitalC.coordinates,rotMat);
   
   double value_qq = multipole->Interaction_qq(atomsDistance,orbitalA,orbitalC);
-  double value_SS_PpiPpi = value_qq + \
-                           multipole->Interaction_qQpipi(atomsDistance,orbitalA,orbitalC);
+
+  double value_SS_PpiPpi,value_SS_PzPz;
+
+  if (! invertIntegral) {
+    value_SS_PpiPpi = value_qq + \
+                      multipole->Interaction_qQpipi(atomsDistance,orbitalA,orbitalC);
+    value_SS_PzPz = value_qq + \
+                    multipole->Interaction_qQzz(atomsDistance,orbitalA,orbitalC);
+  }else{
+    value_SS_PpiPpi = value_qq + \
+                      multipole->Interaction_Qpipiq(atomsDistance,orbitalA,orbitalC);
+    value_SS_PzPz = value_qq + \
+                    multipole->Interaction_Qzzq(atomsDistance,orbitalA,orbitalC);
+  }
+
   value_SS_PpiPpi = ApplyRotationAOs(0,0,AOsTypeInt[2],AOsTypeInt[3],value_SS_PpiPpi,rotMat)\
                     + ApplyRotationAOs(1,1,AOsTypeInt[2],AOsTypeInt[3],value_SS_PpiPpi,rotMat);
 
-  double value_SS_PzPz = value_qq + \
-                         multipole->Interaction_qQzz(atomsDistance,orbitalA,orbitalC);
   value_SS_PzPz = ApplyRotationAOs(2,2,AOsTypeInt[2],AOsTypeInt[3],value_SS_PzPz,rotMat);
+
   return value_SS_PpiPpi + value_SS_PzPz;
 }
 /***************************************************************************************/ 
@@ -519,25 +536,41 @@ double TwoCenterIntegral::IntegralTypeSP_SP(const double& atomsDistance,\
 /***************************************************************************************/ 
 double TwoCenterIntegral::IntegralTypeSP_PP(const double& atomsDistance,\
     const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalC,\
-    const int (&AOsTypeInt)[4],double (&rotMat)[3][3]){
+    const int (&AOsTypeInt)[4],double (&rotMat)[3][3],const bool &invertIntegral){
 
   ComputeRotationMatrix(orbitalA.coordinates,orbitalC.coordinates,rotMat);
  
-  double value_Uzq = multipole->Interaction_Uzq(atomsDistance,orbitalA,orbitalC);
+  double value_Uzq,value_SPz_PpiPpi,value_SPz_PzPz,value_SPpi_PzPpi;
 
-  double value_SPz_PpiPpi = value_Uzq + \
-                            multipole->Interaction_UzQpipi(atomsDistance,orbitalA,orbitalC);
+  if (! invertIntegral) {
+    value_Uzq = multipole->Interaction_Uzq(atomsDistance,orbitalA,orbitalC);
 
+    value_SPz_PpiPpi = value_Uzq + \
+                       multipole->Interaction_UzQpipi(atomsDistance,orbitalA,orbitalC);
+
+    value_SPz_PzPz = value_Uzq + \
+                     multipole->Interaction_UzQz(atomsDistance,orbitalA,orbitalC);
+
+    value_SPpi_PzPpi = multipole->Interaction_UpiQpiz(atomsDistance,orbitalA,orbitalC);
+  }else{
+    value_Uzq = multipole->Interaction_qUz(atomsDistance,orbitalA,orbitalC);
+
+    value_SPz_PpiPpi = value_Uzq + \
+                       multipole->Interaction_QpipiUz(atomsDistance,orbitalA,orbitalC);
+
+    value_SPz_PzPz = value_Uzq + \
+                     multipole->Interaction_QzUz(atomsDistance,orbitalA,orbitalC);
+
+    value_SPpi_PzPpi = multipole->Interaction_QpizUpi(atomsDistance,orbitalA,orbitalC);
+  }
+  
   value_SPz_PpiPpi = ApplyRotationAOs(2,0,0,AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
       value_SPz_PpiPpi,rotMat) + ApplyRotationAOs(2,1,1,AOsTypeInt[1],AOsTypeInt[2],\
         AOsTypeInt[3],value_SPz_PpiPpi,rotMat);
 
-  double value_SPz_PzPz = value_Uzq + \
-                          multipole->Interaction_UzQz(atomsDistance,orbitalA,orbitalC);
   value_SPz_PzPz = ApplyRotationAOs(2,2,2,AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
       value_SPz_PzPz,rotMat);
 
-  double value_SPpi_PzPpi = multipole->Interaction_UpiQpiz(atomsDistance,orbitalA,orbitalC);
 
   value_SPpi_PzPpi = ApplyRotationAOs(0,2,0,AOsTypeInt[1],AOsTypeInt[2],AOsTypeInt[3],\
                          value_SPpi_PzPpi,rotMat) + \
@@ -705,7 +738,7 @@ int TwoCenterIntegral::GetPairType(const AtomicOrbital& orbitalA,const AtomicOrb
     + orbitalB.angularMomentum[0] + orbitalB.angularMomentum[1] + orbitalB.angularMomentum[2];
 }
 /***************************************************************************************/ 
-double TwoCenterIntegral::CorrectOrderIntegral(int& pairTypeA,int& pairTypeB,\
+bool TwoCenterIntegral::CorrectOrderIntegral(int& pairTypeA,int& pairTypeB,\
     int (&AOsTypeInt)[4]){
   if (pairTypeA > pairTypeB) {
     int tmp_pair = pairTypeA;
@@ -721,13 +754,10 @@ double TwoCenterIntegral::CorrectOrderIntegral(int& pairTypeA,int& pairTypeB,\
     AOsTypeInt[2] = AOsTypeInt_tmp;
     AOsTypeInt[3] = AOsTypeInt_tmpp;
 
-    if ((pairTypeA + pairTypeB) % 2 == 1) {
-      return -1.0;
-    }else{
-      return 1.0;
-    }
+    return true;
+
   }
-  return 1.0;
+  return false;
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 
