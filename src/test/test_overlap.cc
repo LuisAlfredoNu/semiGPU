@@ -83,7 +83,7 @@ int main (int argc, char *argv[])
   cout << "  Compute value = " << overlapValue << endl << endl;
  
   
-  
+ /**/ 
   vector<Atom> molecule (6,Atom());
   for (int i=0;i<6;++i) {
     molecule[i].setAtomNumber(1);
@@ -129,8 +129,8 @@ int main (int argc, char *argv[])
   cout << "overlapValue = " << overlapValue << endl;
 
   vector<Atom> moleculeA (2,Atom());
-  double coorAAA[3] = {-1.00000,-2.00000,-3.00000};  
-  double coorBBB[3] = { 1.00000, 1.00000, 1.50000};
+  double coorAAA[3] = {-1.00000,-0.00000,-0.00000};  
+  double coorBBB[3] = { 0.00000, 0.00000, 0.50000};
 
   moleculeA[0].setAtomNumber(6);
   moleculeA[0].setCoordinates(coorAAA[0],coorAAA[1],coorAAA[2]);
@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
   cout << "1C -> {"<<coorAAA[0]<<","<<coorAAA[1]<<","<<coorAAA[2]<<"}" << endl;
   cout << "2C -> {"<<coorBBB[0]<<","<<coorBBB[1]<<","<<coorBBB[2]<<"}" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.orbital.size(),overlapB.matrixHold_);
-
+  /**/
 	return EXIT_SUCCESS;
 }
 

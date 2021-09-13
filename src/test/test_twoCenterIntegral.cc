@@ -74,31 +74,51 @@ int main (int argc, char *argv[])
   cout << "result = " << result << endl;
 /* */ 
 
-  string moleculeTest = "C2H6";
+  string moleculeTest = "CH3OH";
   vector<Atom> molecule;
+  string fileCSV;
+  bool statusAllData = false;
 
   if (moleculeTest == "C2") {
     molecule.push_back(Atom());
     molecule.push_back(Atom());
-    double coorAA[3] = { 0.0, 0.0,-3.0};
-    double coorCC[3] = { 1.0, 1.0, 1.0};
+    double coorAA[3] = { -0.5, -1.0,-1.5};
+    double coorCC[3] = { 1.5, 1.0, 0.5};
 
     molecule[0].setCoordinates(coorAA);
-    molecule[0].setAtomNumber(6);
+    molecule[0].setAtomNumber(8);
     molecule[1].setCoordinates(coorCC);
-    molecule[1].setAtomNumber(6);
+    molecule[1].setAtomNumber(7);
+    fileCSV = "c2_scf_debug_twoInt.csv";
+    statusAllData = true;
   }else if (moleculeTest == "CH4"){
     string fileName = "filetest_ch4.xyz";
       cout << "File for read: "<<fileName<<endl;
       ReadXYZFile reader;
-      bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+      statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }else if (moleculeTest == "CH3OH"){
+    string fileName = "../filestest/methanol.xyz";
+      cout << "File for read: "<<fileName<<endl;
+      ReadXYZFile reader;
+      statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+      fileCSV =  "../filestest/methanol_scf_debug_twoInt.csv";
   }else if (moleculeTest == "C2H6"){
     string fileName = "filetest_c2h6.xyz";
       cout << "File for read: "<<fileName<<endl;
       ReadXYZFile reader;
-      bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+      statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
   }
 
+  if (! statusAllData) {
+    return EXIT_FAILURE;
+  }
+  cout << "Geometry :" << endl;
+  for (size_t i=0;i<molecule.size();++i) {
+    cout << setw(3)  << molecule[i].atomSymbol ;
+    cout << setw(10) << molecule[i].atomCoordinates[0] ;
+    cout << setw(10) << molecule[i].atomCoordinates[1] ;
+    cout << setw(10) << molecule[i].atomCoordinates[2] << endl ;
+  }
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
 
@@ -133,6 +153,14 @@ int main (int argc, char *argv[])
         }
         continue;
       }
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber > 1) {
+        for (int k=0;k<1;k++) {
+          for (int l=0;l<10;l++) {
+            computeData.push_back(all2CenterIntegral[i][j][k][l]);
+          }
+        }
+        continue;
+      }
       if (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1) {
         for (int k=0;k<1;k++) {
           for (int l=0;l<10;l++) {
@@ -145,7 +173,7 @@ int main (int argc, char *argv[])
   }
 
   vector<vector<string>> dataCSV;
-  bool readFile = FileUtils::ReadCSV("c2_scf_debug_twoInt.csv",dataCSV);
+  bool readFile = FileUtils::ReadCSV(fileCSV,dataCSV);
 
   if (!readFile) {
     cout << "Problem to read CSV" << endl;
@@ -168,13 +196,13 @@ int main (int argc, char *argv[])
   int decimals=4;
   cout << std::fixed << setprecision(decimals);
   cout << setw(decimals + 8);
-  for (auto label : listMOPAC) {
+  int totalErrors = 0;
+ /* for (auto label : listMOPAC) {
     cout << label << setw(decimals + 16);
   }
 
   cout << setw(-18) ;
   int j = 0;
-  int totalErrors = 0;
 	for (int i=0;i<computeData.size();++i) {
     if (i % 10 == 0) {
       cout  << endl;
@@ -187,10 +215,11 @@ int main (int argc, char *argv[])
     if (sameReal(computeData[i],refData[i],1.0e-4)) {
       cout << setw(decimals + 4) << computeData[i] <<setw(2) << "O" << setw(decimals +4) << refData[i];
     }else{
-      cout << setw(decimals + 4) << computeData[i];
       ScreenUtils::SetScrRedBoldFont();
-      cout<<setw(2) << "X" << setw(decimals +4) << refData[i];
+      cout << setw(decimals + 4) << computeData[i];
+      cout<<setw(2) << "X" ;
       ScreenUtils::SetScrNormalFont();
+      cout << setw(decimals +4) << refData[i];
       ++totalErrors;
     }
     cout << setw(2)<< "|";
@@ -200,17 +229,102 @@ int main (int argc, char *argv[])
     }
   }
   cout  << endl;
-/*  */
+  */
+  int countData = 0;
+  int countCSV = 0;
+  for (int i=0;i<molecule.size();i++) {
+    for (int j=0;j<=i;j++) {
+
+      
+      cout << "Atom A : "<< molecule[i].atomSymbol << "  index : " << i;
+      cout << " / ";
+      cout << "Atom B : "<< molecule[j].atomSymbol << "  index : " << j;
+      cout  << endl;
+      totalErrors = 0;
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
+        for (int k=0;k<1;k++) {
+          for (int l=0;l<1;l++) {
+            if (sameReal(computeData[countData],refData[countData],1.0e-4)) {
+              cout << setw(decimals + 4) << computeData[countData] <<setw(2) << "O" << setw(decimals +4) << refData[countData];
+            }else{
+              ScreenUtils::SetScrRedBoldFont();
+              cout << setw(decimals + 4) << computeData[countData];
+              cout<<setw(2) << "X" ;
+              ScreenUtils::SetScrNormalFont();
+              cout << setw(decimals +4) << refData[countData];
+              ++totalErrors;
+            }
+            cout << setw(2)<< "|";
+            countData++;
+          }
+        }
+        cout << endl;
+      cout << endl << "total Errors = " << totalErrors <<endl;
+        continue;
+      }
+
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
+        for (int k=0;k<10;k++) {
+          for (int l=0;l<10;l++) {
+            if (sameReal(computeData[countData],refData[countData],1.0e-4)) {
+              cout << setw(decimals + 4) << computeData[countData] <<setw(2) << "O" << setw(decimals +4) << refData[countData];
+            }else{
+              ScreenUtils::SetScrRedBoldFont();
+              cout << setw(decimals + 4) << computeData[countData];
+              cout<<setw(2) << "X" ;
+              ScreenUtils::SetScrNormalFont();
+              cout << setw(decimals +4) << refData[countData];
+              ++totalErrors;
+            }
+            cout << setw(2)<< "|";
+            countData++;
+          }
+        cout << endl;
+        }
+        cout << endl;
+      cout << endl << "total Errors = " << totalErrors <<endl;
+        continue;
+      }
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1 || molecule[i].atomNumber == 1 && molecule[j].atomNumber > 1) {
+        for (int k=0;k<1;k++) {
+          for (int l=0;l<10;l++) {
+            if (sameReal(computeData[countData],refData[countData],1.0e-4)) {
+              cout << setw(decimals + 4) << computeData[countData] <<setw(2) << "O" << setw(decimals +4) << refData[countData];
+            }else{
+              ScreenUtils::SetScrRedBoldFont();
+              cout << setw(decimals + 4) << computeData[countData];
+              cout<<setw(2) << "X" ;
+              ScreenUtils::SetScrNormalFont();
+              cout << setw(decimals +4) << refData[countData];
+              ++totalErrors;
+            }
+            cout << setw(2)<< "|";
+            countData++;
+          }
+        cout << endl;
+        }
+      cout << endl << "total Errors = " << totalErrors <<endl;
+        continue;
+      }
+    }
+  }
  
   cout << "Test for all possible bielectronic  integral" << endl;
   cout << "get 0,0,4,4 = ";
-  cout << TwoCenterIntegral::GetValueFromArray(\
+  cout << "[0][0][4][4] = " << TwoCenterIntegral::GetValueFromArray(\
       infoAOs.orbital[0],infoAOs.orbital[0],\
       infoAOs.orbital[4],infoAOs.orbital[4],all2CenterIntegral) << endl;
+  cout << "[0][0][4][5] = "<< TwoCenterIntegral::GetValueFromArray(\
+      infoAOs.orbital[0],infoAOs.orbital[0],\
+      infoAOs.orbital[4],infoAOs.orbital[5],all2CenterIntegral) << endl;
+  cout << "[4][5][0][0] = "<< TwoCenterIntegral::GetValueFromArray(\
+      infoAOs.orbital[4],infoAOs.orbital[5],\
+      infoAOs.orbital[0],infoAOs.orbital[0],all2CenterIntegral) << endl;
 
   int nAOs = infoAOs.orbital.size();
   cout << "orbital size = " << nAOs << endl;
 
+  /*
   for (int i=0;i<nAOs;i++) {
     for (int j=0;j<nAOs;j++) {
       for (int k=0;k<nAOs;k++) {
@@ -234,7 +348,7 @@ int main (int argc, char *argv[])
         }
       }
     }
-  }
+  }*/
 
   cout << "Dealloc array of all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);

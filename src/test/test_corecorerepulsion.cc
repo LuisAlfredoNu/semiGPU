@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
   MNDOparameter MNDOpara;
 
   // Init molecule
-  string moleculeTest = "C2H6";
+  string moleculeTest = "C2";
 
   vector<Atom> molecule;
 
@@ -44,12 +44,12 @@ int main (int argc, char *argv[])
 
     molecule.push_back(Atom());
     molecule.push_back(Atom());
-    double coorA[3] = { -1.0,-2.0,-3.0};
-    double coorC[3] = {1.0,1.0,1.5};
+    double coorA[3] = { -1.0,-0.0,-0.0};
+    double coorC[3] = {0.0,0.0,0.5};
     molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-    molecule[0].setAtomNumber(6);
+    molecule[0].setAtomNumber(8);
     molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-    molecule[1].setAtomNumber(6);
+    molecule[1].setAtomNumber(1);
   }else if (moleculeTest == "CH4") {
     string fileName = "filetest_ch4.xyz";
     cout << "File for read: "<<fileName<<endl;
@@ -57,6 +57,11 @@ int main (int argc, char *argv[])
     bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
   }else if (moleculeTest == "C2H6") {
     string fileName = "filetest_c2h6.xyz";
+    cout << "File for read: "<<fileName<<endl;
+    ReadXYZFile reader;
+    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  }else if (moleculeTest == "CH3OH") {
+    string fileName = "../filestest/methanol.xyz";
     cout << "File for read: "<<fileName<<endl;
     ReadXYZFile reader;
     bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);

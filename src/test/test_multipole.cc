@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
   orbitalA.SetCoordinates(coorAA);
 
   double coorBB[3] = {0.0,0.0,1.0};
-  orbitalB.SetElement( 6);
+  orbitalB.SetElement( 8);
   orbitalB.SetCoordinates(coorBB);
 
   // Init MNDO parameters
