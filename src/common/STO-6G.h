@@ -11,7 +11,8 @@ class STO_6G{
   STO_6G();
 
   struct STOdata{
-    double exponent[6];
+    double exponentS[6];
+    double exponentP[6];
     double coeffS[6];
     double coeffP[6];
   };

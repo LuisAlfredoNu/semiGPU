@@ -54,26 +54,22 @@ double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
   double overlapTot,overlapFinal = 0.0e-10;
   for (int gtoA=0;gtoA<6;++gtoA) {
     for (int gtoB=0;gtoB<6;++gtoB) {
-      alpha = basisSTO->value[orbitalA.element].exponent[gtoA];
-      beta  = basisSTO->value[orbitalB.element].exponent[gtoB];
+
+      if (sumAngularMomentumA == 0) {
+        alpha = basisSTO->value[orbitalA.element].exponentS[gtoA];
+      }else{
+        alpha = basisSTO->value[orbitalA.element].exponentP[gtoA];
+      }
+      if (sumAngularMomentumB == 0) {
+        beta  = basisSTO->value[orbitalB.element].exponentS[gtoB];
+      }else{
+        beta  = basisSTO->value[orbitalB.element].exponentP[gtoB];
+      }
       p = alpha + beta;
       mu = alpha*beta/p;
   
       overlapTot = exp(-mu * AB);
-
-      for (int i=0; i<3; ++i) {
-        P  = alpha*orbitalA.coordinates[i];
-        P +=  beta*orbitalB.coordinates[i];
-        P /= p;
-        PA[i] = P - orbitalA.coordinates[i];
-        PB[i] = P - orbitalB.coordinates[i];
-        overlapTot *= OverlapMcMurchie(orbitalA.angularMomentum[i],\
-                       orbitalB.angularMomentum[i], p, PA[i], PB[i]);
-      }
-     /**/ 
-      overlapTot *= NormalizationConst(alpha,orbitalA.angularMomentum);
-      overlapTot *= NormalizationConst(beta,orbitalB.angularMomentum);
-      
+     
       if (sumAngularMomentumA == 0) {
         overlapTot *= basisSTO->value[orbitalA.element].coeffS[gtoA];
       }else{
@@ -84,6 +80,21 @@ double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
       }else{
         overlapTot *= basisSTO->value[orbitalB.element].coeffP[gtoB];
       }
+      //cout << "preExp = " << overlapTot << endl;
+
+      for (int i=0; i<3; ++i) {
+        P  = alpha*orbitalA.coordinates[i];
+        P +=  beta*orbitalB.coordinates[i];
+        P /= p;
+        PA[i] = P - orbitalA.coordinates[i];
+        PB[i] = P - orbitalB.coordinates[i];
+        overlapTot *= OverlapMcMurchie(orbitalA.angularMomentum[i],\
+                       orbitalB.angularMomentum[i], p, PA[i], PB[i]);
+      }
+     /** 
+      overlapTot *= NormalizationConst(alpha,orbitalA.angularMomentum);
+      overlapTot *= NormalizationConst(beta,orbitalB.angularMomentum);
+      
       /**/
       overlapFinal += overlapTot ;
     }
@@ -172,6 +183,7 @@ double Overlap::ComputeOverlap_Boys(const AtomicOrbital& orbitalA,const AtomicOr
   double overlapSTO = 0.0e-10;
   double overlapGTO = 0.0;
   // Multiply and sum of exponents
+  double alpha,beta;
   double a_times_b = 0.0;
   double a_plus_b = 0.0;
   // Normalization factor
@@ -179,23 +191,31 @@ double Overlap::ComputeOverlap_Boys(const AtomicOrbital& orbitalA,const AtomicOr
 
   for(int gtoA = 0; gtoA < 6;gtoA++){
     for(int gtoB = 0; gtoB < 6;gtoB++){
-      a_times_b = basisSTO->value[atomTypeA].exponent[gtoA] * \
-                  basisSTO->value[atomTypeB].exponent[gtoB];
-      a_plus_b = basisSTO->value[atomTypeA].exponent[gtoA] +  \
-                 basisSTO->value[atomTypeB].exponent[gtoB];
+      if (sumAngularMomentumA == 0) {
+        alpha = basisSTO->value[orbitalA.element].exponentS[gtoA];
+      }else{
+        alpha = basisSTO->value[orbitalA.element].exponentP[gtoA];
+      }
+      if (sumAngularMomentumB == 0) {
+        beta  = basisSTO->value[orbitalB.element].exponentS[gtoB];
+      }else{
+        beta  = basisSTO->value[orbitalB.element].exponentP[gtoB];
+      }
+      a_times_b = alpha * beta;
+      a_plus_b = alpha + beta;
 
       Overlap_SS(overlapGTO,a_times_b,a_plus_b,atomDistance);
 
       if (sumAngularMomentumA == 1 && sumAngularMomentumB == 0) {
-        Overlap_PS(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
-                              basisSTO->value[atomTypeB].exponent[gtoB],\
+        Overlap_PS(overlapGTO,alpha,\
+                              beta,\
                               a_plus_b,rABx);
       
         normaFactor = basisSTO->value[atomTypeA].coeffP[gtoA] * \
                       basisSTO->value[atomTypeB].coeffS[gtoB];
       }else if (sumAngularMomentumA == 0 && sumAngularMomentumB == 1) {
-        Overlap_SP(overlapGTO,basisSTO->value[atomTypeA].exponent[gtoA],\
-                              basisSTO->value[atomTypeB].exponent[gtoB],\
+        Overlap_SP(overlapGTO,alpha,\
+                              beta,\
                               a_plus_b,rABy);
 
         normaFactor = basisSTO->value[atomTypeA].coeffS[gtoA] * \

@@ -60,6 +60,7 @@ MNDOparameter::MNDOparameter(){
    hsp[7] =    3.14000000; //  EV        ONE-CENTER INTEGRAL (SP,SP)
  dd[7][0] =    0.63990367; //  BOHR      CHARGE SEPARATION, SP, L=1
  dd[7][1] =    0.76788440; //  BOHR      CHARGE SEPARATION, PP, L=2
+ dd[7][1] =    0.54297627; //  BOHR      USING ORIGINAL MNDO PAPER FORMULA
  pp[7][0] =    1.00115465; //  BOHR      KLOPMAN-OHNO TERM, SS, L=0
  pp[7][1] =    0.63747362; //  BOHR      KLOPMAN-OHNO TERM, SP, L=1
  pp[7][2] =    0.61528499; //  BOHR      KLOPMAN-OHNO TERM, PP, L=2
@@ -80,6 +81,7 @@ MNDOparameter::MNDOparameter(){
    hsp[8] =     3.94000000 ; //  EV        ONE-CENTER INTEGRAL (SP,SP)
  dd[8][0] =     0.53460239 ; //  BOHR      CHARGE SEPARATION, SP, L=1
  dd[8][1] =     0.64152287 ; //  BOHR      CHARGE SEPARATION, PP, L=2
+ dd[8][1] =     0.45362517 ; //  BOHR      USING ORIGINAL MNDO PAPER FORMULA
  pp[8][0] =     0.88234058 ; //  BOHR      KLOPMAN-OHNO TERM, SS, L=0
  pp[8][1] =     0.52124931 ; //  BOHR      KLOPMAN-OHNO TERM, SP, L=1
  pp[8][2] =     0.52654944 ; //  BOHR      KLOPMAN-OHNO TERM, PP, L=2
