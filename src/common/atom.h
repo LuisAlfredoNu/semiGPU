@@ -21,7 +21,6 @@ public:
 	double atomWeight;
   int atomValenceElectrons;
 	bool statusData;
-
 /***************************************************************************************/ 
 /* Assing values to coordinates X,Y,Z */
 	void setCoordinates(double,double,double);
@@ -34,19 +33,15 @@ public:
 /* Assign name and letter to type of element */
 	void setAtomSymbol(string);
 	void setAtomNumber(int);
-
-
 /***************************************************************************************/  
+  static void PrintGeometry(const vector<Atom> &molecule);
 /***************************************************************************************/  
-
 protected:
 	double xPosition;
 	double yPosition;
 	double zPosition;
-
 /***************************************************************************************/  
 /***************************************************************************************/  
-
 private:
 	string convertAtomNumber2AtomSymbol(int);
 	int convertAtomSymbol2AtomNumber(string);

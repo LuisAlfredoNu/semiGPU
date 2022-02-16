@@ -7,10 +7,13 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <iomanip>
+using std::setw;
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
+
 #include "atom.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
@@ -60,10 +63,18 @@ double Atom::getYCoordinate(){
 double Atom::getZCoordinate(){
 	return zPosition;
 }
+void Atom::PrintGeometry(const vector<Atom> &molecule){
+  cout << "Geometry :" << endl;
+  for (size_t i=0;i<molecule.size();++i) {   
+    cout << setw(3)  << molecule[i].atomSymbol ;
+    cout << setw(10) << molecule[i].atomCoordinates[0] ;
+    cout << setw(10) << molecule[i].atomCoordinates[1] ;
+    cout << setw(10) << molecule[i].atomCoordinates[2] << endl ; 
+  }
+}
 /***************************************************************************************/ 
 /***************************************************************************************/ 
 void Atom::setAtomSymbol(string element){
-	
 	atomNumber = convertAtomSymbol2AtomNumber(element);
 
 	if(atomNumber == 0){
@@ -76,7 +87,6 @@ void Atom::setAtomSymbol(string element){
 	}
 }
 void Atom::setAtomNumber(int number){
-	
 	if(0 < number && number < 109 ){
 		atomSymbol = convertAtomNumber2AtomSymbol(number);
 		atomNumber = number;
@@ -103,12 +113,10 @@ int Atom::setAtomValenceElectrons(int n){
     statusData = false;
   }
   return -1;
-
 }
 /***************************************************************************************/  
 /***************************************************************************************/  
 int Atom::convertAtomSymbol2AtomNumber(string element){
-	
 	int numelement=0;
 	string listatomymbol[] = {"H" ,"He" ,"Li" ,"Be" ,"B" ,"C" ,"N" ,"O" ,"F" ,"Ne" ,"Na" ,"Mg" ,"Al" ,"Si" ,"P" ,"S" ,"Cl" ,"Ar" ,"K" ,"Ca" ,"Sc" ,"Ti" ,"V" ,"Cr" ,"Mn" ,"Fe" ,"Co" ,"Ni" ,"Cu" ,"Zn" ,"Ga" ,"Ge" ,"As" ,"Se" ,"Br" ,"Kr" ,"Rb" ,"Sr" ,"Y" ,"Zr" ,"Nb" ,"Mo" ,"Tc" ,"Ru" ,"Rh" ,"Pd" ,"Ag" ,"Cd" ,"In" ,"Sn" ,"Sb" ,"Te" ,"I" ,"Xe" ,"Cs" ,"Ba" ,"La" ,"Ce" ,"Pr" ,"Nd" ,"Pm" ,"Sm" ,"Eu" ,"Gd" ,"Tb" ,"Dy" ,"Ho" ,"Er" ,"Tm" ,"Yb" ,"Lu" ,"Hf" ,"Ta" ,"W" ,"Re" ,"Os" ,"Ir" ,"Pt" ,"Au" ,"Hg" ,"Tl" ,"Pb" ,"Bi" ,"Po" ,"At" ,"Rn" ,"Fr" ,"Ra" ,"Ac" ,"Th" ,"Pa" ,"U" ,"Np" ,"Pu" ,"Am" ,"Cm" ,"Bk" ,"Cf" ,"Es" ,"Fm" ,"Md" ,"No" ,"Lr" ,"Rf" ,"Db" ,"Sg" ,"Bh" ,"Hs" ,"Mt"};
 	
@@ -124,7 +132,6 @@ int Atom::convertAtomSymbol2AtomNumber(string element){
 	return numelement;
 }
 string Atom::convertAtomNumber2AtomSymbol(int number){
-
 	string listatomymbol[] = {"H" ,"He" ,"Li" ,"Be" ,"B" ,"C" ,"N" ,"O" ,"F" ,"Ne" ,"Na" ,"Mg" ,"Al" ,"Si" ,"P" ,"S" ,"Cl" ,"Ar" ,"K" ,"Ca" ,"Sc" ,"Ti" ,"V" ,"Cr" ,"Mn" ,"Fe" ,"Co" ,"Ni" ,"Cu" ,"Zn" ,"Ga" ,"Ge" ,"As" ,"Se" ,"Br" ,"Kr" ,"Rb" ,"Sr" ,"Y" ,"Zr" ,"Nb" ,"Mo" ,"Tc" ,"Ru" ,"Rh" ,"Pd" ,"Ag" ,"Cd" ,"In" ,"Sn" ,"Sb" ,"Te" ,"I" ,"Xe" ,"Cs" ,"Ba" ,"La" ,"Ce" ,"Pr" ,"Nd" ,"Pm" ,"Sm" ,"Eu" ,"Gd" ,"Tb" ,"Dy" ,"Ho" ,"Er" ,"Tm" ,"Yb" ,"Lu" ,"Hf" ,"Ta" ,"W" ,"Re" ,"Os" ,"Ir" ,"Pt" ,"Au" ,"Hg" ,"Tl" ,"Pb" ,"Bi" ,"Po" ,"At" ,"Rn" ,"Fr" ,"Ra" ,"Ac" ,"Th" ,"Pa" ,"U" ,"Np" ,"Pu" ,"Am" ,"Cm" ,"Bk" ,"Cf" ,"Es" ,"Fm" ,"Md" ,"No" ,"Lr" ,"Rf" ,"Db" ,"Sg" ,"Bh" ,"Hs" ,"Mt"};
 
 	return listatomymbol[number-1]; 
