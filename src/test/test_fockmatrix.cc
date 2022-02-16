@@ -12,6 +12,7 @@ using std::string;
 using std::vector;
 
 #include "atom.h"
+#include "readxyzfile.h"
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
 #include "mymemory.h"
@@ -22,27 +23,32 @@ using std::vector;
 
 #include "fockmatrix.h"
 
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for Class Hcore " << endl;
-	cout << "********************************************************" << endl << endl;
-
-  // Init MNDO parameters
-  MNDOparameter MNDOpara;
+int main (int argc, char *argv[]){
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for Class FockMatrix " << endl;
+  cout << "********************************************************" << endl << endl;
+  
+  if (argc < 2) {
+    cout << "Dont input file in arguments " << endl << endl;
+    return EXIT_FAILURE;
+  }
+/***************************************************************************************/ 
+  string filename = argv[1];
+  cout << "File for read: " << filename << endl;
 
   // Init molecule
-  vector<Atom> molecule (2,Atom());
+  ReadXYZFile reader;
+  vector<Atom> molecule;
 
-  double coorA[3] = {-1.0,-2.0,-3.0};
-  double coorC[3] = {1.0,1.0,1.5};
-  molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-  molecule[0].setAtomNumber(6);
-  molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-  molecule[1].setAtomNumber(6);
+  bool statusAllData = reader.GetValuesFromFile(filename,molecule);
 
-  cout << "Coordinates A = " << coorA[0] << "  " << coorA[1] << "  " << coorA[2] << endl;
-  cout << "Coordinates B = " << coorC[0] << "  " << coorC[1] << "  " << coorC[2] << endl;
+  if (! statusAllData) {
+    cout << "Somethig is wrong with xyz file" << endl;
+    return EXIT_FAILURE;
+  }
+
+  Atom::PrintGeometry(molecule);
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
@@ -55,6 +61,8 @@ int main (int argc, char *argv[])
   }else{
     cout << "Bad Alloc: all2CenterIntegral " << endl;
   }
+  // Init MNDO parameters
+  MNDOparameter MNDOpara;
   // Init TwoCenterIntegral
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
@@ -72,7 +80,7 @@ int main (int argc, char *argv[])
 
   cout << "hcore matrix" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,hcore.matrixHold_);
-  
+
   double* eigenVec;
 
   if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,eigenVec,0.0)) {
@@ -89,7 +97,7 @@ int main (int argc, char *argv[])
   ScreenUtils::PrintMatrixNxN(nAOs,eigenVec);
 
 
-  // Init Hcore
+  // Init Pmatrix
   cout << "Init and Compute DensityMatrix" << endl;
   DensityMatrix Pmatrix(eigenVec,nAOs);
   // Alloc Pmatrix Matrix

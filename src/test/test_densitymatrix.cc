@@ -16,11 +16,11 @@ using std::vector;
 
 #include "densitymatrix.h"
 
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for Class DensityMatrix " << endl;
-	cout << "********************************************************" << endl << endl;
+int main (int argc, char *argv[]){
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for Class DensityMatrix " << endl;
+  cout << "********************************************************" << endl << endl;
 
   double* eigenVec;
 
@@ -47,16 +47,17 @@ int main (int argc, char *argv[])
   }else{
     cout << "Bad Alloc: PmatrixMatrix " << endl;
   }
-  // Init Hcore
-  cout << "Init and compute DensityMatrix" << endl;
+  cout << "Compute DensityMatrix" << endl;
   Pmatrix.ComputeMatrix();
 
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Pmatrix.matrixHold_);
 
   cout << "Update eigenVec values" << endl;
+  cout << "eigenVec[1]  = -1.0" << endl;
+  cout << "eigenVec[14] = -0.5" << endl;
   eigenVec[1] = -1.0;
   eigenVec[14] = -0.5;
-  
+
   cout << "Compute again DensityMatrix" << endl;
   Pmatrix.ComputeMatrix();
 

@@ -21,60 +21,32 @@ using std::vector;
 
 #include "corecorerepulsion.h"
 
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
+int main (int argc, char *argv[]){
+	cout << endl;
+  cout << "********************************************************" << endl;
 	cout << " Testing for Class CoreCoreRepulsion " << endl;
 	cout << "********************************************************" << endl << endl;
+/***************************************************************************************/
+  if (argc < 2) {
+    cout << "Dont input file in arguments " << endl << endl;
+    return EXIT_FAILURE;
+  }
 
-  // Init MNDO parameters
-  MNDOparameter MNDOpara;
-
-  // Init molecule
-  string moleculeTest = "C2";
+  string fileName = argv[1];
+  cout << "File for read: " << fileName << endl;
 
   vector<Atom> molecule;
+  ReadXYZFile reader;
+  bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
 
-  if (moleculeTest == "H6") {
-    string fileName = "filetest_h6.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
-  }else if (moleculeTest == "C2") {
-
-    molecule.push_back(Atom());
-    molecule.push_back(Atom());
-    double coorA[3] = { -1.0,-0.0,-0.0};
-    double coorC[3] = {0.0,0.0,0.5};
-    molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-    molecule[0].setAtomNumber(8);
-    molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-    molecule[1].setAtomNumber(1);
-  }else if (moleculeTest == "CH4") {
-    string fileName = "filetest_ch4.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
-  }else if (moleculeTest == "C2H6") {
-    string fileName = "filetest_c2h6.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
-  }else if (moleculeTest == "CH3OH") {
-    string fileName = "../filestest/methanol.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  if (! statusAllData) {
+    cout << "Problems to get geometry info from xyz file" << endl << endl;
+    return EXIT_FAILURE;
   }
 
-  cout << "Geometry :" << endl;
-  for (size_t i=0;i<molecule.size();++i) {
-    cout << setw(3)  << molecule[i].atomSymbol ;
-    cout << setw(10) << molecule[i].atomCoordinates[0] ;
-    cout << setw(10) << molecule[i].atomCoordinates[1] ;
-    cout << setw(10) << molecule[i].atomCoordinates[2] << endl ;
-  }
+  Atom::PrintGeometry(molecule);
 
+  // Create all info of Atomic Orbitals
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
   int nAOs = infoAOs.orbital.size();
@@ -82,11 +54,12 @@ int main (int argc, char *argv[])
   cout << "infoAOs :" << endl;
   for (size_t i=0;i<nAOs;++i) {
     cout << "AO "<< setw(3)  << infoAOs.orbital[i].indexAO << " : ";
-    cout << setw(5) << infoAOs.orbital[i].element;
-    cout << setw(5) << infoAOs.orbital[i].angularMomentumInt;
+    cout << setw(5)  << infoAOs.orbital[i].element;
+    cout << setw(5)  << infoAOs.orbital[i].angularMomentumInt;
     cout << setw(10) << infoAOs.orbital[i].coordinates[0];
     cout << setw(10) << infoAOs.orbital[i].coordinates[1];
-    cout << setw(10) << infoAOs.orbital[i].coordinates[2]<< endl;
+    cout << setw(10) << infoAOs.orbital[i].coordinates[2];
+    cout << endl;
   }
   // Alloc for all 2 center integrals 
   ScreenUtils::PrintScrStarLine();
@@ -96,14 +69,14 @@ int main (int argc, char *argv[])
   }else{
     cout << "Bad Alloc: all2CenterIntegral " << endl;
   }
+  // Init MNDO parameters
+  MNDOparameter MNDOpara;
   // Init TwoCenterIntegral
   cout << "Compute all2CenterIntegral" << endl;
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
-
+  
   cout << "Compute Core-Core Repulsion" << endl;
-
-
   double energyCoreCoreRepulsion = CoreCoreRepulsion::ComputeRepulsion(MNDOpara,infoAOs,all2CenterIntegral);
 
   ScreenUtils::PrintScrStarLine();

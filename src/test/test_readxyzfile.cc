@@ -12,42 +12,46 @@ using std::vector;
 #include "atom.h"
 
 int main (int argc, char *argv[]){
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for ReadXYZFile Class " << endl;
-	cout << "********************************************************" << endl << endl;
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for ReadXYZFile Class " << endl;
+  cout << "********************************************************" << endl << endl;
 
-	if(argc>1){
-		cout << "File for read: "<<argv[1]<<endl;
+  if (argc < 2) {
+    cout << "Dont input file in arguments " << endl << endl;
+    return EXIT_FAILURE;
+  }
+/***************************************************************************************/ 
+  string filename = argv[1];
 
-		ReadXYZFile reader;
-		vector<Atom> molecule;
+  cout << "File for read: " << filename << endl;
 
-		bool statusAllData = reader.GetValuesFromFile(argv[1],molecule);
+  ReadXYZFile reader;
+  vector<Atom> molecule;
 
-		string statusanswer;
-		for(unsigned int i=0;i<molecule.size();i++){
-			cout << "Atom = " << i << endl;
-			for (int ii=0;ii<3;ii++) cout << "Coordinate = " << molecule[i].atomCoordinates[ii] << endl;
-			cout << "Element: "<< molecule[i].atomSymbol <<"   Atomic number="<< molecule[i].atomNumber << "   Atomic weight= "<< molecule[i].atomWeight<< endl;
-			molecule[i].statusData ? statusanswer="yes" : statusanswer="no"; 
-			cout << "All data is fine? " << statusanswer << endl;
-			cout << "********************************************************" << endl << endl;
-		}   
-		cout << "All data is fine ?  " << (statusAllData ? statusanswer="yes" : statusanswer="no") << endl;
-		for(unsigned int i=0;i<molecule.size();i++){
-			cout << "  " << molecule[i].atomNumber;
-			for (int ii=0;ii<3;ii++) cout << std::setw(15)<< std::setprecision(6) << molecule[i].atomCoordinates[ii];
-			cout << endl;
-		}
+  bool statusAllData = reader.GetValuesFromFile(filename,molecule);
 
-
-		return EXIT_SUCCESS;
-	}else { 
-		cout << "Dont input file in arguments " << endl << endl;
-		return EXIT_FAILURE;
-	}
+  string statusanswer;
+  for(unsigned int i=0;i<molecule.size();i++){
+    cout << "Atom = " << i << endl;
+    for (int ii=0;ii<3;ii++){
+      cout << "Coordinate = " << molecule[i].atomCoordinates[ii] << endl;
+    }
+    cout << "Element: "<< molecule[i].atomSymbol; 
+    cout << "   Atomic number=" << molecule[i].atomNumber;
+    cout << "   Atomic weight= "<< molecule[i].atomWeight << endl;
+    molecule[i].statusData ? statusanswer="yes" : statusanswer="no"; 
+    cout << "All data is fine? " << statusanswer << endl;
+    cout << "********************************************************" << endl << endl;
+  }   
+  cout << "All data is fine ?  ";
+  cout << (statusAllData ? statusanswer="yes" : statusanswer="no") << endl;
+  for(unsigned int i=0;i<molecule.size();i++){
+    cout << "  " << molecule[i].atomNumber;
+    for (int ii=0;ii<3;ii++){
+      cout << std::setw(15)<< std::setprecision(6) << molecule[i].atomCoordinates[ii];
+    }
+    cout << endl;
+  }
+  return EXIT_SUCCESS;
 }
-
-
-
-

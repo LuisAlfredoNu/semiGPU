@@ -13,13 +13,12 @@ using std::vector;
 
 #include "multipole.h"
 
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for Class Multipole " << endl;
-	cout << "********************************************************" << endl << endl;
-
-
+int main (int argc, char *argv[]){
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for Class Multipole " << endl;
+  cout << "********************************************************" << endl << endl;
+/***************************************************************************************/ 
   // Make singles orbitals
 
   AtomicOrbital orbitalA,orbitalB;
@@ -100,17 +99,17 @@ int main (int argc, char *argv[])
   cout << "multipole interaction QzzQpipi = " << interaction << endl;
 
   cout << "******************************" << endl;
-  
+
   interaction = multipole.Interaction_QzzQzz(atomDistance,orbitalA,orbitalB);
   cout << "multipole interaction QzzQzz = " << interaction << endl;
-  
+
   interaction = multipole.Interaction_QpizQpiz(atomDistance,orbitalA,orbitalB);
   cout << "multipole interaction QpizQpiz = " << interaction << endl;
 
   interaction = multipole.Interaction_QxyQxy(atomDistance,orbitalA,orbitalB);
   cout << "multipole interaction QxyQxy = " << interaction << endl;
 
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 

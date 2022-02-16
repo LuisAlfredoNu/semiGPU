@@ -13,12 +13,12 @@ using std::vector;
 
 #include "basematrix.h"
 #include "overlap.h"
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing Class: Overlap " << endl;
-	cout << "********************************************************" << endl << endl;
-
+int main (int argc, char *argv[]){
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing Class: Overlap " << endl;
+  cout << "********************************************************" << endl << endl;
+/***************************************************************************************/ 
   // Make singles orbitals
 
   AtomicOrbital orbitalA,orbitalB;
@@ -43,47 +43,46 @@ int main (int argc, char *argv[])
 
   double coorBBBB[3] = {1.0,1.0,1.0};
   orbitalB.SetCoordinates(coorBBBB);
-  
+
   orbitalA.SetElement( 6);
   int angularMomentumA[3] = {0,0,0};
   orbitalA.SetAngularMomentum(angularMomentumA);
-  
+
   orbitalB.SetElement( 6);
   int angularMomentumB[3] = {1,0,0};
   orbitalB.SetAngularMomentum(angularMomentumB);
-  
+
   overlapValue = overlap.ComputeOverlap(orbitalA,orbitalB);
 
   cout << " Overlap between C-2s C-2p_y with 1 Angstrom distance" << endl;
   cout << " Expected value = -0.152276 " << endl; 
   cout << "  Compute value = " << overlapValue << endl << endl;
-  
+
   int angularMomentumAA[3] = {1,0,0};
   orbitalA.SetAngularMomentum(angularMomentumAA);
-  
+
   int angularMomentumBB[3] = {1,0,0};
   orbitalB.SetAngularMomentum(angularMomentumBB);
-  
+
   overlapValue = overlap.ComputeOverlap(orbitalA,orbitalB);
 
   cout << " Overlap between C-2p_x C-2p_x with 1 Angstrom distance" << endl;
   cout << " Expected value = -0.0184144 " << endl; 
   cout << "  Compute value = " << overlapValue << endl << endl;
-  
+
   int angularMomentumAAA[3] = {1,0,0};
   orbitalA.SetAngularMomentum(angularMomentumAAA);
-  
+
   int angularMomentumBBB[3] = {0,0,1};
   orbitalB.SetAngularMomentum(angularMomentumBBB);
-  
+
   overlapValue = overlap.ComputeOverlap(orbitalA,orbitalB);
 
   cout << " Overlap between C-2p_x C-2p_z with 1 Angstrom distance" << endl;
   cout << " Expected value = -0.130419 " << endl; 
   cout << "  Compute value = " << overlapValue << endl << endl;
- 
-  
- /**/ 
+
+  /**/ 
   vector<Atom> molecule (6,Atom());
   for (int i=0;i<6;++i) {
     molecule[i].setAtomNumber(1);
@@ -104,7 +103,7 @@ int main (int argc, char *argv[])
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
-  
+
   Overlap overlapA(infoAOs);
 
   if (overlapA.Alloc4Matrix("overlapMatrix")){
@@ -140,9 +139,9 @@ int main (int argc, char *argv[])
 
   ListAtomicOrbitals infoAOsA;
   infoAOsA.SetOrbitals(moleculeA);
-  
+
   Overlap overlapB(infoAOsA);
-  
+
   if (overlapB.Alloc4Matrix("overlapMatrix")){
     cout << "Correct Alloc: overlapMatrix" << endl;
   }else{
@@ -150,13 +149,13 @@ int main (int argc, char *argv[])
   }
 
   overlapB.ComputeMatrix();
-  
+
   cout << "Overlap Matrix done" << endl;
   cout << "1C -> {"<<coorAAA[0]<<","<<coorAAA[1]<<","<<coorAAA[2]<<"}" << endl;
   cout << "2C -> {"<<coorBBB[0]<<","<<coorBBB[1]<<","<<coorBBB[2]<<"}" << endl;
   ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.orbital.size(),overlapB.matrixHold_);
   /**/
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 

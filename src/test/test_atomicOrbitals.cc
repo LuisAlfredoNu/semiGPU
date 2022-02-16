@@ -14,16 +14,20 @@ using std::vector;
 #include "readxyzfile.h"
 #include "atom.h"
 
-
 #include "atomicOrbitals.h"
 
 int main (int argc, char *argv[]){
-  cout << endl << "********************************************************" << endl;
-  cout << " Testing for  Class AtomicOrbital  " << endl;
-  cout << "              Class ListAtomicOrbitals " << endl;
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for:  Class AtomicOrbital  " << endl;
+  cout << "               Class ListAtomicOrbitals " << endl;
   cout << "********************************************************" << endl << endl;
 
-  string fileName = "filetest_numbers_xyz.xyz";
+  string fileName = "../Geometries4Test/benzene.xyz";
+  
+  if (argc > 1) {
+    fileName = argv[1];
+  }
 
   cout << "File for read: "<<fileName<<endl;
 

@@ -24,54 +24,34 @@ using std::vector;
 
 #include "scfcalculation.h"
 
-int main (int argc, char *argv[])
-{
-	cout << endl << "********************************************************" << endl;
-	cout << " Testing for Class SCFcalculation " << endl;
-	cout << "********************************************************" << endl << endl;
+int main (int argc, char *argv[]){
+  cout << endl;
+  cout << "********************************************************" << endl;
+  cout << " Testing for Class SCFcalculation " << endl;
+  cout << "********************************************************" << endl << endl;
 
-  // Init MNDO parameters
-  MNDOparameter MNDOpara;
+  if (argc < 2) {
+    cout << "Dont input file in arguments " << endl << endl;
+    return EXIT_FAILURE;
+  }
+/***************************************************************************************/ 
+  string filename = argv[1];
+  cout << "File for read: " << filename << endl;
 
   // Init molecule
-  string moleculeTest = "C2H6";
-
+  ReadXYZFile reader;
   vector<Atom> molecule;
 
-  if (moleculeTest == "H6") {
-    string fileName = "filetest_h6.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
-  }else if (moleculeTest == "C2") {
+  bool statusAllData = reader.GetValuesFromFile(filename,molecule);
 
-    molecule.push_back(Atom());
-    molecule.push_back(Atom());
-    double coorA[3] = { -1.0,-2.0,-3.0};
-    double coorC[3] = {1.0,1.0,1.5};
-    molecule[0].setCoordinates(coorA[0],coorA[1],coorA[2]);
-    molecule[0].setAtomNumber(6);
-    molecule[1].setCoordinates(coorC[0],coorC[1],coorC[2]);
-    molecule[1].setAtomNumber(6);
-  }else if (moleculeTest == "CH4") {
-    string fileName = "filetest_ch4.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
-  }else if (moleculeTest == "C2H6") {
-    string fileName = "filetest_c2h6.xyz";
-    cout << "File for read: "<<fileName<<endl;
-    ReadXYZFile reader;
-    bool statusAllData = reader.GetValuesFromFile(fileName.c_str(),molecule);
+  if (! statusAllData) {
+    cout << "Somethig is wrong with xyz file" << endl;
+    return EXIT_FAILURE;
   }
 
-  cout << "Geometry :" << endl;
-  for (size_t i=0;i<molecule.size();++i) {
-    cout << setw(3)  << molecule[i].atomSymbol ;
-    cout << setw(10) << molecule[i].atomCoordinates[0] ;
-    cout << setw(10) << molecule[i].atomCoordinates[1] ;
-    cout << setw(10) << molecule[i].atomCoordinates[2] << endl ;
-  }
+  Atom::PrintGeometry(molecule);
+
+/***************************************************************************************/ 
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
@@ -94,6 +74,8 @@ int main (int argc, char *argv[])
   }else{
     cout << "Bad Alloc: all2CenterIntegral " << endl;
   }
+  // Init MNDO parameters
+  MNDOparameter MNDOpara;
   // Init TwoCenterIntegral
   cout << "Compute all2CenterIntegral" << endl;
   TwoCenterIntegral twoCIntegral(MNDOpara);
@@ -126,7 +108,7 @@ int main (int argc, char *argv[])
   }
 
   SCFprocess.ComputeSCF();
-  
+
   ScreenUtils::PrintScrStarLine();
   cout << "Final Energy = " << SCFprocess.finalEnergy << endl;
   ScreenUtils::PrintScrStarLine();
@@ -139,5 +121,4 @@ int main (int argc, char *argv[])
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   return EXIT_SUCCESS;
 }
-
 
