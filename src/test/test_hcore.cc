@@ -53,6 +53,7 @@ int main (int argc, char *argv[]){
   }
 
   Atom::PrintGeometry(molecule);
+  ScreenUtils::PrintScrStarLine();
 
 /***************************************************************************************/ 
 
@@ -82,7 +83,7 @@ int main (int argc, char *argv[]){
   // Init Hcore
   cout << "Init and compute Overlap" << endl;
   overlap.ComputeMatrix();
-  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlap.matrixHold_);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlap.matrixHold_);
 
   ScreenUtils::PrintScrStarLine();
 
@@ -97,7 +98,7 @@ int main (int argc, char *argv[]){
   cout << "Init and compute Hcore" << endl;
   hcore.ComputeMatrix();
 
-  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),hcore.matrixHold_);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),hcore.matrixHold_);
 
 /***************************************************************************************/ 
   // Compare data
@@ -115,19 +116,16 @@ int main (int argc, char *argv[]){
 
   vector<double> refData;
 
-  ScreenUtils::PrintScrStarLine();
   cout << "Get CSV Data" << endl;
 
-  cout << "data [0][0] = "<<dataCSV[0][0]<<endl;
   for (size_t i=0;i<infoAOs.orbital.size();++i) {
     for (size_t j=0;j<=i;++j) {
       refData.push_back(std::stod(dataCSV[i][j]));
     }
   }
-  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),&refData[0]);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),&refData[0]);
 
   ScreenUtils::PrintScrStarLine();
-  cout << "Compare Data" << endl;
   int index;
   int totalErrors = 0;
   int decimals=4;
@@ -166,7 +164,15 @@ int main (int argc, char *argv[]){
   hcore.Dealloc4Matrix();
   cout << "Dealloc array: overlapMatrix" << endl;
   overlap.Dealloc4Matrix();
-  return EXIT_SUCCESS;
+
+  ScreenUtils::PrintScrStarLine();
+  if (totalErrors == 0) {
+    ScreenUtils::DisplayGreenMessage("Test pass");
+    return EXIT_SUCCESS;
+  }else{
+    ScreenUtils::DisplayErrorMessage("Fail in Hcore");
+    return EXIT_FAILURE;
+  }
 }
 
 

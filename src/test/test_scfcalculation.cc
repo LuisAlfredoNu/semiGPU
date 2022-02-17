@@ -16,7 +16,9 @@ using std::vector;
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
 #include "mymemory.h"
+#include "mymath.h"
 #include "twocenterintegral.h"
+#include "fileutils.h"
 #include "screenutils.h"
 #include "hcore.h"
 #include "densitymatrix.h"
@@ -30,12 +32,14 @@ int main (int argc, char *argv[]){
   cout << " Testing for Class SCFcalculation " << endl;
   cout << "********************************************************" << endl << endl;
 
-  if (argc < 2) {
+  if (argc < 3) {
     cout << "Dont input file in arguments " << endl << endl;
+    cout << "input files: geometry.xyz MOPAC_data_energies.csv" << endl;
     return EXIT_FAILURE;
   }
 /***************************************************************************************/ 
   string filename = argv[1];
+  string fileCSV = argv[2];
   cout << "File for read: " << filename << endl;
 
   // Init molecule
@@ -57,15 +61,16 @@ int main (int argc, char *argv[]){
   infoAOs.SetOrbitals(molecule);
   int nAOs = infoAOs.orbital.size();
 
-  cout << "infoAOs :" << endl;
-  for (size_t i=0;i<nAOs;++i) {
-    cout << "AO "<< setw(3)  << infoAOs.orbital[i].indexAO << " : ";
-    cout << setw(5) << infoAOs.orbital[i].element;
-    cout << setw(5) << infoAOs.orbital[i].angularMomentumInt;
-    cout << setw(10) << infoAOs.orbital[i].coordinates[0];
-    cout << setw(10) << infoAOs.orbital[i].coordinates[1];
-    cout << setw(10) << infoAOs.orbital[i].coordinates[2]<< endl;
-  }
+  //cout << "infoAOs :" << endl;
+  //for (size_t i=0;i<nAOs;++i) {
+  //  cout << "AO "<< setw(3)  << infoAOs.orbital[i].indexAO << " : ";
+  //  cout << setw(5) << infoAOs.orbital[i].element;
+  //  cout << setw(5) << infoAOs.orbital[i].angularMomentumInt;
+  //  cout << setw(10) << infoAOs.orbital[i].coordinates[0];
+  //  cout << setw(10) << infoAOs.orbital[i].coordinates[1];
+  //  cout << setw(10) << infoAOs.orbital[i].coordinates[2]<< endl;
+  //}
+  
   // Alloc for all 2 center integrals 
   ScreenUtils::PrintScrStarLine();
   double**** all2CenterIntegral = NULL;
@@ -92,9 +97,6 @@ int main (int argc, char *argv[]){
   cout << "Init and compute Hcore" << endl;
   hcore.ComputeMatrix();
 
-  cout << "hcore matrix" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,hcore.matrixHold_);
-
   ScreenUtils::PrintScrStarLine();
   cout << "Init and compute SCF" << endl;
   SCFCalculation SCFprocess(infoAOs,all2CenterIntegral,hcore);
@@ -107,11 +109,14 @@ int main (int argc, char *argv[]){
     return EXIT_FAILURE;
   }
 
+  ScreenUtils::PrintScrStarLine();
+  
   SCFprocess.ComputeSCF();
 
+/***************************************************************************************/ 
+
   ScreenUtils::PrintScrStarLine();
-  cout << "Final Energy = " << SCFprocess.finalEnergy << endl;
-  ScreenUtils::PrintScrStarLine();
+  double finalEnergy = SCFprocess.finalEnergy;
 
   cout << "Dealloc array: SCFData" << endl;
   SCFprocess.DeallocSCFData();
@@ -119,6 +124,30 @@ int main (int argc, char *argv[]){
   hcore.Dealloc4Matrix();
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
-  return EXIT_SUCCESS;
+  
+
+  vector<vector<string>> dataCSV;
+  bool readFile = FileUtils::ReadCSV(fileCSV,dataCSV);
+
+  if (!readFile) {
+    cout << "Problem to read CSV" << endl;
+    return EXIT_FAILURE;
+  }
+  double refData = std::stod(dataCSV[1][1]);
+
+
+  ScreenUtils::PrintScrStarLine();
+  cout << "Compute Electronic Energy = " << finalEnergy << endl;
+  cout << "    Ref Electronic Energy = " << refData << endl;
+
+  ScreenUtils::PrintScrStarLine();
+
+  if (sameReal(finalEnergy,refData,0.001)) {
+    ScreenUtils::DisplayGreenMessage("Test pass");
+    return EXIT_SUCCESS;
+  }else{
+    ScreenUtils::DisplayErrorMessage("Test fail");
+    return EXIT_FAILURE;
+  }
 }
 

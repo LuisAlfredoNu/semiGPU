@@ -22,6 +22,8 @@ using std::vector;
 
 #include "twocenterintegral.h"
 
+static double GetValueFromCsvMOPAC(const vector<Atom> &molecule,const ListAtomicOrbitals &infoAOs,int pi,int pj,int pk,int pl,vector<double> &dataCSV);
+
 int main (int argc, char *argv[]){
   cout << endl;
   cout << "********************************************************" << endl;
@@ -98,7 +100,8 @@ int main (int argc, char *argv[]){
   }
 
   Atom::PrintGeometry(molecule);
-
+  
+  ScreenUtils::PrintScrStarLine();
 /***************************************************************************************/ 
 
   ListAtomicOrbitals infoAOs;
@@ -115,6 +118,7 @@ int main (int argc, char *argv[]){
   }
 
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
+/***************************************************************************************/ 
 
   cout << "Get Compute Data" << endl;
   vector<double> computeData;
@@ -172,7 +176,11 @@ int main (int argc, char *argv[]){
       refData.push_back(std::stod(col));
     }
   }
+/***************************************************************************************/ 
+  ScreenUtils::PrintScrStarLine();
 
+  bool findError = false;
+  string errorMen = "";
 
   cout << "Compare data" << endl;
   vector<string> listMOPAC = {"SS","SX","XX","SY","XY","YY","SZ","XZ","YZ","ZZ"};
@@ -181,44 +189,11 @@ int main (int argc, char *argv[]){
   cout << std::fixed << setprecision(decimals);
   cout << setw(decimals + 8);
   int totalErrors = 0;
-  /* for (auto label : listMOPAC) {
-     cout << label << setw(decimals + 16);
-     }
-
-     cout << setw(-18) ;
-     int j = 0;
-     for (int i=0;i<computeData.size();++i) {
-     if (i % 10 == 0) {
-     cout  << endl;
-     cout << listMOPAC[j];
-     ++j;
-     if (j == 10) {
-     j=0;
-     }
-     }
-     if (sameReal(computeData[i],refData[i],1.0e-4)) {
-     cout << setw(decimals + 4) << computeData[i] <<setw(2) << "O" << setw(decimals +4) << refData[i];
-     }else{
-     ScreenUtils::SetScrRedBoldFont();
-     cout << setw(decimals + 4) << computeData[i];
-     cout<<setw(2) << "X" ;
-     ScreenUtils::SetScrNormalFont();
-     cout << setw(decimals +4) << refData[i];
-     ++totalErrors;
-     }
-     cout << setw(2)<< "|";
-     if ((1+i)%100 == 0) {
-     cout << endl << "total Errors = " << totalErrors <<endl;
-     totalErrors = 0;
-     }
-     }
-     cout  << endl;
-   */
+  int globalTotalErrors = 0;
   int countData = 0;
   int countCSV = 0;
   for (int i=0;i<molecule.size();i++) {
     for (int j=0;j<=i;j++) {
-
       cout << "Atom A : "<< molecule[i].atomSymbol << "  index : " << i;
       cout << " / ";
       cout << "Atom B : "<< molecule[j].atomSymbol << "  index : " << j;
@@ -243,6 +218,7 @@ int main (int argc, char *argv[]){
         }
         cout << endl;
         cout << endl << "total Errors = " << totalErrors <<endl;
+        globalTotalErrors += totalErrors;
         continue;
       }
 
@@ -266,9 +242,10 @@ int main (int argc, char *argv[]){
         }
         cout << endl;
         cout << endl << "total Errors = " << totalErrors <<endl;
+        globalTotalErrors += totalErrors;
         continue;
       }
-      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1 || molecule[i].atomNumber == 1 && molecule[j].atomNumber > 1) {
+      if ( (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1) || (molecule[i].atomNumber == 1 && molecule[j].atomNumber > 1)) {
         for (int k=0;k<1;k++) {
           for (int l=0;l<10;l++) {
             if (sameReal(computeData[countData],refData[countData],1.0e-4)) {
@@ -287,96 +264,148 @@ int main (int argc, char *argv[]){
           cout << endl;
         }
         cout << endl << "total Errors = " << totalErrors <<endl;
+        globalTotalErrors += totalErrors;
         continue;
       }
     }
   }
-
+  if (globalTotalErrors > 0) {
+    findError = true;
+    errorMen = "Compute the integral\t";
+  }
+/***************************************************************************************/ 
+  ScreenUtils::PrintScrStarLine();
   cout << "Test for all possible bielectronic  integral" << endl;
-  cout << "get 0,0,4,4 = ";
-  cout << "[0][0][4][4] = " << TwoCenterIntegral::GetValueFromArray(\
-      infoAOs.orbital[0],infoAOs.orbital[0],\
-      infoAOs.orbital[4],infoAOs.orbital[4],all2CenterIntegral) << endl;
-  cout << "[0][0][4][5] = "<< TwoCenterIntegral::GetValueFromArray(\
-      infoAOs.orbital[0],infoAOs.orbital[0],\
-      infoAOs.orbital[4],infoAOs.orbital[5],all2CenterIntegral) << endl;
-  cout << "[4][5][0][0] = "<< TwoCenterIntegral::GetValueFromArray(\
-      infoAOs.orbital[4],infoAOs.orbital[5],\
-      infoAOs.orbital[0],infoAOs.orbital[0],all2CenterIntegral) << endl;
-
-  int nAOs = infoAOs.orbital.size();
+  
+  size_t nAOs = infoAOs.orbital.size();
   cout << "orbital size = " << nAOs << endl << endl;
 
-  vector<int> list_CSV = {102,110};
-  vector<int> list_AO_a = {4,1};
-  vector<int> list_AO_b = {4,1};
-  vector<int> list_AO_c = {1,4};
-  vector<int> list_AO_d = {1,4};
+  double refValue,arrayValue;
 
-  double value_CSV,value_fromArray,value_fromCompute;
+  globalTotalErrors = 0;
+  
+  for (size_t pi=0;pi<nAOs;++pi) {
+    for (size_t pj=0;pj<nAOs;++pj) {
+      for (size_t pk=0;pk<nAOs;++pk) {
+        for (size_t pl=0;pl<nAOs;++pl) {
+          refValue = GetValueFromCsvMOPAC(molecule,infoAOs,pi,pj,pk,pl,refData);
+          arrayValue = TwoCenterIntegral::GetValueFromArray(\
+                       infoAOs.orbital[pi],\
+                       infoAOs.orbital[pj],\
+                       infoAOs.orbital[pk],\
+                       infoAOs.orbital[pl],\
+                       all2CenterIntegral);
+          if ( ! sameReal(refValue,arrayValue,1.0e-4) ) {
+            cout << "[" << pi << "][" << pj << "][" << pk << "][" << pl << "] = " ; 
 
-  for (size_t i=0;i<list_CSV.size();++i) {
-    cout << " [" << list_AO_a[i] ;
-    cout << "][" << list_AO_b[i] ;
-    cout << "][" << list_AO_c[i] ;
-    cout << "][" << list_AO_d[i] << "]" <<endl;
-    value_fromArray = TwoCenterIntegral::GetValueFromArray(\
-        infoAOs.orbital[list_AO_a[i]],\
-        infoAOs.orbital[list_AO_b[i]],\
-        infoAOs.orbital[list_AO_c[i]],\
-        infoAOs.orbital[list_AO_d[i]],\
-        all2CenterIntegral);
-    value_fromCompute = twoCIntegral.ComputeTwoCenterIntegral(\
-        infoAOs.orbital[list_AO_a[i]],\
-        infoAOs.orbital[list_AO_b[i]],\
-        infoAOs.orbital[list_AO_c[i]],\
-        infoAOs.orbital[list_AO_d[i]]\
-        );
-    value_CSV = refData[list_CSV[i]];
-    cout << "  getFromArray = " << value_fromArray << endl;
-    cout << "getFromCompute = " << value_fromCompute << endl;
-    cout << "    getFromCSV = " << value_CSV << endl;
-    if ( sameReal(value_CSV,value_fromArray,1.0e-4) ) {
-      cout << setw(decimals + 4) << value_CSV <<setw(2) << "O" << setw(decimals +4) << value_fromArray;
-    }else{
-      ScreenUtils::SetScrRedBoldFont();
-      cout << setw(decimals + 4) << value_CSV;
-      cout<<setw(2) << "X" ;
-      ScreenUtils::SetScrNormalFont();
-      cout << setw(decimals +4) << value_fromArray;
+            ScreenUtils::SetScrRedBoldFont();
+            cout << setw(decimals + 4) << arrayValue;
+            cout<<setw(2) << "X" ;
+            ScreenUtils::SetScrNormalFont();
+            cout << setw(decimals +4) << refValue << endl;
+            globalTotalErrors += 1;
+          }
+        }
+      }
     }
-    cout << setw(2)<< "|" << endl;
   }
-
-  /*
-     for (int i=0;i<nAOs;i++) {
-     for (int j=0;j<nAOs;j++) {
-     for (int k=0;k<nAOs;k++) {
-     cout << " element_atomindex " << endl;
-     for (int l=0;l<nAOs;l++) {
-     cout << infoAOs.orbital[i].element << "_" << infoAOs.orbital[i].indexAtom;
-     cout << "  " ;
-     cout << infoAOs.orbital[j].element << "_" << infoAOs.orbital[j].indexAtom;
-     cout << "  " ;
-     cout << infoAOs.orbital[k].element << "_" << infoAOs.orbital[k].indexAtom;
-     cout << "  " ;
-     cout << infoAOs.orbital[l].element << "_" << infoAOs.orbital[l].indexAtom;
-     cout << "  " ;
-     cout << "[ " << setw(2) <<  i ;
-     cout << " "  << setw(2) <<  j ;
-     cout << " | "<< setw(2) <<  k ;
-     cout << " "  << setw(2) <<  l << setw(3) << " ] = "; 
-     cout << TwoCenterIntegral::GetValueFromArray(infoAOs.orbital[i],\
-     infoAOs.orbital[j],infoAOs.orbital[k],infoAOs.orbital[l],\
-     all2CenterIntegral) << endl; 
-     }
-     }
-     }
-     }*/
+  if (globalTotalErrors > 0) {
+    findError = true;
+    errorMen += "Retrun integral Value\t";
+  }
 
   cout << "Dealloc array of all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
-  return EXIT_SUCCESS;
+  
+  ScreenUtils::PrintScrStarLine();
+  if (findError) {
+    ScreenUtils::DisplayErrorMessage(errorMen);
+    return EXIT_FAILURE;
+  }else{
+    ScreenUtils::DisplayGreenMessage("Test Pass");
+    return EXIT_SUCCESS;
+  }
 }
+/***************************************************************************************/ 
+/***************************************************************************************/ 
+static double GetValueFromCsvMOPAC(const vector<Atom> &molecule,const ListAtomicOrbitals &infoAOs,int pi,int pj,int pk,int pl,vector<double> &dataCSV){
+  if (infoAOs.orbital[pi].indexAtom != infoAOs.orbital[pj].indexAtom) {
+    return 0.0e-16;
+  }
+  if (infoAOs.orbital[pk].indexAtom != infoAOs.orbital[pl].indexAtom) {
+    return 0.0e-16;
+  }
+  if (infoAOs.orbital[pi].indexAtom < infoAOs.orbital[pk].indexAtom) {
+    swapValues(pi,pk);
+    swapValues(pj,pl);
+  }
 
+  unsigned int countDataCSV = 0;
+  for (int i=0;i < infoAOs.orbital[pi].indexAtom ;i++) {
+    for (int j=0;j<=i;j++) {
 
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
+        countDataCSV += 1;
+        continue;
+      }
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
+        countDataCSV += 100;
+        continue;
+      }
+      if (molecule[i].atomNumber == 1 && molecule[j].atomNumber > 1) {
+        countDataCSV += 10;
+        continue;
+      }
+      if (molecule[i].atomNumber > 1 && molecule[j].atomNumber == 1) {
+        countDataCSV += 10;
+        continue;
+      }
+    }
+  }
+  int lastAtom = infoAOs.orbital[pi].indexAtom;
+  for (int k=0;k < infoAOs.orbital[pk].indexAtom ;k++) {
+
+    if (molecule[lastAtom].atomNumber == 1 && molecule[k].atomNumber  == 1) {
+      countDataCSV += 1;
+      continue;
+    }
+    if (molecule[lastAtom].atomNumber > 1 && molecule[k].atomNumber > 1) {
+      countDataCSV += 100;
+      continue;
+    }
+    if (molecule[lastAtom].atomNumber == 1 && molecule[k].atomNumber > 1) {
+      countDataCSV += 10;
+      continue;
+    }
+    if (molecule[lastAtom].atomNumber > 1 && molecule[k].atomNumber == 1) {
+      countDataCSV += 10;
+      continue;
+    }
+  }
+  int MOPACindex[4][4];
+  
+  MOPACindex[0][0] = 0;
+  MOPACindex[0][1] = 1 ;
+  MOPACindex[1][1] = 2 ;
+  MOPACindex[0][2] = 3 ;
+  MOPACindex[1][2] = 4 ;
+  MOPACindex[2][2] = 5 ;
+  MOPACindex[0][3] = 6 ;
+  MOPACindex[1][3] = 7 ;
+  MOPACindex[2][3] = 8 ;
+  MOPACindex[3][3] = 9 ;
+                     
+  if (pi > pj) {
+    swapValues(pi,pj);
+  }
+  if (pk > pl) {
+    swapValues(pk,pl);
+  }
+  
+  countDataCSV += MOPACindex[infoAOs.orbital[pi].angularMomentumInt]\
+                            [infoAOs.orbital[pj].angularMomentumInt] * 10;
+  countDataCSV += MOPACindex[infoAOs.orbital[pk].angularMomentumInt]\
+                            [infoAOs.orbital[pl].angularMomentumInt] ;
+ 
+  return dataCSV[countDataCSV];
+}
