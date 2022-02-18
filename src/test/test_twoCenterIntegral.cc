@@ -171,10 +171,13 @@ int main (int argc, char *argv[]){
   vector<double> refData;
 
   cout << "Get CSV Data" << endl;
-  for (auto& row : dataCSV) {
-    for (auto& col : row ) {
-      refData.push_back(std::stod(col));
+  try{
+    for (auto& row : dataCSV) {
+      for (auto& col : row ) {
+        refData.push_back(std::stod(col));
+      }
     }
+  }catch(...){
   }
 /***************************************************************************************/ 
   ScreenUtils::PrintScrStarLine();

@@ -1,0 +1,175 @@
+#!/bin/bash
+
+file_geo=$1
+mopac_exe="/opt/mopac/MOPAC2016.exe"
+
+
+computeMOPAC(){
+   file_geo_input=$1
+   file_mopac_input="${file_geo_input%.xyz}_scf_debug.mop"
+   
+   header_mopac="MNDO NOOPT 1ELECTRON AUX LARGE FOCK HCORE XYZ ITER EIGS DEBUG DENSITY VECTORS"
+   
+   echo $header_mopac > $file_mopac_input
+   cat $file_geo_input >> $file_mopac_input
+   
+   $mopac_exe $file_mopac_input
+}
+#-----------------------------------------------------------------------------# 
+make_matrix(){
+   local start_matrix=$1
+   local end_matrix=$2
+   local tail_chunks=$3
+   local output_filename=$4
+   local file_name=$5
+   
+   #echo "start_matrix = $start_matrix"
+   #echo "end_matrix = $end_matrix"
+   #echo "tail_chunks = $tail_chunks"
+   #echo "output_filename = $output_filename"
+   
+   chunks=$(sed -n "${start_matrix},${end_matrix}p" $file_name | grep  -n -- '--' | awk -F ':' '{printf "%d ",$1}')
+   chunks=(${chunks} $tail_chunks )
+   size_matrix=$(( chunks[1] - chunks[0] -4  ))
+  
+
+   tmp_output_filename="${output_filename}_tmp.tmp"
+   
+   :> $output_filename
+   
+   for i in $(seq 0 $(( ${#chunks[@]} -2 )) ); do
+   
+      s_part_matrix=$(( start_matrix + chunks[i]  ))
+      e_part_matrix=$(( start_matrix + chunks[i+1] -5 ))
+      part_matrix_size=$((e_part_matrix-s_part_matrix))
+      paste $output_filename <(sed -n "${s_part_matrix},${e_part_matrix}p" $file_name | awk '{print substr($0,12)}' | awk '{for(i=0;i<6;i++) printf "%s \t",substr($0,1+11*i,11);printf "\n" }' | tac )>  $tmp_output_filename && mv $tmp_output_filename $output_filename
+   done
+   
+   mv $output_filename $tmp_output_filename
+   
+   tac $tmp_output_filename | awk -v matrix_size=$size_matrix '{ for(i=1; i<=matrix_size; i++) if($i ~ /^ *$/) $i = 0; for(i=1;i<=matrix_size;i++) printf "%.6f,",$i }{printf "\n"}'|sed 's/.$//' > $output_filename
+   
+   #cat $output_filename
+   rm $tmp_output_filename
+}
+#-----------------------------------------------------------------------------# 
+print_hcore_Pmatrix_1Fmatrix_Fmatrix(){   
+   local file_name2print=$1
+   
+   start_matrix_Hcore=$(grep -n "FINAL ONE-ELECTRON MATRIX" $file_name2print | tail -n1 | awk -F ':' '{print $1}')
+   end_matrix_Hcore=$(grep -n "JOB ENDED NORMALLY" $file_name2print | awk -F ':' '{print $1}')
+   tail_chunks_Hcore=$(( end_matrix_Hcore - start_matrix_Hcore +1 ))
+   output_filename_Hcore="${file_name2print%.out}_Hcore.csv"
+
+   echo $output_filename_Hcore
+   make_matrix "$start_matrix_Hcore" "$end_matrix_Hcore" "$tail_chunks_Hcore" "$output_filename_Hcore" "$file_name2print"
+
+   start_matrix_Pmatrix=$(grep -n "DENSITY MATRIX" $file_name2print | tail -n1 | awk -F ':' '{print $1}')
+   end_matrix_Pmatrix=$(grep -n "ATOMIC ORBITAL ELECTRON POPULATIONS" $file_name2print | awk -F ':' '{print $1}')
+   tail_chunks_Pmatrix=$(( end_matrix_Pmatrix - start_matrix_Pmatrix +2 ))
+   output_filename_Pmatrix="${file_name2print%.out}_Pmatrix.csv"
+
+   echo $output_filename_Pmatrix
+   make_matrix "$start_matrix_Pmatrix" "$end_matrix_Pmatrix" "$tail_chunks_Pmatrix" "$output_filename_Pmatrix" "$file_name2print"
+
+   start_matrix_Fmatrix=$(grep -n "FOCK MATRIX" $file_name2print | tail -n1 | awk -F ':' '{print $1}')
+   end_matrix_Fmatrix=$(grep -n "DENSITY MATRIX" $file_name2print | tail -n1 | awk -F ':' '{print $1}')
+   tail_chunks_Fmatrix=$(( end_matrix_Fmatrix - start_matrix_Fmatrix +2 ))
+   output_filename_Fmatrix="${file_name2print%.out}_Fmatrix.csv"
+
+   echo $output_filename_Fmatrix
+   make_matrix "$start_matrix_Fmatrix" "$end_matrix_Fmatrix" "$tail_chunks_Fmatrix" "$output_filename_Fmatrix" "$file_name2print"
+
+   start_matrix_1Fmatrix=$(grep -n "FOCK MATRIX ON ITERATION  1" $file_name2print  | awk -F ':' '{print $1}')
+   end_matrix_1Fmatrix=$(grep -n "Diagonal of FOCK Matrix" $file_name2print | head -n1 | awk -F ':' '{print $1}')
+   tail_chunks_1Fmatrix=$(( end_matrix_1Fmatrix - start_matrix_1Fmatrix +4 ))
+   output_filename_1Fmatrix="${file_name2print%.out}_1Fmatrix.csv"
+   
+   echo $output_filename_1Fmatrix
+   make_matrix "$start_matrix_1Fmatrix" "$end_matrix_1Fmatrix" "$tail_chunks_1Fmatrix" "$output_filename_1Fmatrix" "$file_name2print"
+}
+#-----------------------------------------------------------------------------# 
+print_two_electron_integrals(){
+   local input_file=$1
+
+   line_start=$(grep -n "TWO-ELECTRON MATRIX IN HCORE" $input_file | awk -F ":" '{print $1+2}')
+   line_end=$(grep -n "SCF CRITERION =" $input_file | awk -F ":" '{print $1-1}')
+
+   step_integrals=0
+
+# Print raw data in csv
+
+   output_file_csv="${input_file%.*}_twoInt.csv"
+   echo $output_file_csv
+   :> $output_file_csv
+   for i in $(seq $line_start $line_end); do
+      sed -n "${i}p" $input_file | awk '{print $1","$2","$3","$4","$5","$6","$7","$8","$9","$10}'>>$output_file_csv
+   done
+}
+#-----------------------------------------------------------------------------# 
+print_energies(){
+   local input_file=$1
+   
+   local output_file="${input_file%.*}_energies.csv"
+
+   echo $output_file
+   
+   total_e=$(grep "TOTAL ENERGY" $input_file | tail -n 1)
+   total_e=${total_e#*=}
+   total_e=$(echo ${total_e%EV*} | tr -d '[:space:]' )
+   
+   echo "TOTAL_ENERGY,$total_e,EV" > $output_file
+   
+   electronic_e=$(grep "ELECTRONIC ENERGY" $input_file )
+   electronic_e=${electronic_e%POINT*}
+   electronic_e=${electronic_e#*=}
+   electronic_e=$(echo ${electronic_e%EV*} | tr -d '[:space:]')
+   
+   echo "ELECTRONIC_ENERGY,$electronic_e,EV" >> $output_file
+   
+   core_rep=$(grep "CORE-CORE REPULSION" $input_file)
+   core_rep=${core_rep#*=}
+   core_rep=$(echo ${core_rep%EV*} | tr -d '[:space:]')
+   
+   echo "CORE-CORE_REPULSION,$core_rep,EV" >> $output_file
+}
+#-----------------------------------------------------------------------------# 
+# MAIN
+#-----------------------------------------------------------------------------# 
+
+computeMOPAC $file_geo
+
+file_output_mopac="${file_geo%.xyz}_scf_debug.out"
+
+print_hcore_Pmatrix_1Fmatrix_Fmatrix $file_output_mopac
+print_two_electron_integrals $file_output_mopac
+print_energies $file_output_mopac
+
+fail_men="\033[1;31mFail\033[0m"
+pass_men="\033[;32mPass\033[0m"
+
+twoCenterIntegral="$fail_men"
+hcore="$fail_men"
+Fmatrix="$fail_men"
+CoreCoreEnergy="$fail_men"
+SCFcal="$fail_men"
+
+./test_twoCenterIntegral.x $file_geo "${file_output_mopac%.out}_twoInt.csv" && twoCenterIntegral="$pass_men"
+./test_hcore.x $file_geo "${file_output_mopac%.out}_Hcore.csv" && hcore="$pass_men"
+./test_fockmatrix.x $file_geo "${file_output_mopac%.out}_1Fmatrix.csv" && Fmatrix="$pass_men"
+./test_corecorerepulsion.x $file_geo "${file_output_mopac%.out}_energies.csv" && CoreCoreEnergy="$pass_men"
+./test_scfcalculation.x $file_geo "${file_output_mopac%.out}_energies.csv" && SCFcal="$pass_men"
+
+echo -e "==================================================="
+echo -e " test_twoCenterIntegral.x : $twoCenterIntegral"
+echo -e "             test_hcore.x : $hcore"
+echo -e "        test_fockmatrix.x : $Fmatrix"
+echo -e " test_corecorerepulsion.x : $CoreCoreEnergy"
+echo -e "    test_scfcalculation.x : $SCFcal"
+
+#rm "${file_output_mopac%.out}"*
+
+
+
+
+
