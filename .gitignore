@@ -31,3 +31,8 @@
 *.exe
 *.out
 *.app
+
+# This project
+# MOPAC outputs from testing part
+
+src/Geometries4Test/*scf_debug*
