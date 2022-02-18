@@ -167,7 +167,7 @@ echo -e "        test_fockmatrix.x : $Fmatrix"
 echo -e " test_corecorerepulsion.x : $CoreCoreEnergy"
 echo -e "    test_scfcalculation.x : $SCFcal"
 
-#rm "${file_output_mopac%.out}"*
+rm "${file_output_mopac%.out}"*
 
 
 
