@@ -1,8 +1,6 @@
 #!/bin/bash
 
-file_geo=$1
 mopac_exe="/opt/mopac/MOPAC2016.exe"
-
 
 computeMOPAC(){
    file_geo_input=$1
@@ -176,13 +174,40 @@ print_energies(){
 # MAIN
 #-----------------------------------------------------------------------------# 
 
-computeMOPAC $file_geo
-
+file_geo="${@: -1}"
 file_output_mopac="${file_geo%.xyz}_scf_debug.out"
 
-print_hcore_Pmatrix_1Fmatrix_Fmatrix $file_output_mopac
-print_two_electron_integrals $file_output_mopac
-print_energies $file_output_mopac
+update_mopac_files="false"
+
+while getopts ":huc" opt; do
+  case $opt in
+    u)
+      update_mopac_files="true"
+      ;;
+    c)
+      rm "${file_output_mopac%.out}"*
+      exit 0
+      ;;
+    h)
+      help_and_syntax $prog_name
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ ! -f $file_output_mopac || $update_mopac_files == "true" ]]; then
+   computeMOPAC $file_geo
+   print_hcore_Pmatrix_1Fmatrix_Fmatrix $file_output_mopac
+   print_two_electron_integrals $file_output_mopac
+   print_energies $file_output_mopac
+fi
 
 fail_men="\033[1;31mFail\033[0m"
 pass_men="\033[;32mPass\033[0m"
@@ -196,19 +221,20 @@ SCFcal="$fail_men"
 ./test_twoCenterIntegral.x $file_geo "${file_output_mopac%.out}_twoInt.csv" && twoCenterIntegral="$pass_men"
 ./test_hcore.x $file_geo "${file_output_mopac%.out}_Hcore.csv" && hcore="$pass_men"
 ./test_fockmatrix.x $file_geo "${file_output_mopac%.out}_1Fmatrix.csv" && Fmatrix="$pass_men"
+
 ./test_corecorerepulsion.x $file_geo "${file_output_mopac%.out}_energies.csv" && CoreCoreEnergy="$pass_men"
+corecoreError=$(./test_corecorerepulsion.x $file_geo "${file_output_mopac%.out}_energies.csv" | tail -n 3 | head -n 1 | awk '{print $3}')
+
 ./test_scfcalculation.x $file_geo "${file_output_mopac%.out}_energies.csv" && SCFcal="$pass_men"
+scfcalError=$(./test_scfcalculation.x $file_geo "${file_output_mopac%.out}_energies.csv" | tail -n 3 | head -n 1 | awk '{print $3}')
 
 echo -e "==================================================="
 echo -e " test_twoCenterIntegral.x : $twoCenterIntegral"
 echo -e "             test_hcore.x : $hcore"
 echo -e "        test_fockmatrix.x : $Fmatrix"
 echo -e " test_corecorerepulsion.x : $CoreCoreEnergy"
+echo -e "                    Error : $corecoreError"
 echo -e "    test_scfcalculation.x : $SCFcal"
-
-#rm "${file_output_mopac%.out}"*
-
-
-
+echo -e "                    Error : $scfcalError"
 
 

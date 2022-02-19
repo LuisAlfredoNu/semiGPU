@@ -134,7 +134,7 @@ int main (int argc, char *argv[]){
     for (size_t i=1*k;i<infoAOs.orbital.size();++i) {
       for (size_t j=1*k;j<=i;++j) {
         index = MyMemory::GetIndexSymmetricMatrix(i,j);
-        if ( sameReal(hcore.matrixHold_[index],refData[index],1.0e-3) ) {
+        if ( sameReal(hcore.matrixHold_[index],refData[index],1.0e-2) ) {
           cout << setw(decimals + 6) << hcore.matrixHold_[index] ;
           cout << setw(2)<< "O" << setw(decimals +6) << refData[index] << " | ";
         }else{

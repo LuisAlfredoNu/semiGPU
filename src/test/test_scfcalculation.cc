@@ -137,12 +137,32 @@ int main (int argc, char *argv[]){
 
 
   ScreenUtils::PrintScrStarLine();
+  vector<double> percentError = {0.0001,0.001,0.01,0.1,1.0};
+
+  double limit;
+  bool isSame = false;
+  for (auto error : percentError) {
+    limit = error * refData/ 100.0;
+    limit = std::abs(limit);
+    if (sameReal(finalEnergy,refData,limit)) {
+      isSame = true;
+      limit = error;
+      break;
+    }
+  }
   cout << "Compute Electronic Energy = " << finalEnergy << endl;
   cout << "    Ref Electronic Energy = " << refData << endl;
 
+  if (SCFprocess.energyConverge) {
+    cout << "                    Error < " << limit << " %" << endl;
+  }else{
+    cout << "                    Error = " << "NoConverge" << endl;
+  }
+
+
   ScreenUtils::PrintScrStarLine();
 
-  if (sameReal(finalEnergy,refData,0.001)) {
+  if (isSame) {
     ScreenUtils::DisplayGreenMessage("Test pass");
     return EXIT_SUCCESS;
   }else{

@@ -99,12 +99,27 @@ int main (int argc, char *argv[]){
 
 
   ScreenUtils::PrintScrStarLine();
+  
+  vector<double> percentError = {0.0001,0.001,0.01,0.1,1.0};
+
+  double limit;
+  bool isSame = false;
+  for (auto error : percentError) {
+    limit = error * refData / 100.00;
+    limit = std::abs(limit);
+    if (sameReal(energyCoreCoreRepulsion,refData,limit)) {
+      isSame = true;
+      limit = error;
+      break;
+    }
+  }
   cout << "Compute Core-Core Repulsion = " << energyCoreCoreRepulsion << endl;
   cout << "    Ref Core-Core Repulsion = " << refData << endl;
+  cout << "                      Error < " << limit << " %" << endl;
 
   ScreenUtils::PrintScrStarLine();
 
-  if (sameReal(energyCoreCoreRepulsion,refData,0.0001)) {
+  if (isSame) {
     ScreenUtils::DisplayGreenMessage("Test pass");
     return EXIT_SUCCESS;
   }else{
