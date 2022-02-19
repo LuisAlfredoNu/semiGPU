@@ -75,7 +75,7 @@ void SCFCalculation::ComputeSCF(){
   unsigned int SCFSteps = 0;
 
   double thresholdEnergy = 5.0e-3;
-  bool energyConverge = false;
+  energyConverge = false;
 
   int statusLAPACK;
 

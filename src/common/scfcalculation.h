@@ -22,6 +22,8 @@ class SCFCalculation {
   FockMatrix* Fmatrix;
   // Final Energy
   double finalEnergy;
+  // SCF Convergence
+  bool energyConverge;
 /***************************************************************************************/ 
   // Methods
   bool AllocSCFData();
