@@ -29,6 +29,9 @@ int main (int argc, char *argv[]) {
   }else{
     cout << "Read XYZ file successful" << endl;
   }
+
+  Atom::PrintGeometry(molecule);
+
   // Construct all Atomic Orbitals
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
