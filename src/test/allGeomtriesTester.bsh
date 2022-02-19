@@ -6,7 +6,7 @@ geo_exemption=(${geo_exemption[@]} "filetest_4_readxyz_class_2.xyz")
 
 echo "geo_exemption = ${geo_exemption[@]}"
 
-printf  "                 geo   twoElec  Hcore    Fmat    Core     Error     Scf    Error\n"
+printf  "                      geo     twoElec   Hcore    Fmat    Core     Error     Scf    Error\n"
 for i in ../Geometries4Test/*.xyz ; do
 
    next_geo="true"
@@ -18,7 +18,7 @@ for i in ../Geometries4Test/*.xyz ; do
    if [ $next_geo == "false" ];then
     continue
    fi
-   printf "%20s \t" "${i##*/}"
+   printf "%25s \t" "${i##*/}"
    
    ./fullTester.bsh $i | tail -n 7 | awk -F ':' '{printf "%s   ",$2}'
    printf "\n"
