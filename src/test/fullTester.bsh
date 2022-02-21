@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mopac_exe="/opt/mopac/MOPAC2016.exe"
+mopac_exe="../Geometries4Test/MOPAC2016.exe.old"
 
 computeMOPAC(){
    file_geo_input=$1
@@ -11,7 +11,7 @@ computeMOPAC(){
    echo $header_mopac > $file_mopac_input
    cat $file_geo_input >> $file_mopac_input
    
-   $mopac_exe $file_mopac_input
+   yes | $mopac_exe $file_mopac_input 
 }
 #-----------------------------------------------------------------------------# 
 make_matrix(){
