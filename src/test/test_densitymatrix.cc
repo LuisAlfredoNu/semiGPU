@@ -11,6 +11,9 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include "readxyzfile.h"
+#include "atom.h"
+#include "atomicOrbitals.h"
 #include "mymemory.h"
 #include "screenutils.h"
 
@@ -22,24 +25,49 @@ int main (int argc, char *argv[]){
   cout << " Testing for Class DensityMatrix " << endl;
   cout << "********************************************************" << endl << endl;
 
+  if (argc < 2) {
+    cout << "Dont input file in arguments " << endl << endl;
+    return EXIT_FAILURE;
+  }
+/***************************************************************************************/
+  string filename = argv[1];
+  cout << "File for read: " << filename << endl;
+
+  // Init molecule
+  ReadXYZFile reader;
+  vector<Atom> molecule;
+
+  bool statusAllData = reader.GetValuesFromFile(filename,molecule);
+
+  if (! statusAllData) {
+    cout << "Somethig is wrong with xyz file" << endl;
+    return EXIT_FAILURE;
+  }
+
+  Atom::PrintGeometry(molecule);
+  ScreenUtils::PrintScrStarLine();
+/***************************************************************************************/ 
+  ListAtomicOrbitals infoAOs;
+  infoAOs.SetOrbitals(molecule);
+
   double* eigenVec;
 
-  int nAOs = 8;
+  size_t nAOs = infoAOs.orbital.size();
 
-  if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,eigenVec,2.0)) {
+  if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,eigenVec,0.0)) {
     cout << "Correct Alloc: eigenVec" << endl;
   }else{
     cout << "Bad Alloc: eigenVec " << endl;
   }
 
-  for (int i=0;i<nAOs;++i) {
-    eigenVec[i * nAOs + i] = 2.0;
+  for (size_t i=0;i<nAOs;++i) {
+    eigenVec[i * nAOs + i] = 1.0;
   }
 
   cout << "Eigen matrix" << endl;
   ScreenUtils::PrintMatrixNxN(nAOs,eigenVec);
 
-  DensityMatrix Pmatrix(eigenVec,nAOs);
+  DensityMatrix Pmatrix(infoAOs,eigenVec,nAOs);
 
   // Alloc Hcore Matrix
   if (Pmatrix.Alloc4Matrix("PmatrixMatrix")){
@@ -48,6 +76,11 @@ int main (int argc, char *argv[]){
     cout << "Bad Alloc: PmatrixMatrix " << endl;
   }
   cout << "Compute DensityMatrix" << endl;
+  Pmatrix.GuessDensityMatrixSwitch(true);
+  Pmatrix.ComputeMatrix();
+  ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Pmatrix.matrixHold_);
+  
+  Pmatrix.GuessDensityMatrixSwitch(false);
   Pmatrix.ComputeMatrix();
 
   ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Pmatrix.matrixHold_);

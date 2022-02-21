@@ -31,7 +31,7 @@ bool SCFCalculation::AllocSCFData(){
   if (! MyMemory::Alloc1DRealArray("eigenVal",nAOs_,eigenVal,0.0)) {
     return false;
   }
-  Pmatrix = new DensityMatrix(eigenVec,nAOs_);
+  Pmatrix = new DensityMatrix(*infoAOs_,eigenVec,nAOs_);
   if ( ! Pmatrix->Alloc4Matrix("Pmatrix") ){
     return false;
   }
@@ -66,10 +66,7 @@ void SCFCalculation::ComputeSCF(){
   double oldElectronicenergy = 0.0e-10 ;
   double electronicEnergy = ElectronicEnergy::ComputeEnergy(nAOs_,*hcore_,*Fmatrix,*Pmatrix);
 
-  if (printInfo) {
-    cout << "Electronic Energy beginning  = " << electronicEnergy << endl;
-    ScreenUtils::PrintScrStarLine();
-  }
+  cout << "SCF step : " << 0 << "  Energy = " << electronicEnergy << endl;
   
   unsigned int maxSCFSteps = 100;
   unsigned int SCFSteps = 0;
@@ -122,13 +119,14 @@ void SCFCalculation::ComputeSCF(){
 }
 /***************************************************************************************/ 
 void SCFCalculation::InitialGuess(){
-  for (size_t i=0;i<nAOs_;++i) {
-    Pmatrix->matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] = 1.0;
-  }
+  Pmatrix->GuessDensityMatrixSwitch(true);
+  Pmatrix->ComputeMatrix();
+  Pmatrix->GuessDensityMatrixSwitch(false);
+
   Fmatrix->ComputeMatrix();
-  for (size_t i=0;i<nAOs_;++i) {
-    Fmatrix->matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] -= 0.5;
-  }
+  //for (size_t i=0;i<nAOs_;++i) {
+  //  Fmatrix->matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] -= 0.5;
+  //}
   if (printInfo) {
     cout << "Guess : Pmatrix" << endl;
     ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Pmatrix->matrixHold_);

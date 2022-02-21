@@ -741,21 +741,12 @@ int TwoCenterIntegral::GetPairType(const AtomicOrbital& orbitalA,const AtomicOrb
 bool TwoCenterIntegral::CorrectOrderIntegral(int& pairTypeA,int& pairTypeB,\
     int (&AOsTypeInt)[4]){
   if (pairTypeA > pairTypeB) {
-    int tmp_pair = pairTypeA;
-    pairTypeA = pairTypeB;
-    pairTypeB = tmp_pair;
-
-    int AOsTypeInt_tmp = AOsTypeInt[0];
-    int AOsTypeInt_tmpp = AOsTypeInt[1];
-
-    AOsTypeInt[0] = AOsTypeInt[2];
-    AOsTypeInt[1] = AOsTypeInt[3];
-
-    AOsTypeInt[2] = AOsTypeInt_tmp;
-    AOsTypeInt[3] = AOsTypeInt_tmpp;
+    
+    swapValues(pairTypeA,pairTypeB);
+    swapValues(AOsTypeInt[0],AOsTypeInt[2]);
+    swapValues(AOsTypeInt[1],AOsTypeInt[3]);
 
     return true;
-
   }
   return false;
 }

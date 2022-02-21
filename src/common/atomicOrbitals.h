@@ -31,6 +31,7 @@ class AtomicOrbital{
   void SetIndexAO(int);
   void SetCoordinates(const double (&coor)[3]);
   int GetCoreCharge() const;
+  int GetAOsSize() const;
 
  private:
 

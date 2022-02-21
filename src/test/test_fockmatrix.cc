@@ -104,17 +104,16 @@ int main (int argc, char *argv[]){
 
   // Init Pmatrix
   cout << "Init and Compute DensityMatrix" << endl;
-  DensityMatrix Pmatrix(eigenVec,nAOs);
+  DensityMatrix Pmatrix(infoAOs,eigenVec,nAOs);
   // Alloc Pmatrix Matrix
   if (Pmatrix.Alloc4Matrix("Pmatrix")){
     cout << "Correct Alloc: Pmatrix" << endl;
   }else{
     cout << "Bad Alloc: Pmatrix " << endl;
   }
+  Pmatrix.GuessDensityMatrixSwitch(true);
   Pmatrix.ComputeMatrix();
-  for (int i=0;i<nAOs;++i) {
-    Pmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] = 1.0;
-  }
+  Pmatrix.GuessDensityMatrixSwitch(false);
 
   //cout << "Pmatrix matrix" << endl;
   //ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Pmatrix.matrixHold_);
@@ -130,6 +129,9 @@ int main (int argc, char *argv[]){
     cout << "Bad Alloc: Fmatrix " << endl;
   }
   Fmatrix.ComputeMatrix();
+  for (size_t i=0;i<nAOs;++i) {
+    Fmatrix.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] -= 0.5;
+  }
   //cout << "Fock Matrix" << endl;
   //ScreenUtils::PrintMatrixNxNSymmetric(nAOs,Fmatrix.matrixHold_); 
 /***************************************************************************************/ 
