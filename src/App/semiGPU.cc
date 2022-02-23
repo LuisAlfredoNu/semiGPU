@@ -5,6 +5,7 @@ using std::endl;
 using std::setw;
 #include <vector>
 using std::vector;
+#include <time.h>
 /***************************************************************************************/ 
 #include "screenutils.h"
 #include "readxyzfile.h"
@@ -17,6 +18,9 @@ using std::vector;
 #include "corecorerepulsion.h"
 /***************************************************************************************/ 
 int main (int argc, char *argv[]) {
+
+  clock_t start, end;
+  start = clock();
 
   string filename_molecule = argv[argc-1];
 
@@ -92,6 +96,12 @@ int main (int argc, char *argv[]) {
   hcore.Dealloc4Matrix();
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegrals);
+
+  double cpu_time_used;
+  end = clock();
+  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+  cout << "Time taken for calculation: " << cpu_time_used << endl;
+
   return EXIT_SUCCESS;
 }
 
