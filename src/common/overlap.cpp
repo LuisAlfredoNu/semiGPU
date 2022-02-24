@@ -95,7 +95,7 @@ double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
       overlapTot *= NormalizationConst(alpha,orbitalA.angularMomentum);
       overlapTot *= NormalizationConst(beta,orbitalB.angularMomentum);
       
-      /**/
+      **/
       overlapFinal += overlapTot ;
     }
   }

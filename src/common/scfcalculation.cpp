@@ -1,13 +1,16 @@
 #ifndef _SCFCALCULATION_CPP_
 #define _SCFCALCULATION_CPP_
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
+#include <chrono>
+
 #include "mymemory.h"
 #include "mymath.h"
 #include "electronicenergy.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
 #include "screenutils.h"
 
 #include "scfcalculation.h"
@@ -77,6 +80,9 @@ void SCFCalculation::ComputeSCF(){
   int statusLAPACK;
 
   while (! energyConverge && maxSCFSteps > SCFSteps ) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    auto startPartial = std::chrono::high_resolution_clock::now();
     statusLAPACK = GetEigenValVecOfFmatrix();
     if (statusLAPACK > 0) {
       cout << "LAPACK: The algorithm failed to converge" << endl;
@@ -85,11 +91,24 @@ void SCFCalculation::ComputeSCF(){
       cout << "LAPACL: the argument "<< statusLAPACK << " had an illegal value" << endl;
       break;
     }
-    Pmatrix->ComputeMatrix();
-    Fmatrix->ComputeMatrix();
+    auto stopLapack = std::chrono::high_resolution_clock::now();
+    auto durationLapack = std::chrono::duration_cast<std::chrono::milliseconds>(stopLapack - startPartial);
     
+    startPartial = std::chrono::high_resolution_clock::now();
+    Pmatrix->ComputeMatrix();
+    auto stopPmatrix = std::chrono::high_resolution_clock::now();
+    auto durationPmat = std::chrono::duration_cast<std::chrono::milliseconds>(stopPmatrix - startPartial);
+    
+    startPartial = std::chrono::high_resolution_clock::now();
+    Fmatrix->ComputeMatrix();
+    auto stopFmatrix = std::chrono::high_resolution_clock::now();
+    auto durationFmat = std::chrono::duration_cast<std::chrono::milliseconds>(stopFmatrix - startPartial);
+    
+    startPartial = std::chrono::high_resolution_clock::now();
     oldElectronicenergy = electronicEnergy;
     electronicEnergy = ElectronicEnergy::ComputeEnergy(nAOs_,*hcore_,*Fmatrix,*Pmatrix);
+    auto stopEnergy = std::chrono::high_resolution_clock::now();
+    auto durationEnergy = std::chrono::duration_cast<std::chrono::milliseconds>(stopEnergy - startPartial);
 
     energyConverge = sameReal(oldElectronicenergy,electronicEnergy,thresholdEnergy);
 
@@ -110,7 +129,15 @@ void SCFCalculation::ComputeSCF(){
       ScreenUtils::PrintScrStarLine();
     }
     SCFSteps++;
-    cout << "SCF step : " << SCFSteps << "  Energy = " << electronicEnergy << endl;
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "SCF step : " << SCFSteps ;
+    cout << "  Energy = " << electronicEnergy;
+    cout << "  LapackTime = " << durationLapack.count();
+    cout << "  PmatTime = " << durationPmat.count();
+    cout << "  FmatTime = " << durationFmat.count();
+    cout << "  EnerTime = " << durationEnergy.count();
+    cout << "  StepTime = " << duration.count() << endl;
   }
   if (printInfo) {
     cout << "Electronic Energy end  = " << electronicEnergy << endl;

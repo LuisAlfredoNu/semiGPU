@@ -26,11 +26,13 @@ endif
 ifneq ($(DARWIN),)
   CXX          := g++-mp-4.9
 else
-  CXX          := g++
+  CXX          := nvc++
 endif
 
 CXXFLAGS       += -std=c++11 -fPIC
-OPTIMFLAGS      = -O3 -funroll-loops -falign-loops=8 -ffast-math
+OPTIMFLAGS      = -O2 -fast
+
+OPENACCFLAGS := -acc -ta=multicore -Minfo=accel
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
@@ -59,11 +61,12 @@ TESTEXECS=$(patsubst %.cc,%.x,$(wildcard *.cc))
 
 # -L: FOLDER LIBRARY
 	LFLAGS+=-L$(TOP)/../common/
-	LFLAGS+=#-L.
+	LFLAGS+=-pgf90libs
 
 # -l: LIBRARY
 	lLIBS+=-l$(COMMONSTATICLIBNAME)
 	lLIBS+=-llapack -lblas
+	lLIBS+=$(OPENACCFLAGS)
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS) -I$(TOP)/../common/

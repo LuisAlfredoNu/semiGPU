@@ -26,14 +26,16 @@ endif
 ifneq ($(DARWIN),)
   CXX          := g++-mp-4.9
 else
-  CXX          := g++
+  CXX          := nvc++
 endif
 
 CXXFLAGS       += -std=c++11 -fPIC
-OPTIMFLAGS      = -O3 -funroll-loops -falign-loops=8 -ffast-math
+OPTIMFLAGS      = -O2 -fast
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
+
+OPENACCFLAGS := -acc -ta=multicore -Minfo=accel
 
 # Debug build flags
 ifeq ($(DEBUGVERSION),1)
@@ -67,6 +69,7 @@ STATICLIB="lib$(COMMONSTATICLIBNAME).a"
 	lLIBS+=#-lgfnl_util
 	lLIBS+= #-lapr-1 -laprutil-1 -llog4cxx
 	lLIBS+=-llapack -lblas
+	lLIBS+=$(OPENACCFLAGS)
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS)

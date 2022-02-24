@@ -26,6 +26,7 @@ double BaseMatrix::ComputeElementMatrix(const size_t &i,const size_t &j){
 }
 /***************************************************************************************/ 
 void BaseMatrix::ComputeMatrix(){
+#pragma acc parallel loop
   //for (size_t i=0;i<matrixSize_;++i) {
   //  for (size_t j=0;j<=i;++j) {
   //    AssignValue2Matrix(i,j,ComputeElementMatrix(i,j));

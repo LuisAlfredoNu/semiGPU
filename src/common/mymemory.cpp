@@ -376,6 +376,9 @@ int MyMemory::GetIndexFullSymmetricMatrix(const int row,const int col){
     return row * (row + 1)/ 2 + col;
   }
 }
+int MyMemory::GetTotalSizeSymmetricMatrix(const int row){
+  return row * (row+ 1 ) / 2 ;
+}
 void MyMemory::GetIndex_ij_SymetricMatrix(const unsigned int index1D,unsigned int (&index2D)[2]){
 
   float index1Df = static_cast<float>(index1D);

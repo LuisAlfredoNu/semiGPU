@@ -58,6 +58,7 @@ int AtomicOrbital::GetCoreCharge() const {
   }else if (element < 19) {
     return element - 10;
   }
+  return -1;
 }
 /***************************************************************************************/ 
 int AtomicOrbital::GetAOsSize() const {
@@ -66,6 +67,7 @@ int AtomicOrbital::GetAOsSize() const {
   }else if (element < 11 ) {
     return 4 ;
   }
+  return -1;
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 
