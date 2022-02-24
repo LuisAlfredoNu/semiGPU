@@ -26,10 +26,19 @@ double BaseMatrix::ComputeElementMatrix(const size_t &i,const size_t &j){
 }
 /***************************************************************************************/ 
 void BaseMatrix::ComputeMatrix(){
-  for (size_t i=0;i<matrixSize_;++i) {
-    for (size_t j=0;j<=i;++j) {
-      AssignValue2Matrix(i,j,ComputeElementMatrix(i,j));
-    }
+  //for (size_t i=0;i<matrixSize_;++i) {
+  //  for (size_t j=0;j<=i;++j) {
+  //    AssignValue2Matrix(i,j,ComputeElementMatrix(i,j));
+  //  }
+  //}
+  size_t total1DArray = matrixSize_ * (matrixSize_ + 1) / 2;
+  unsigned int index_ij[2] = {0,0};
+//    std::cout << " Start i , j = " << index_ij[0] << " , " << index_ij[1]  << std::endl;
+//    std::cout << " total 1D = " << total1DArray << std::endl;
+  for (size_t i=0;i<total1DArray;++i) {
+    MyMemory::GetIndex_ij_SymetricMatrix(i,index_ij);
+ //   std::cout << "index1D = " << i << " ->  i , j = " << index_ij[0] << " , " << index_ij[1]  << std::endl;
+    matrixHold_[i] = ComputeElementMatrix(index_ij[0],index_ij[1]);
   }
 }
 /***************************************************************************************/ 

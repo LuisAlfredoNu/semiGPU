@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 #include "mymemory.h"
 
 bool MyMemory::Alloc1DRealArray(string ptrname,const int n,double* &thptr) {
@@ -374,6 +375,18 @@ int MyMemory::GetIndexFullSymmetricMatrix(const int row,const int col){
   }else{
     return row * (row + 1)/ 2 + col;
   }
+}
+void MyMemory::GetIndex_ij_SymetricMatrix(const unsigned int index1D,unsigned int (&index2D)[2]){
+
+  float index1Df = static_cast<float>(index1D);
+  float rf = 0.5*(-1.0 + sqrtf(1.0 + 8.0 * index1Df));
+  unsigned int r = static_cast<unsigned int>(rf) ;
+  unsigned int xLowLimit = r*(r+3)/2 +1;
+  if (index1D == xLowLimit) {
+    r -= 1 ;
+  }
+  index2D[0] = r;
+  index2D[1] = index1D - r*(r-1)/2 - r;
 }
 bool MyMemory::DeallocSymmetricMatrixReal(double* &thptr){
   return Dealloc1DRealArray(thptr);

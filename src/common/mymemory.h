@@ -77,6 +77,7 @@ public:
    /***************************************************************************************/ 
    static int GetIndexSymmetricMatrix(const int row,const int col);
    static int GetIndexFullSymmetricMatrix(const int row,const int col);
+   static void GetIndex_ij_SymetricMatrix(const unsigned int index1D,unsigned int (&index2D)[2]);
    /***************************************************************************************/
    static bool DeallocSymmetricMatrixReal(double* &thptr);
 
