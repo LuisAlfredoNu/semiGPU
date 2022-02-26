@@ -1,18 +1,11 @@
 #ifndef _ATOMICORBITALS_CPP_
 #define _ATOMICORBITALS_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <vector>
-using std::vector;
-
 #include "mymath.h"
 
 #include "atomicOrbitals.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-
 AtomicOrbital::AtomicOrbital(){
   indexAtom = 0;
   element = 0;
@@ -71,13 +64,11 @@ int AtomicOrbital::GetAOsSize() const {
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-
 ListAtomicOrbitals::ListAtomicOrbitals(){
   statusData = true;
 }
 /***************************************************************************************/ 
 void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
-
   int moleculeSize = molecule.size();
   int totalOrbitals = 0;
   int indexAO = 0;
@@ -86,7 +77,9 @@ void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
     totalOrbitals += SetNumberValenceOrbitals(molecule[i].atomNumber);
   }
 
-  orbital.resize(totalOrbitals);
+  totalOrbitals_ = totalOrbitals;
+
+  orbital = new AtomicOrbital[totalOrbitals];
 
   int angularMomentum[3];
 
@@ -98,6 +91,7 @@ void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
       orbital[indexAO].SetAngularMomentum(angularMomentum);
       orbital[indexAO].SetIndexAO(indexAO);
       orbital[indexAO].SetCoordinates(molecule[i].atomCoordinates);
+
       indexAO++;
       continue;
     }
@@ -113,7 +107,6 @@ void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
       }
       continue;
     }
-
   }
 }
 /***************************************************************************************/ 
@@ -155,5 +148,9 @@ void ListAtomicOrbitals::SetEachAngularMomentum(int type, int angularMomentum[3]
 int ListAtomicOrbitals::GetOrbital4NextAtom(const int& actualOrbital,const vector<AtomicOrbital>& AOs){
   int actualAtom = AOs[actualOrbital].indexAtom;
   return  actualOrbital + SetNumberValenceOrbitals(actualAtom);
+}
+/***************************************************************************************/ 
+size_t ListAtomicOrbitals::size() const {
+  return totalOrbitals_;
 }
 #endif // _ATOMICORBITALS_CPP_

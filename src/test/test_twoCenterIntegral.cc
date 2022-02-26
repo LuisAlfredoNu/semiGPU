@@ -194,7 +194,6 @@ int main (int argc, char *argv[]){
   int totalErrors = 0;
   int globalTotalErrors = 0;
   int countData = 0;
-  int countCSV = 0;
   for (int i=0;i<molecule.size();i++) {
     for (int j=0;j<=i;j++) {
       cout << "Atom A : "<< molecule[i].atomSymbol << "  index : " << i;
@@ -280,7 +279,7 @@ int main (int argc, char *argv[]){
   ScreenUtils::PrintScrStarLine();
   cout << "Test for all possible bielectronic  integral" << endl;
   
-  size_t nAOs = infoAOs.orbital.size();
+  size_t nAOs = infoAOs.size();
   cout << "orbital size = " << nAOs << endl << endl;
 
   double refValue,arrayValue;

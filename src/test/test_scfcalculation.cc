@@ -59,7 +59,7 @@ int main (int argc, char *argv[]){
 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
-  int nAOs = infoAOs.orbital.size();
+  int nAOs = infoAOs.size();
 
   //cout << "infoAOs :" << endl;
   //for (size_t i=0;i<nAOs;++i) {

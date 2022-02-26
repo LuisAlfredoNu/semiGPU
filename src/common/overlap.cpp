@@ -21,7 +21,7 @@ Overlap::Overlap() {
   basisSTO = new STO_6G();
 }
 /***************************************************************************************/ 
-Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.orbital.size()){
+Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.size()){
   basisSTO = new STO_6G();
   infoAOs_ = &infoAOs;
 }

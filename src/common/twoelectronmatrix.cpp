@@ -17,8 +17,8 @@ double TwoElectronMatrix::ComputeGMatrix_UV(const AtomicOrbital &orbitalU,\
   double value = 0.0e-10;
   double valueTmp = 0.0e-10;
 
-  for (size_t i=0;i<infoAOs.orbital.size();++i) {
-    for (size_t j=0;j<infoAOs.orbital.size();++j) {
+  for (size_t i=0;i<infoAOs.size();++i) {
+    for (size_t j=0;j<infoAOs.size();++j) {
       valueTmp = TwoCenterIntegral::GetValueFromArray(orbitalU,orbitalV,\
               infoAOs.orbital[i],infoAOs.orbital[j],all2CenterIntegral);
       valueTmp -= 0.5 * TwoCenterIntegral::GetValueFromArray(orbitalU,infoAOs.orbital[i],\

@@ -68,9 +68,9 @@ class TwoCenterIntegral{
   double ApplyRotationAOs(int,int,int,int,const int&,const int&,const int&,const int&,const double&,const double (&rotMat)[3][3]);
 
   // Funtions fro compute by atoms pairs
-  void ComputePair_HH(const int&,int&,const vector<AtomicOrbital>&,double**&);
-  void ComputePair_HX(      int&,int&,const vector<AtomicOrbital>&,double**&);
-  void ComputePair_XH(      int&,int&,const vector<AtomicOrbital>&,double**&);
-  void ComputePair_XX(const int&,int&,const vector<AtomicOrbital>&,double**&);
+  void ComputePair_HH(const int&,int&,const ListAtomicOrbitals&,double**&);
+  void ComputePair_HX(      int&,int&,const ListAtomicOrbitals&,double**&);
+  void ComputePair_XH(      int&,int&,const ListAtomicOrbitals&,double**&);
+  void ComputePair_XX(const int&,int&,const ListAtomicOrbitals&,double**&);
 };
 #endif // _TWOCENTERINTEGRAL_H_

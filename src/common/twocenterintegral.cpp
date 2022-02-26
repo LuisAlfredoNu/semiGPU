@@ -188,7 +188,7 @@ double TwoCenterIntegral::ComputeTwoCenterIntegral(const AtomicOrbital& orbitalA
 void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& infoAOs,\
     double**** &all2CenterIntegral){
 
-  int totalAOs = infoAOs.orbital.size();
+  int totalAOs = infoAOs.size();
   int indexOfAtomA,indexOfAtomB;
   //cout << "total AOs : " << totalAOs << endl;
   for (int i=0;i < totalAOs;++i) {
@@ -201,12 +201,12 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
         // Compute for X-X or H-H
         if (infoAOs.orbital[i].element == 1) {
           //Compute for H-H
-          ComputePair_HH(i,j,infoAOs.orbital,\
+          ComputePair_HH(i,j,infoAOs,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
           //cout << "  Hit : pair_HH " << endl;
         }else{
           //Compute for X-X
-          ComputePair_XX(i,j,infoAOs.orbital,\
+          ComputePair_XX(i,j,infoAOs,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
           //cout << "  Hit : pair_XX " << endl;
         }
@@ -214,17 +214,17 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
         // Compute for X-Y, H-X or X-H
         if (infoAOs.orbital[i].element > 1 && infoAOs.orbital[j].element > 1) {
           //Compute for X-Y
-          ComputePair_XX(i,j,infoAOs.orbital,\
+          ComputePair_XX(i,j,infoAOs,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
           //cout << "  Hit : pair_XY " << endl;
         }else if (infoAOs.orbital[i].element == 1) {
           //Compute for H-X
-          ComputePair_HX(i,j,infoAOs.orbital,\
+          ComputePair_HX(i,j,infoAOs,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
           //cout << "  Hit : pair_HX " << endl;
         }else{
           //Compute for X-H
-          ComputePair_XH(i,j,infoAOs.orbital,\
+          ComputePair_XH(i,j,infoAOs,\
               all2CenterIntegral[indexOfAtomA][indexOfAtomB]);
           //cout << "  Hit : pair_XH " << endl;
         }
@@ -344,14 +344,16 @@ double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
 }
 /***************************************************************************************/ 
 void TwoCenterIntegral::ComputePair_HH(const int& indexAO_A,int& indexAO_B,\
-    const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
+    const ListAtomicOrbitals& infoAOs,double** &all2CenterIntegral){
 
-  all2CenterIntegral[0][0] = ComputeTwoCenterIntegral(infoAOs[indexAO_A],infoAOs[indexAO_A],\
-      infoAOs[indexAO_B],infoAOs[indexAO_B]);
+  all2CenterIntegral[0][0] = ComputeTwoCenterIntegral(infoAOs.orbital[indexAO_A],\
+                                                      infoAOs.orbital[indexAO_A],\
+                                                      infoAOs.orbital[indexAO_B],\
+                                                      infoAOs.orbital[indexAO_B]);
 }
 /***************************************************************************************/ 
 void TwoCenterIntegral::ComputePair_HX(int& indexAO_A,int& indexAO_B,\
-    const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
+    const ListAtomicOrbitals& infoAOs,double** &all2CenterIntegral){
   // List of order lik MOPAC print 
   // SS	SX	XX	SY	XY	YY	SZ	XZ	YZ	ZZ
   int listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
@@ -367,15 +369,15 @@ void TwoCenterIntegral::ComputePair_HX(int& indexAO_A,int& indexAO_B,\
     ajustIndexD = listMOPACB[i] + indexAO_B;
 
     all2CenterIntegral[0][i] = ComputeTwoCenterIntegral(\
-        infoAOs[ajustIndexA],infoAOs[ajustIndexB],\
-        infoAOs[ajustIndexC],infoAOs[ajustIndexD]);
+        infoAOs.orbital[ajustIndexA],infoAOs.orbital[ajustIndexB],\
+        infoAOs.orbital[ajustIndexC],infoAOs.orbital[ajustIndexD]);
   }
   
   indexAO_B += 3;
 }
 /***************************************************************************************/ 
 void TwoCenterIntegral::ComputePair_XH(int& indexAO_A,int& indexAO_B,\
-    const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
+    const ListAtomicOrbitals& infoAOs,double** &all2CenterIntegral){
   // List of order lik MOPAC print 
   // SS	SX	XX	SY	XY	YY	SZ	XZ	YZ	ZZ
   int listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
@@ -392,13 +394,13 @@ void TwoCenterIntegral::ComputePair_XH(int& indexAO_A,int& indexAO_B,\
     ajustIndexD = listMOPACB[i] + indexAO_A;
 
     all2CenterIntegral[0][i] = ComputeTwoCenterIntegral(\
-        infoAOs[ajustIndexA],infoAOs[ajustIndexB],\
-        infoAOs[ajustIndexC],infoAOs[ajustIndexD]);
+        infoAOs.orbital[ajustIndexA],infoAOs.orbital[ajustIndexB],\
+        infoAOs.orbital[ajustIndexC],infoAOs.orbital[ajustIndexD]);
   }
 }
 /***************************************************************************************/ 
 void TwoCenterIntegral::ComputePair_XX(const int& indexAO_A,int& indexAO_B,\
-       const vector<AtomicOrbital>& infoAOs,double** &all2CenterIntegral){
+       const ListAtomicOrbitals& infoAOs,double** &all2CenterIntegral){
   // List of order lik MOPAC print 
   // SS	SX	XX	SY	XY	YY	SZ	XZ	YZ	ZZ
   unsigned short listMOPACA[10] = {0,0,1,0,1,2,0,1,2,3};
@@ -414,8 +416,8 @@ void TwoCenterIntegral::ComputePair_XX(const int& indexAO_A,int& indexAO_B,\
       ajustIndexC = listMOPACA[j] + indexAO_B;
       ajustIndexD = listMOPACB[j] + indexAO_B;
       all2CenterIntegral[i][j] = ComputeTwoCenterIntegral(\
-                                   infoAOs[ajustIndexA],infoAOs[ajustIndexB],\
-                                   infoAOs[ajustIndexC],infoAOs[ajustIndexD]);
+                                   infoAOs.orbital[ajustIndexA],infoAOs.orbital[ajustIndexB],\
+                                   infoAOs.orbital[ajustIndexC],infoAOs.orbital[ajustIndexD]);
     }
   }
   indexAO_B += 3;

@@ -12,7 +12,7 @@ CoreCoreRepulsion::CoreCoreRepulsion(){
 double CoreCoreRepulsion::ComputeRepulsion(const MNDOparameter &parameter,\
                    const ListAtomicOrbitals &infoAOs,double**** all2CenterInt){
 
-  size_t nAOs = infoAOs.orbital.size();
+  size_t nAOs = infoAOs.size();
   double energy = 0.0e-10; 
   double tmp_energy;
   for (size_t i=0;i<nAOs;++i) {

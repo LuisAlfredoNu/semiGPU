@@ -19,7 +19,7 @@ using std::endl;
 SCFCalculation::SCFCalculation(const ListAtomicOrbitals &infoAOs,\
       double**** &all2CenterIntegral,const Hcore &hcore){
   infoAOs_ = &infoAOs;
-  nAOs_ = infoAOs.orbital.size();
+  nAOs_ = infoAOs.size();
   all2CIntegral_ = all2CenterIntegral;
   hcore_ = &hcore;
   printInfo = false;

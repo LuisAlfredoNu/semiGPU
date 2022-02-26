@@ -116,7 +116,7 @@ int main (int argc, char *argv[]){
 
   cout << "Overlap Matrix done" << endl;
   cout << "HexaHidrogen" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlapA.matrixHold_);
+  ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),overlapA.matrixHold_);
 
   overlapValue = overlap.ComputeOverlap(infoAOs.orbital[0],infoAOs.orbital[0]);
 
@@ -153,7 +153,7 @@ int main (int argc, char *argv[]){
   cout << "Overlap Matrix done" << endl;
   cout << "1C -> {"<<coorAAA[0]<<","<<coorAAA[1]<<","<<coorAAA[2]<<"}" << endl;
   cout << "2C -> {"<<coorBBB[0]<<","<<coorBBB[1]<<","<<coorBBB[2]<<"}" << endl;
-  ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.orbital.size(),overlapB.matrixHold_);
+  ScreenUtils::PrintMatrixNxNSymmetric(infoAOsA.size(),overlapB.matrixHold_);
   /**/
   return EXIT_SUCCESS;
 }
