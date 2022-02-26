@@ -8,10 +8,10 @@
 #include "hcore.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-Hcore::Hcore(const MNDOparameter& MNDOpara,const ListAtomicOrbitals& allAOs,\
-             double**** all2CenInt) : BaseMatrix(allAOs.orbital.size()){
+Hcore::Hcore(const MNDOparameter& MNDOpara,const ListAtomicOrbitals& infoAOs,\
+             double**** all2CenInt) : BaseMatrix(infoAOs.size()){
   parameter_ = &MNDOpara;
-  infoAOs_ = &allAOs;
+  infoAOs_ = &infoAOs;
   all2CenterIntegral_ = all2CenInt;
   overlap_ = new Overlap();
 }
@@ -65,7 +65,7 @@ double Hcore::ComputeNonDiagonalSameAtom(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB){
 
   double sumVuvB = 0.0e-10;
-  for (size_t i=0;i<infoAOs_->orbital.size();++i) {
+  for (size_t i=0;i<infoAOs_->size();++i) {
     if (orbitalA.indexAtom != infoAOs_->orbital[i].indexAtom \
         && infoAOs_->orbital[i].angularMomentumInt == 0) {
       sumVuvB += CoreElectronAttraction(orbitalA,orbitalB,infoAOs_->orbital[i]);
