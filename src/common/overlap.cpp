@@ -19,25 +19,50 @@ using std::string;
 /***************************************************************************************/ 
 Overlap::Overlap() {
   basisSTO = new STO_6G();
+  xk_ = new double[12];
+  wk_ = new double[12];
+
+  xk_[0]  = -3.889724897869781919272;       xk_[1]  = -3.020637025120889771711;
+  xk_[2]  = -2.279507080501059900188;       xk_[3]  = -1.59768263515260479671;
+  xk_[4]  = -0.9477883912401637437046;      xk_[5]  = -0.314240376254359111277;
+  xk_[6]  =  3.889724897869781919272;       xk_[7]  =  3.020637025120889771711;
+  xk_[8]  =  2.279507080501059900188;       xk_[9]  =  1.59768263515260479671;
+  xk_[10] =  0.9477883912401637437046;      xk_[11] =  0.314240376254359111277;
+  wk_[0]  =  2.65855168435630160602E-7;     wk_[1]  =  8.5736870435878586546E-5;
+  wk_[2]  =  0.00390539058462906185999;     wk_[3]  =  0.05160798561588392999187;
+  wk_[4]  =  0.2604923102641611292334;      wk_[5]  =  0.5701352362624795783471;
+  wk_[6]  =  2.65855168435630160602E-7;     wk_[7]  =  8.5736870435878586546E-5;
+  wk_[8]  =  0.00390539058462906185999;     wk_[9]  =  0.05160798561588392999187;
+  wk_[10] =  0.2604923102641611292334;      wk_[11] =  0.5701352362624795783471;
 }
 /***************************************************************************************/ 
 Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.orbital.size()){
   basisSTO = new STO_6G();
   infoAOs_ = &infoAOs;
-}
-/***************************************************************************************/ 
-double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
-  //return ComputeOverlap_Boys(orbitalA,orbitalB);
-  return ComputeOverlap_McMurchieDavidson(orbitalA,orbitalB);
+  xk_ = new double[12];
+  wk_ = new double[12];
+
+  xk_[0]  = -3.889724897869781919272;       xk_[1]  = -3.020637025120889771711;
+  xk_[2]  = -2.279507080501059900188;       xk_[3]  = -1.59768263515260479671;
+  xk_[4]  = -0.9477883912401637437046;      xk_[5]  = -0.314240376254359111277;
+  xk_[6]  =  3.889724897869781919272;       xk_[7]  =  3.020637025120889771711;
+  xk_[8]  =  2.279507080501059900188;       xk_[9]  =  1.59768263515260479671;
+  xk_[10] =  0.9477883912401637437046;      xk_[11] =  0.314240376254359111277;
+  wk_[0]  =  2.65855168435630160602E-7;     wk_[1]  =  8.5736870435878586546E-5;
+  wk_[2]  =  0.00390539058462906185999;     wk_[3]  =  0.05160798561588392999187;
+  wk_[4]  =  0.2604923102641611292334;      wk_[5]  =  0.5701352362624795783471;
+  wk_[6]  =  2.65855168435630160602E-7;     wk_[7]  =  8.5736870435878586546E-5;
+  wk_[8]  =  0.00390539058462906185999;     wk_[9]  =  0.05160798561588392999187;
+  wk_[10] =  0.2604923102641611292334;      wk_[11] =  0.5701352362624795783471;
 }
 /***************************************************************************************/ 
 double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
   //return ComputeOverlap_Boys(infoAOs_->orbital[(int)i],infoAOs_->orbital[(int)j]);
-  return ComputeOverlap_McMurchieDavidson(infoAOs_->orbital[i],infoAOs_->orbital[j]);
+  return ComputeOverlap(infoAOs_->orbital[i],infoAOs_->orbital[j]);
 }
 /***************************************************************************************/ 
-double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
-       const AtomicOrbital& orbitalB){
+double Overlap::ComputeOverlap(const AtomicOrbital& orbitalA,\
+                               const AtomicOrbital& orbitalB){
   // Code develop by Julio Céar Cruz Monterrosas Feb 2021.
 
   double AB = 0.0e-10;
@@ -88,7 +113,9 @@ double Overlap::ComputeOverlap_McMurchieDavidson(const AtomicOrbital& orbitalA,\
         P /= p;
         PA[i] = P - orbitalA.coordinates[i];
         PB[i] = P - orbitalB.coordinates[i];
-        overlapTot *= OverlapMcMurchie(orbitalA.angularMomentum[i],\
+        //overlapTot *= OverlapMcMurchie(orbitalA.angularMomentum[i],\
+                       orbitalB.angularMomentum[i], p, PA[i], PB[i]);
+        overlapTot *= OverlapNumericalIntegral(orbitalA.angularMomentum[i],\
                        orbitalB.angularMomentum[i], p, PA[i], PB[i]);
       }
      /** 
@@ -142,7 +169,23 @@ double Overlap::NormalizationConst(const double &alpha,const int (&angMom)[3]){
                    );
   return norm;
 }
-/***************************************************************************************/ 
+/***************************************************************************************/
+double Overlap::OverlapNumericalIntegral(const int &la,const int &lb,const double &expoTot,const double &Xpa,const double &Xpb) {
+  
+  double sqrt_p = std::sqrt(expoTot);
+
+  if (la == 0 && lb == 0){
+    return std::sqrt(M_PI) / sqrt_p;
+  }
+
+  double x,integral = 0.0;
+  
+  for (short i=0;i<12;++i) {
+    x = xk_[i]/sqrt_p;
+    integral += wk_[i] * pow(x + Xpa, la) * pow(x + Xpb, lb);
+  }
+  return integral/sqrt_p;
+}
 /***************************************************************************************/ 
 double Overlap::ComputeOverlap_Boys(const AtomicOrbital& orbitalA,const AtomicOrbital& orbitalB){
   int atomTypeA = orbitalA.element;

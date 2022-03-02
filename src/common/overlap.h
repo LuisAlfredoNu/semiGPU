@@ -31,12 +31,13 @@ class Overlap: public BaseMatrix{
   double ComputeElementMatrix(const size_t &i,const size_t &j);
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
   double ComputeOverlap_Boys(const AtomicOrbital&,const AtomicOrbital&);
-  double ComputeOverlap_McMurchieDavidson(const AtomicOrbital&,const AtomicOrbital&);
 
  private:
 /***************************************************************************************/ 
   // Variables
   const ListAtomicOrbitals *infoAOs_;
+  int tmp_count;
+  double *xk_, *wk_;
 /***************************************************************************************/ 
   // Methods 
   // Overlap McMurchieDavidson Method
@@ -44,6 +45,8 @@ class Overlap: public BaseMatrix{
          const double &);
   double OverlapMcMurchie(const int &,const int &,const double &,const double &,const double &);
   double NormalizationConst(const double &,const int (&)[3]);
+  // Overlap Numerical Integral
+  double OverlapNumericalIntegral(const int &,const int &,const double &,const double &,const double &);
   // Overlap Boys Method
   void Overlap_SS(double&,const double&,const double&,const double&);
   void Overlap_PS(double&,const double&,const double&,const double&,const double&);
