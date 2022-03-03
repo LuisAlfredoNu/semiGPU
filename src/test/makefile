@@ -31,18 +31,30 @@ endif
 
 CXXFLAGS       += -std=c++11 -fPIC
 OPTIMFLAGS      = -O2 -fast
-
-OPENACCFLAGS := -acc -ta=multicore -Minfo=accel
+OPENACCFLAGS := -acc -ta=nvidia -Minfo=accel
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
 
+# OpenACC build flags
+ifeq ($(OPENACC),1)
+  CXXFLAGS     += $(OPENACCFLAGS)
+  LFLAGS       += -acc
+  CXXFLAGS     += -DOPENACC_AVIL
+endif
+
 # Debug build flags
 ifeq ($(DEBUGVERSION),1)
   CXXFLAGS     += -DDEBUG=1 -g -W -Wall -pedantic -Wno-long-long
+  ifeq ($(OPENACC),1)
+    CXXFLAGS   += -G -ta=nvidia:lineinfo
+    CXXFLAGS   += -DOPENACC_AVIL
+  endif
 else
   CXXFLAGS     += -DDEBUG=0 -Wall $(OPTIMFLAGS)
 endif
+
+
 
 INCDEFS        :=  #-include localdefs.h
 
@@ -60,13 +72,11 @@ TESTEXECS=$(patsubst %.cc,%.x,$(wildcard *.cc))
 
 # -L: FOLDER LIBRARY
 	LFLAGS+=-L$(TOP)/../common/
-	LFLAGS+=-pgf90libs
 
 # -l: LIBRARY
 	lLIBS+=-l$(COMMONSTATICLIBNAME)
+	lLIBS+=-pgf90libs
 	lLIBS+=-llapack -lblas
-	lLIBS+=$(OPENACCFLAGS)
-
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS) -I$(TOP)/../common/
@@ -89,7 +99,7 @@ $(TESTEXECS): %.x: %.o $(STATICLIB)
 	$(CXX) $(LFLAGS) $< $(lLIBS) -o $@
 
 $(STATICLIB): $(COMMONHEADERS) $(COMMONSOURCES)
-	@cd $(TOP)/../common/;make DEBUGVERSION=$(DEBUGVERSION)
+	@cd $(TOP)/../common/;make DEBUGVERSION=$(DEBUGVERSION) OPENACC=$(OPENACC)
 
 .PHONY: clean
 clean:

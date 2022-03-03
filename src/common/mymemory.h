@@ -75,9 +75,13 @@ public:
    static bool AllocSymmetricMatrixReal(string ptrname,const int row, \
          double* &thptr,const double val=0.0);
    /***************************************************************************************/ 
+   #pragma acc routine seq
    static int GetIndexSymmetricMatrix(const int row,const int col);
+   #pragma acc routine seq
    static int GetIndexFullSymmetricMatrix(const int row,const int col);
+   #pragma acc routine seq
    static int GetTotalSizeSymmetricMatrix(const int row);
+   #pragma acc routine seq
    static void GetIndex_ij_SymetricMatrix(const unsigned int index1D,unsigned int (&index2D)[2]);
    /***************************************************************************************/
    static bool DeallocSymmetricMatrixReal(double* &thptr);

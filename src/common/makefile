@@ -31,15 +31,24 @@ endif
 
 CXXFLAGS       += -std=c++11 -fPIC
 OPTIMFLAGS      = -O2 -fast
+OPENACCFLAGS := -acc -ta=nvidia -Minfo=accel
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
 
-OPENACCFLAGS := -acc -ta=multicore -Minfo=accel
+# OpenACC build flags
+ifeq ($(OPENACC),1)
+  CXXFLAGS     += $(OPENACCFLAGS)
+  CXXFLAGS     += -DOPENACC_AVIL
+endif
 
 # Debug build flags
 ifeq ($(DEBUGVERSION),1)
   CXXFLAGS     += -DDEBUG=1 -g -W -Wall -pedantic -Wno-long-long
+  ifeq ($(OPENACC),1)
+    CXXFLAGS   += -G -ta=nvidia:lineinfo
+    CXXFLAGS   += -DOPENACC_AVIL
+  endif
 else
   CXXFLAGS     += -DDEBUG=0 -Wall $(OPTIMFLAGS)
 endif
@@ -49,6 +58,9 @@ ifeq ($(USE_FLOATS_FOR_REALS),)
 else
   CXXFLAGS     += -DUSE_FLOATS_FOR_REALS=$(USE_FLOATS_FOR_REALS)
 endif
+
+  
+
 
 INCDEFS        := -include globaldefs.h
 
@@ -69,7 +81,6 @@ STATICLIB="lib$(COMMONSTATICLIBNAME).a"
 	lLIBS+=#-lgfnl_util
 	lLIBS+= #-lapr-1 -laprutil-1 -llog4cxx
 	lLIBS+=-llapack -lblas
-	lLIBS+=$(OPENACCFLAGS)
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS)
