@@ -18,19 +18,21 @@ using std::vector;
 /***************************************************************************************/
 class Overlap: public BaseMatrix{
  public:
-  Overlap();
+  Overlap(const STO_6G &);
   // Constructor only to create a overlap matrix
-  Overlap(const ListAtomicOrbitals &);
+  Overlap(const ListAtomicOrbitals &,const STO_6G &);
 /***************************************************************************************/ 
   // Variables
   // Start STO-6G data
-  STO_6G* basisSTO;
+  const STO_6G* basisSTO;
 
 /***************************************************************************************/ 
   // Methods 
   double ComputeElementMatrix(const size_t &i,const size_t &j);
+  #pragma acc routine seq
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
   double ComputeOverlap_Boys(const AtomicOrbital&,const AtomicOrbital&);
+  #pragma acc routine seq
   double ComputeOverlap_McMurchieDavidson(const AtomicOrbital&,const AtomicOrbital&);
 
  private:
@@ -40,8 +42,10 @@ class Overlap: public BaseMatrix{
 /***************************************************************************************/ 
   // Methods 
   // Overlap McMurchieDavidson Method
+  #pragma acc routine seq
   double McMurchieCoef(const int &,const int &,const int &,const double &,const double &,\
          const double &);
+  #pragma acc routine seq
   double OverlapMcMurchie(const int &,const int &,const double &,const double &,const double &);
   double NormalizationConst(const double &,const int (&)[3]);
   // Overlap Boys Method

@@ -17,12 +17,13 @@ using std::string;
 #include "overlap.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-Overlap::Overlap() {
-  basisSTO = new STO_6G();
+Overlap::Overlap(const STO_6G& basisSTO_) {
+  basisSTO = &basisSTO_;
+  #pragma acc enter data copyin(this[0:1])
 }
 /***************************************************************************************/ 
-Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.size()){
-  basisSTO = new STO_6G();
+Overlap::Overlap(const ListAtomicOrbitals &infoAOs,const STO_6G& basisSTO_) : BaseMatrix(infoAOs.size()){
+  basisSTO = &basisSTO_;
   infoAOs_ = &infoAOs;
 }
 /***************************************************************************************/ 
