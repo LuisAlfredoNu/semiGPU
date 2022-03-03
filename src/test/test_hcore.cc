@@ -83,7 +83,7 @@ int main (int argc, char *argv[]){
   // Init Hcore
   cout << "Init and compute Overlap" << endl;
   overlap.ComputeMatrix();
-  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),overlap.matrixHold_);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),overlap.matrixHold_);
 
   ScreenUtils::PrintScrStarLine();
 
@@ -98,7 +98,7 @@ int main (int argc, char *argv[]){
   cout << "Init and compute Hcore" << endl;
   hcore.ComputeMatrix();
 
-  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),hcore.matrixHold_);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),hcore.matrixHold_);
 
 /***************************************************************************************/ 
   // Compare data
@@ -118,20 +118,20 @@ int main (int argc, char *argv[]){
 
   cout << "Get CSV Data" << endl;
 
-  for (size_t i=0;i<infoAOs.orbital.size();++i) {
+  for (size_t i=0;i<infoAOs.size();++i) {
     for (size_t j=0;j<=i;++j) {
       refData.push_back(std::stod(dataCSV[i][j]));
     }
   }
-  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),&refData[0]);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),&refData[0]);
 
   ScreenUtils::PrintScrStarLine();
   int index;
   int totalErrors = 0;
   int decimals=4;
   cout << std::fixed << setprecision(decimals);
-  for (size_t k=0;k<infoAOs.orbital.size();k+=4) {
-    for (size_t i=1*k;i<infoAOs.orbital.size();++i) {
+  for (size_t k=0;k<infoAOs.size();k+=4) {
+    for (size_t i=1*k;i<infoAOs.size();++i) {
       for (size_t j=1*k;j<=i;++j) {
         index = MyMemory::GetIndexSymmetricMatrix(i,j);
         if ( sameReal(hcore.matrixHold_[index],refData[index],1.0e-2) ) {

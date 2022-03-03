@@ -8,7 +8,7 @@
 /***************************************************************************************/ 
 /***************************************************************************************/ 
 FockMatrix::FockMatrix(const ListAtomicOrbitals &infoAOs,const Hcore &hcore,\
-    const DensityMatrix &Pmatrix,double**** &all2CenterIntegral) : BaseMatrix(infoAOs.orbital.size()){
+    const DensityMatrix &Pmatrix,double**** &all2CenterIntegral) : BaseMatrix(infoAOs.size()){
   infoAOs_ = &infoAOs;
   hcore_ = &hcore;
   Pmatrix_ = &Pmatrix;

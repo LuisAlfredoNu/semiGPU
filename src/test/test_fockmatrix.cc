@@ -57,7 +57,7 @@ int main (int argc, char *argv[]){
 /***************************************************************************************/ 
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
-  int nAOs = infoAOs.orbital.size();
+  int nAOs = infoAOs.size();
 
   // Alloc for all 2 center integrals 
   double**** all2CenterIntegral = NULL;
@@ -151,20 +151,20 @@ int main (int argc, char *argv[]){
 
   cout << "Get CSV Data" << endl;
 
-  for (size_t i=0;i<infoAOs.orbital.size();++i) {
+  for (size_t i=0;i<infoAOs.size();++i) {
     for (size_t j=0;j<=i;++j) {
       refData.push_back(std::stod(dataCSV[i][j]));
     }
   }
-  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.orbital.size(),&refData[0]);
+  //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),&refData[0]);
 
   ScreenUtils::PrintScrStarLine();
   int index;
   int totalErrors = 0;
   int decimals=4;
   cout << std::fixed << setprecision(decimals);
-  for (size_t k=0;k<infoAOs.orbital.size();k+=4) {
-    for (size_t i=1*k;i<infoAOs.orbital.size();++i) {
+  for (size_t k=0;k<infoAOs.size();k+=4) {
+    for (size_t i=1*k;i<infoAOs.size();++i) {
       for (size_t j=1*k;j<=i;++j) {
         index = MyMemory::GetIndexSymmetricMatrix(i,j);
         if ( sameReal(Fmatrix.matrixHold_[index],refData[index],1.0e-3) ) {

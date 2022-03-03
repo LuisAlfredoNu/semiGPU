@@ -45,10 +45,10 @@ int main (int argc, char *argv[]){
     ListAtomicOrbitals infoAOs;
     infoAOs.SetOrbitals(molecule);
 
-    cout << "Size of infoAOs " << infoAOs.orbital.size() << endl;
+    cout << "Size of infoAOs " << infoAOs.size() << endl;
 
     cout << "indexAO  indexAtom  element  angular momentum  int  Core   Coordinates" << endl; 
-    for (unsigned int i=0; i< infoAOs.orbital.size() ; i++) {
+    for (unsigned int i=0; i< infoAOs.size() ; i++) {
       cout << setw(4) << infoAOs.orbital[i].indexAO ;
       cout << setw(9) << infoAOs.orbital[i].indexAtom ; 
       cout << setw(12) << infoAOs.orbital[i].element ; 

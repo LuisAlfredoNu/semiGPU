@@ -52,7 +52,7 @@ int main (int argc, char *argv[]){
 
   double* eigenVec;
 
-  size_t nAOs = infoAOs.orbital.size();
+  size_t nAOs = infoAOs.size();
 
   if (MyMemory::Alloc1DRealArray("eigenVec",nAOs*nAOs,eigenVec,0.0)) {
     cout << "Correct Alloc: eigenVec" << endl;

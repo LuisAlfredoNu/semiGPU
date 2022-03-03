@@ -36,7 +36,7 @@ Overlap::Overlap() {
   wk_[10] =  0.2604923102641611292334;      wk_[11] =  0.5701352362624795783471;
 }
 /***************************************************************************************/ 
-Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.orbital.size()){
+Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.size()){
   basisSTO = new STO_6G();
   infoAOs_ = &infoAOs;
   xk_ = new double[12];
