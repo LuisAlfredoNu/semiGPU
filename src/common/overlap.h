@@ -32,22 +32,23 @@ class Overlap: public BaseMatrix{
   #pragma acc routine seq
   double ComputeOverlap(const AtomicOrbital&,const AtomicOrbital&);
   double ComputeOverlap_Boys(const AtomicOrbital&,const AtomicOrbital&);
-  #pragma acc routine seq
-  double ComputeOverlap_McMurchieDavidson(const AtomicOrbital&,const AtomicOrbital&);
 
  private:
 /***************************************************************************************/ 
   // Variables
   const ListAtomicOrbitals *infoAOs_;
+  int tmp_count;
+  double *xk_, *wk_;
 /***************************************************************************************/ 
   // Methods 
   // Overlap McMurchieDavidson Method
-  #pragma acc routine seq
   double McMurchieCoef(const int &,const int &,const int &,const double &,const double &,\
          const double &);
-  #pragma acc routine seq
   double OverlapMcMurchie(const int &,const int &,const double &,const double &,const double &);
   double NormalizationConst(const double &,const int (&)[3]);
+  // Overlap Numerical Integral
+  #pragma acc routine seq
+  double OverlapNumericalIntegral(const int &,const int &,const double &,const double &,const double &);
   // Overlap Boys Method
   void Overlap_SS(double&,const double&,const double&,const double&);
   void Overlap_PS(double&,const double&,const double&,const double&,const double&);
