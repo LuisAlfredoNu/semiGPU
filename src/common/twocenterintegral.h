@@ -27,7 +27,9 @@ class TwoCenterIntegral{
       double**** &all2CenterIntegral);
   void ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& infoAOs,\
       double**** &all2CenterIntegral);
+  #pragma acc routine seq
   static double GetValueFromArray(const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,const AtomicOrbital&,double**** all2CenterIntegral);
+  static void To_device(const vector<Atom>& molecule,double**** &all2CenterIntegral);
 /***************************************************************************************/
 /***************************************************************************************/ 
  private:

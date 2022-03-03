@@ -2,6 +2,8 @@
 #ifndef _TWOCENTERINTEGRAL_CPP_
 #define _TWOCENTERINTEGRAL_CPP_
 
+#include <iostream>
+
 #include <vector>
 using std::vector;
 
@@ -18,6 +20,38 @@ TwoCenterIntegral::TwoCenterIntegral(MNDOparameter& MNDOpara){
   multipole = new Multipole(MNDOpara);
 }
 /***************************************************************************************/ 
+void TwoCenterIntegral::To_device(const vector<Atom>& molecule,\
+                                 double**** &all2CenterIntegral){
+  int NAtoms = molecule.size();
+  double**** all2CenterIntegral_tmp = all2CenterIntegral;
+  #pragma acc enter data pcopyin(all2CenterIntegral_tmp[:NAtoms])
+  // Alloc for the second atom
+  for (int i=1;i<=NAtoms;++i) {
+    #pragma acc enter data copyin(all2CenterIntegral_tmp[i-1][:i]) 
+  }
+  int atomNumberA, atomNumberB ;
+  for (int i=0;i<NAtoms;i++) {
+    for (int j=0;j <= i;j++) {
+      atomNumberA = molecule[i].atomNumber;
+      atomNumberB = molecule[j].atomNumber;
+      if (atomNumberA == 1 && atomNumberB  == 1) {
+        // Alloc for H-H pair
+        #pragma acc enter data copyin(all2CenterIntegral_tmp[i][j][0:1][0:1])
+        continue;
+      }
+      if (atomNumberA > 1 && atomNumberB > 1) {
+        // Alloc for X-X pair
+        #pragma acc enter data copyin(all2CenterIntegral_tmp[i][j][0:10][0:10])
+        continue;
+      }else{
+        // Alloc for H-X pair
+        #pragma acc enter data copyin(all2CenterIntegral_tmp[i][j][0:1][0:10])
+        continue;
+      }
+    }
+  }
+}
+/***************************************************************************************/ 
 bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,\
     double**** &all2CenterIntegral){
 
@@ -28,7 +62,9 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
   }
   // Alloc for the second atom
   for (int i=1;i <= NAtoms;i++) {
+  //for (int i=0;i < NAtoms;i++) {
     if (!(all2CenterIntegral[i-1] = new double** [i])){
+    //if (!(all2CenterIntegral[i] = new double** [NAtoms])){
       return false;
     }
   }
@@ -37,6 +73,7 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
 
   for (int i=0;i<NAtoms;i++) {
     for (int j=0;j <= i;j++) {
+    //for (int j=0;j < NAtoms;j++) {
 
       atomNumberA = molecule[i].atomNumber;
       atomNumberB = molecule[j].atomNumber;
@@ -44,6 +81,7 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
       if (atomNumberA == 1 && atomNumberB  == 1) {
         // Alloc for H-H pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,1,all2CenterIntegral[i][j],0.0);
+        //dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",10,10,all2CenterIntegral[i][j],0.0);
         //cout << "Hit 1 - 1" ; 
         //cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 1 << "]" << endl;
         continue;
@@ -57,6 +95,7 @@ bool TwoCenterIntegral::Alloc4AllTwoCenterIntegral(const vector<Atom>& molecule,
       }else{
         // Alloc for H-X pair
         dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",1,10,all2CenterIntegral[i][j],0.0);
+        //dataStatus = MyMemory::Alloc2DRealArray("all2CenterIntegral",10,10,all2CenterIntegral[i][j],0.0);
         //cout << "Hit 1 - X" ;
         //cout << "  Index : [" << i << "][" << j << "][" << 1 << "][" << 10 << "]" << endl;
         continue;
@@ -77,6 +116,7 @@ bool TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(const vector<Atom>& molecul
       if (molecule[i].atomNumber == 1 && molecule[j].atomNumber  == 1) {
         // Dealloc for H-H pair
         dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],1);
+        //dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],10);
         continue;
       }
       if (molecule[i].atomNumber > 1 && molecule[j].atomNumber > 1) {
@@ -86,6 +126,7 @@ bool TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(const vector<Atom>& molecul
       }else{
         // Dealloc for H-X pair
         dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],1);
+        //dataStatus = MyMemory::Dealloc2DRealArray(all2CenterIntegral[i][j],10);
         continue;
       }
     }
@@ -240,6 +281,7 @@ void TwoCenterIntegral::ComputeAllTwoCenterIntegral(const ListAtomicOrbitals& in
 /*
    Function to get the value of big array, this function have 4 arguments, each is a orbital 
  */
+
 double TwoCenterIntegral::GetValueFromArray(const AtomicOrbital& orbitalA,\
     const AtomicOrbital& orbitalB,const AtomicOrbital& orbitalC,const AtomicOrbital& orbitalD,\
     double**** all2CenterIntegral){

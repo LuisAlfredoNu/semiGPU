@@ -66,6 +66,11 @@ int AtomicOrbital::GetAOsSize() const {
 /***************************************************************************************/ 
 ListAtomicOrbitals::ListAtomicOrbitals(){
   statusData = true;
+  totalOrbitals_ = 0;
+}
+/***************************************************************************************/ 
+ListAtomicOrbitals::~ListAtomicOrbitals(){
+  From_device();
 }
 /***************************************************************************************/ 
 void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
@@ -79,7 +84,9 @@ void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
 
   totalOrbitals_ = totalOrbitals;
 
-  orbital = new AtomicOrbital[totalOrbitals];
+  if (!(orbital = new AtomicOrbital[totalOrbitals_]) ) {
+    statusData = false;
+  }
 
   int angularMomentum[3];
 
@@ -108,6 +115,7 @@ void ListAtomicOrbitals::SetOrbitals(const vector<Atom> &molecule){
       continue;
     }
   }
+  To_device();
 }
 /***************************************************************************************/ 
 int ListAtomicOrbitals::SetNumberValenceOrbitals(const int &atomNumber){
@@ -152,5 +160,30 @@ int ListAtomicOrbitals::GetOrbital4NextAtom(const int& actualOrbital,const vecto
 /***************************************************************************************/ 
 size_t ListAtomicOrbitals::size() const {
   return totalOrbitals_;
+}
+/***************************************************************************************/ 
+void ListAtomicOrbitals::To_device(){
+  #pragma acc enter data copyin(this[0:1],this->orbital[0:totalOrbitals_])
+  for (size_t i=0;i<totalOrbitals_;++i) {
+    #pragma acc enter data copyin(this->orbital[i].indexAtom,\
+      this->orbital[i].element,\
+      this->orbital[i].angularMomentum[0:3],\
+      this->orbital[i].angularMomentumInt,\
+      this->orbital[i].indexAO,\
+      this->orbital[i].coordinates[0:3],\
+    )
+  }
+}
+void ListAtomicOrbitals::From_device(){
+  for (size_t i=0;i<totalOrbitals_;++i) {
+    #pragma acc exit data copyout(this->orbital[i].indexAtom,\
+        this->orbital[i].element,\
+        this->orbital[i].angularMomentum[0:3],\
+        this->orbital[i].angularMomentumInt,\
+        this->orbital[i].indexAO,\
+        this->orbital[i].coordinates[0:3],\
+    )
+  }
+  #pragma acc exit data copyout(this[0:1],this->orbital[0:totalOrbitals_])
 }
 #endif // _ATOMICORBITALS_CPP_

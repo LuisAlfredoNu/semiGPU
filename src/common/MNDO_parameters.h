@@ -9,29 +9,46 @@ class MNDOparameter{
 /***************************************************************************************/ 
 public:
    MNDOparameter();
-   double uss[109];
-   double upp[109];
+   ~MNDOparameter();
+
+/***************************************************************************************/
+// Variables
+/***************************************************************************************/ 
+   unsigned int countParameter_;
+
+   double* uss;
+   double* upp;
    
-   double zs[109];
+   double* zs;
 
-   double betaS[109];
-   double betaP[109];
+   double* betaS;
+   double* betaP;
 
-   double alpha[109];
+   double* alpha;
 
-   double gss[109];
-   double gpp[109];
-   double gsp[109];
-   double gp2[109];
-   double hsp[109];
+   double* gss;
+   double* gpp;
+   double* gsp;
+   double* gp2;
+   double* hsp;
 //TODO Is posible compute this values 
 //  ref: https://arxiv.org/pdf/1806.06147v3
-   double dd[109][2];
-   double pp[109][3];
+   double** dd;//[2]
+   double** pp;//[3]
 //TODO END
 
-   double heat[109];
-   double eisol[109];
+   double* heat;
+   double* eisol;
+/***************************************************************************************/ 
+/***************************************************************************************/ 
+private:
+/***************************************************************************************/ 
+// Methods
+/***************************************************************************************/ 
+   void SetArraysSizes();
+   void SetParameterValues();
+   void To_device();
+   void From_device();
 };
 
 #endif // _MNDO_PARAMETERS_H_

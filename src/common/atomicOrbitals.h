@@ -30,7 +30,9 @@ class AtomicOrbital{
   void SetAngularMomentum(int *);
   void SetIndexAO(int);
   void SetCoordinates(const double (&coor)[3]);
+  #pragma acc routine seq
   int GetCoreCharge() const;
+  #pragma acc routine seq
   int GetAOsSize() const;
 
  private:
@@ -44,6 +46,7 @@ class AtomicOrbital{
 class ListAtomicOrbitals{
  public:
   ListAtomicOrbitals();
+  ~ListAtomicOrbitals();
   /***************************************************************************************/ 
   // Variables
   /***************************************************************************************/ 
@@ -54,6 +57,7 @@ class ListAtomicOrbitals{
   /***************************************************************************************/ 
   void SetOrbitals(const vector<Atom> &);
   int GetOrbital4NextAtom(const int&,const vector<AtomicOrbital>&);
+  #pragma acc routine seq
   size_t size() const;
  private:
   /***************************************************************************************/ 
@@ -65,6 +69,14 @@ class ListAtomicOrbitals{
   /***************************************************************************************/ 
   int SetNumberValenceOrbitals(const int &);
   void SetEachAngularMomentum(int, int* );
+  /***************************************************************************************/ 
+  // OpenAcc
+  /***************************************************************************************/ 
+  void To_device();
+  void From_device();
+  void Update_host();
+  void Update_device();
+
 };
 
 #endif // _ATOMICORBITALS_H_
