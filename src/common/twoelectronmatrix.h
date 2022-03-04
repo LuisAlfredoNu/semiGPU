@@ -17,6 +17,7 @@ class TwoElectronMatrix {
   // Variables
 /***************************************************************************************/ 
   // Methods
+  #pragma acc routine seq
   static double ComputeGMatrix_UV(const AtomicOrbital &orbitalU,const AtomicOrbital &orbitalV,\
          const ListAtomicOrbitals &infoAOs,const DensityMatrix &Pmatrix,\
          double**** &all2CenterIntegral);

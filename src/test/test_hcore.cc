@@ -16,6 +16,7 @@ using std::vector;
 #include "atomicOrbitals.h"
 #include "MNDO_parameters.h"
 #include "twocenterintegral.h"
+#include "STO-6G.h"
 #include "overlap.h"
 #include "mymath.h"
 #include "mymemory.h"
@@ -72,17 +73,19 @@ int main (int argc, char *argv[]){
   // Init TwoCenterIntegral
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
+  TwoCenterIntegral::To_device(molecule,all2CenterIntegral);
 
   // Init Overlap
-  Overlap overlap(infoAOs);
-  if (overlap.Alloc4Matrix("overlapMatrix")){
-    cout << "Correct Alloc: overlapMatrix" << endl;
-  }else{
-    cout << "Bad Alloc: overlapMatrix " << endl;
-  }
-  // Init Hcore
-  cout << "Init and compute Overlap" << endl;
-  overlap.ComputeMatrix();
+  //STO_6G basisSTO;
+  //Overlap overlap(infoAOs,basisSTO);
+  //if (overlap.Alloc4Matrix("overlapMatrix")){
+  //  cout << "Correct Alloc: overlapMatrix" << endl;
+  //}else{
+  //  cout << "Bad Alloc: overlapMatrix " << endl;
+  //}
+  //// Init Hcore
+  //cout << "Init and compute Overlap" << endl;
+  //overlap.ComputeMatrix();
   //ScreenUtils::PrintMatrixNxNSymmetric(infoAOs.size(),overlap.matrixHold_);
 
   ScreenUtils::PrintScrStarLine();
@@ -162,8 +165,8 @@ int main (int argc, char *argv[]){
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   cout << "Dealloc array: hcoreMatrix" << endl;
   hcore.Dealloc4Matrix();
-  cout << "Dealloc array: overlapMatrix" << endl;
-  overlap.Dealloc4Matrix();
+  //cout << "Dealloc array: overlapMatrix" << endl;
+  //overlap.Dealloc4Matrix();
 
   ScreenUtils::PrintScrStarLine();
   if (totalErrors == 0) {

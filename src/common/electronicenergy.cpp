@@ -15,7 +15,6 @@ double ElectronicEnergy::ComputeEnergy(const size_t &nAOs,const Hcore &hcore,\
   double tmpEnergy;
   // All matrix are symmetric, thus only compute the half lower triangle multiply by two
   // and subtract the diagonal.
-#pragma acc parallel loop
   for (size_t i=0;i<nAOs;++i) {
     for (size_t j=0;j<=i;++j) {
       tmpEnergy =   hcore.matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,j)] +\

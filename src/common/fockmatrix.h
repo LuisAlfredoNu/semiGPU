@@ -19,6 +19,12 @@ class FockMatrix : public BaseMatrix {
 /***************************************************************************************/ 
   // Methods 
   double ComputeElementMatrix(const size_t &i,const size_t &j);
+#ifdef OPENACC_AVIL
+  //OpenACC
+  #pragma acc routine seq
+  double ComputeElementMatrixLocal(const size_t &i,const size_t &j);
+  void ComputeMatrix();
+#endif // OPENACC_AVIL
  private:
 /***************************************************************************************/ 
   // Variables
@@ -26,6 +32,11 @@ class FockMatrix : public BaseMatrix {
   const Hcore* hcore_;
   const DensityMatrix* Pmatrix_;
   double**** all2CIntegral_;
+/***************************************************************************************/ 
+  // Methods
+  //OpenACC
+  void To_device();
+  void From_device();
 };
 
  

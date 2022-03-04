@@ -285,7 +285,7 @@ int main (int argc, char *argv[]){
   double refValue,arrayValue;
 
   globalTotalErrors = 0;
-  
+ 
   for (size_t pi=0;pi<nAOs;++pi) {
     for (size_t pj=0;pj<nAOs;++pj) {
       for (size_t pk=0;pk<nAOs;++pk) {
@@ -315,7 +315,32 @@ int main (int argc, char *argv[]){
     findError = true;
     errorMen += "Retrun integral Value\t";
   }
-
+#ifdef OPENACC_AVIL
+  cout << "all2CenterIntegral ptr = " << all2CenterIntegral << endl;
+  TwoCenterIntegral::To_device(molecule,all2CenterIntegral);
+  #pragma acc parallel loop gang present(infoAOs,all2CenterIntegral)
+  for (size_t pi=0;pi<nAOs;++pi) {
+    #pragma acc loop worker
+    for (size_t pj=0;pj<nAOs;++pj) {
+      #pragma acc loop vector
+      for (size_t pk=0;pk<nAOs;++pk) {
+        #pragma acc loop seq
+        for (size_t pl=0;pl<nAOs;++pl) {
+          arrayValue = TwoCenterIntegral::GetValueFromArray(\
+                       infoAOs.orbital[pi],\
+                       infoAOs.orbital[pj],\
+                       infoAOs.orbital[pk],\
+                       infoAOs.orbital[pl],\
+                       all2CenterIntegral);
+        }
+      }
+    }
+  }
+  if (globalTotalErrors > 0) {
+    findError = true;
+    errorMen += "Retrun integral Value\t";
+  }
+#endif
   cout << "Dealloc array of all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegral);
   

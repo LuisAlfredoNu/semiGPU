@@ -9,6 +9,7 @@ using std::string;
 using std::vector;
 
 #include "atomicOrbitals.h"
+#include "STO-6G.h"
 #include "screenutils.h"
 
 #include "basematrix.h"
@@ -31,6 +32,7 @@ int main (int argc, char *argv[]){
   orbitalB.SetElement( 1);
   orbitalB.SetCoordinates(coorBB);
 
+  STO_6G basisSTO;
   Overlap overlap;
   double overlapValue = overlap.ComputeOverlap(orbitalA,orbitalB);
 

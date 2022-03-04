@@ -47,7 +47,7 @@ int main (int argc, char *argv[]){
 
     cout << "Size of infoAOs " << infoAOs.size() << endl;
 
-    cout << "indexAO  indexAtom  element  angular momentum  int  Core   Coordinates" << endl; 
+    cout << "indexAO  indexAtom  element  angular momentum  int  Core   Coordinates" << endl;
     for (unsigned int i=0; i< infoAOs.size() ; i++) {
       cout << setw(4) << infoAOs.orbital[i].indexAO ;
       cout << setw(9) << infoAOs.orbital[i].indexAtom ; 
@@ -62,6 +62,26 @@ int main (int argc, char *argv[]){
       cout << ", " << infoAOs.orbital[i].coordinates[2] << " }" << endl; 
 
     }
+
+
+#ifdef OPENACC_AVIL
+    #pragma acc parallel loop present(infoAOs[0:1])
+      for (unsigned int i=0; i< infoAOs.size() ; i++) {
+        printf ("%4d"   ,infoAOs.orbital[i].indexAO );
+        printf ("%9d"   ,infoAOs.orbital[i].indexAtom) ; 
+        printf ("%12d"  ,infoAOs.orbital[i].element ); 
+        printf ("%9s %d","   { " , infoAOs.orbital[i].angularMomentum[0]);
+        printf ("%s %d" , ", ", infoAOs.orbital[i].angularMomentum[1] ); 
+        printf ("%s %d" , ", ", infoAOs.orbital[i].angularMomentum[2] );
+        printf (" }");
+        printf ("%6d"   , infoAOs.orbital[i].angularMomentumInt);
+        printf ("%4d"   , infoAOs.orbital[i].GetCoreCharge());
+        printf ("%7s %f", "   { " , infoAOs.orbital[i].coordinates[0]);
+        printf ("%s %f" , ", ", infoAOs.orbital[i].coordinates[1] ); 
+        printf ("%s %f" , ", ", infoAOs.orbital[i].coordinates[2] );
+        printf (" }\n");
+      }
+#endif
     return EXIT_SUCCESS;
   } else {
     cout << "Problem to read file" << endl;

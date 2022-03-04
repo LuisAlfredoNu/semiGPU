@@ -5,8 +5,6 @@
 using std::cout;
 using std::endl;
 
-
-
 #include "atomicOrbitals.h"
 #include "twocenterintegral.h"
 #include "mymemory.h"
@@ -22,6 +20,10 @@ Hcore::Hcore(const MNDOparameter& MNDOpara,const ListAtomicOrbitals& infoAOs,\
 
   overlap_ = new Overlap();
   To_device();
+}
+/***************************************************************************************/ 
+Hcore::~Hcore() {
+  From_device();
 }
 /***************************************************************************************/ 
 double Hcore::ComputeElementMatrix(const size_t &i,const size_t &j){
@@ -142,6 +144,7 @@ void Hcore::To_device(){
 }
 /***************************************************************************************/ 
 void Hcore::From_device(){
+  #pragma acc exit data delete(this[0:1])
 }
 /***************************************************************************************/ 
 /***************************************************************************************/ 

@@ -155,6 +155,8 @@ void SCFCalculation::InitialGuess(){
   //  Fmatrix->matrixHold_[MyMemory::GetIndexSymmetricMatrix(i,i)] -= 0.5;
   //}
   if (printInfo) {
+    cout << "Hcore matrix" << endl;
+    ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,hcore_->matrixHold_);
     cout << "Guess : Pmatrix" << endl;
     ScreenUtils::PrintMatrixNxNSymmetric(nAOs_,Pmatrix->matrixHold_);
     cout << "Guess : Fmatrix" << endl;

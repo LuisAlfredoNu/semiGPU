@@ -85,6 +85,7 @@ int main (int argc, char *argv[]){
   cout << "Compute all2CenterIntegral" << endl;
   TwoCenterIntegral twoCIntegral(MNDOpara);
   twoCIntegral.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegral);
+  TwoCenterIntegral::To_device(molecule,all2CenterIntegral);
 
   Hcore hcore(MNDOpara,infoAOs,all2CenterIntegral);
   // Alloc Hcore Matrix

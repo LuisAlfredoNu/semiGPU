@@ -14,6 +14,7 @@
 class Hcore : public BaseMatrix {
  public:
   Hcore(const MNDOparameter&,const ListAtomicOrbitals&,double****);
+  ~Hcore();
 /***************************************************************************************/ 
   // Variables
 /***************************************************************************************/ 
