@@ -9,6 +9,7 @@ class STO_6G{
 /***************************************************************************************/ 
  public:
   STO_6G();
+  ~STO_6G();
 
   struct STOdata{
     double exponentS[6];
@@ -17,7 +18,16 @@ class STO_6G{
     double coeffP[6];
   };
 
-  struct STOdata value[36];
+  unsigned int countAtomValues_;
+  struct STOdata* value;
+  private:
+/***************************************************************************************/
+// Methods
+/***************************************************************************************/
+   void SetArraysSizes();
+   void SetParameterValues();
+   void To_device();
+   void From_device();
 };
 
 

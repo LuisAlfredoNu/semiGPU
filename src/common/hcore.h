@@ -6,6 +6,7 @@
 #define _HCORE_H_
 
 #include "MNDO_parameters.h"
+#include "STO-6G.h"
 #include "overlap.h"
 
 #include "basematrix.h"
@@ -18,6 +19,12 @@ class Hcore : public BaseMatrix {
 /***************************************************************************************/ 
   // Methods
   double ComputeElementMatrix(const size_t &i,const size_t &j);
+#ifdef OPENACC_AVIL
+  //OpenACC
+  void ComputeMatrix();
+  #pragma acc routine seq
+  double ComputeElementMatrixLocal(const size_t &i,const size_t &j);
+#endif
 
  private:
 /***************************************************************************************/ 
@@ -29,11 +36,17 @@ class Hcore : public BaseMatrix {
 
 /***************************************************************************************/ 
   // Methods
+  #pragma acc routine seq
   double ComputeNonDiagonalDiffAtom(const AtomicOrbital&,const AtomicOrbital&);
+  #pragma acc routine seq
   double ComputeNonDiagonalSameAtom(const AtomicOrbital&,const AtomicOrbital&);
+  #pragma acc routine seq
   double ComputeDiagonal(const AtomicOrbital&);
+  #pragma acc routine seq
   double CoreElectronAttraction(const AtomicOrbital&,const AtomicOrbital&,\
          const AtomicOrbital&);
+  void To_device();
+  void From_device();
 };
 
 
