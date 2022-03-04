@@ -40,10 +40,9 @@ double Hcore::ComputeElementMatrix(const size_t &i,const size_t &j){
 double Hcore::ComputeNonDiagonalDiffAtom(const AtomicOrbital& orbitalA,\
        const AtomicOrbital& orbitalB){
 
-  printf ("Llego aqui ComputeNonDiagonalSameAtom \n");
-  //double overlapValue = overlap_->ComputeOverlap(orbitalA,orbitalB);
+  double overlapValue = overlap_->ComputeOverlap(orbitalA,orbitalB);
   //double overlapValue = overlap_->ComputeDummy(orbitalA,orbitalB);
-  double overlapValue = 11.1;
+  //double overlapValue = 81.1;
   double hcoreValue = 0.0e-10;
 
   if (orbitalA.angularMomentumInt == 0 ) {
@@ -112,9 +111,9 @@ void Hcore::ComputeMatrix(){
   cout << "this.infoAOs_ = " << this->infoAOs_  << endl;
   cout << "this.all2CenterIntegral_ = " << this->all2CenterIntegral_  << endl;
   cout << "this.overlap_ = " << this->overlap_  << endl;
-//  #pragma acc parallel loop present(this[0:1],matrixHold_[0:array1DSize_],\
-      parameter_,infoAOs_,all2CenterIntegral_)
-  #pragma acc parallel loop present(this[0:1],infoAOs_,parameter_,all2CenterIntegral_)
+  cout << "this.overlap_.basisSTO = " << this->overlap_->basisSTO  << endl;
+
+  #pragma acc parallel loop present(this[0:1],infoAOs_,parameter_,all2CenterIntegral_,overlap_,overlap_->basisSTO)
   for (size_t i=0;i<array1DSize_;++i) {
     unsigned int index_ij[2] = {0,0};
     MyMemory::GetIndex_ij_SymetricMatrix(i,index_ij);

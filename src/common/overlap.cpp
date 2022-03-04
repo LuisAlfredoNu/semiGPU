@@ -17,8 +17,9 @@ using std::string;
 #include "overlap.h"
 /***************************************************************************************/ 
 /***************************************************************************************/ 
-Overlap::Overlap(const STO_6G& basisSTO_) {
-  basisSTO = &basisSTO_;
+Overlap::Overlap() {
+  basisSTO = new STO_6G();
+  
   xk_ = new double[12];
   wk_ = new double[12];
 
@@ -34,11 +35,11 @@ Overlap::Overlap(const STO_6G& basisSTO_) {
   wk_[6]  =  2.65855168435630160602E-7;     wk_[7]  =  8.5736870435878586546E-5;
   wk_[8]  =  0.00390539058462906185999;     wk_[9]  =  0.05160798561588392999187;
   wk_[10] =  0.2604923102641611292334;      wk_[11] =  0.5701352362624795783471;
-  #pragma acc enter data copyin(this[0:1],this->xk_[0:12],this->wk_[0:12])
+  #pragma acc enter data copyin(this[0:1],xk_[0:12],wk_[0:12])
 }
 /***************************************************************************************/ 
-Overlap::Overlap(const ListAtomicOrbitals &infoAOs,const STO_6G& basisSTO_) : BaseMatrix(infoAOs.size()){
-  basisSTO = &basisSTO_;
+Overlap::Overlap(const ListAtomicOrbitals &infoAOs) : BaseMatrix(infoAOs.size()){
+  basisSTO = new STO_6G();
   infoAOs_ = &infoAOs;
   xk_ = new double[12];
   wk_ = new double[12];
@@ -59,6 +60,8 @@ Overlap::Overlap(const ListAtomicOrbitals &infoAOs,const STO_6G& basisSTO_) : Ba
 /***************************************************************************************/ 
 double Overlap::ComputeElementMatrix(const size_t &i,const size_t &j){
   //return ComputeOverlap_Boys(infoAOs_->orbital[(int)i],infoAOs_->orbital[(int)j]);
+  cout << "basisSTO->value[8].exponentS[1] = ";
+  cout << basisSTO ->value[8].exponentS[1]  << endl;
   return ComputeOverlap(infoAOs_->orbital[i],infoAOs_->orbital[j]);
 }
 /***************************************************************************************/ 

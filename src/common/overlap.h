@@ -18,13 +18,14 @@ using std::vector;
 /***************************************************************************************/
 class Overlap: public BaseMatrix{
  public:
-  Overlap(const STO_6G &);
+  Overlap();
   // Constructor only to create a overlap matrix
-  Overlap(const ListAtomicOrbitals &,const STO_6G &);
+  Overlap(const ListAtomicOrbitals &);
 /***************************************************************************************/ 
   // Variables
   // Start STO-6G data
-  const STO_6G* basisSTO;
+  const STO_6G *basisSTO;
+  double *xk_, *wk_;
 
 /***************************************************************************************/ 
   // Methods 
@@ -37,8 +38,6 @@ class Overlap: public BaseMatrix{
 /***************************************************************************************/ 
   // Variables
   const ListAtomicOrbitals *infoAOs_;
-  int tmp_count;
-  double *xk_, *wk_;
 /***************************************************************************************/ 
   // Methods 
   // Overlap McMurchieDavidson Method
