@@ -21,7 +21,7 @@ class FockMatrix : public BaseMatrix {
   double ComputeElementMatrix(const size_t &i,const size_t &j);
 #ifdef OPENACC_AVIL
   //OpenACC
-  #pragma acc routine seq
+  #pragma acc routine 
   double ComputeElementMatrixLocal(const size_t &i,const size_t &j);
   void ComputeMatrix();
 #endif // OPENACC_AVIL

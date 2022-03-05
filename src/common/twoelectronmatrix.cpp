@@ -14,11 +14,11 @@ TwoElectronMatrix::TwoElectronMatrix(){
 double TwoElectronMatrix::ComputeGMatrix_UV(const AtomicOrbital &orbitalU,\
        const AtomicOrbital &orbitalV,const ListAtomicOrbitals &infoAOs,\
        const DensityMatrix &Pmatrix,double**** &all2CenterIntegral){
-  double value = 0.0e-10;
-  double valueTmp = 0.0e-10;
 
+  double value = 0.0e-10;
   for (size_t i=0;i<infoAOs.size();++i) {
     for (size_t j=0;j<infoAOs.size();++j) {
+      double valueTmp = 0.0e-10;
       valueTmp = TwoCenterIntegral::GetValueFromArray(orbitalU,orbitalV,\
               infoAOs.orbital[i],infoAOs.orbital[j],all2CenterIntegral);
       valueTmp -= 0.5 * TwoCenterIntegral::GetValueFromArray(orbitalU,infoAOs.orbital[i],\
