@@ -11,12 +11,37 @@ geo_exemption=''
 geo_exemption=(${geo_exemption[@]} "filetest_4_readxyz_class_1.xyz")
 geo_exemption=(${geo_exemption[@]} "filetest_4_readxyz_class_2.xyz")
 
+#-----------------------------------------------------------------------------# 
+mopac_exe="../Geometries4Test/MOPAC2016.exe.old"
+
+computeMOPAC(){
+   file_geo_input=$1
+   file_mopac_input="${file_geo_input%.xyz}_performance.mop"
+
+   header_mopac="MNDO NOOPT XYZ"
+
+   echo $header_mopac > $file_mopac_input
+   cat $file_geo_input >> $file_mopac_input
+
+   yes | $mopac_exe $file_mopac_input 2>/dev/null
+
+   file_mopac_output="${file_geo_input%.xyz}_performance.out"
+
+   mopac_time=$(grep "TOTAL JOB TIME" $file_mopac_output | awk '{print $4}')
+
+   rm $file_mopac_input $file_mopac_output "${file_mopac_output%.out}.arc"
+
+   echo $mopac_time
+}
+#-----------------------------------------------------------------------------#
+
 printf "%25s \t" "Molecule"
 printf "%10s" "seq"
 for cores in $(seq 2 2 $total_cores); do
    printf "%9dp" "$cores"
 done
-printf "%10s\n" "GPU"
+printf "%10s" "GPU"
+printf "%10s\n" "MOPAC"
 
 for i in ../Geometries4Test/*.xyz ; do
 
@@ -57,6 +82,8 @@ for i in ../Geometries4Test/*.xyz ; do
    printf "%10.3f" "$time_nvidia"
    full_time="$full_time $(printf "%10.3f" "$time_nvidia")"
 
+   time_mopac=$(computeMOPAC $i)
+   printf "%10.3f" "$time_mopac"
 
    printf "\n"
    echo $full_time | tr " " "\n" | \
