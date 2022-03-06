@@ -1,10 +1,6 @@
 #ifndef _HCORE_CPP_
 #define _HCORE_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 #include "atomicOrbitals.h"
 #include "twocenterintegral.h"
 #include "mymemory.h"
@@ -106,6 +102,7 @@ double Hcore::CoreElectronAttraction(const AtomicOrbital& orbitalAu,\
 /***************************************************************************************/
 #ifdef OPENACC_AVIL
 void Hcore::ComputeMatrix(){
+  /*
   cout << "Stop here" << endl;
   cout << "this = " << this  << endl;
   cout << "this.matrixHold_ = " << this->matrixHold_  << endl;
@@ -114,6 +111,7 @@ void Hcore::ComputeMatrix(){
   cout << "this.all2CenterIntegral_ = " << this->all2CenterIntegral_  << endl;
   cout << "this.overlap_ = " << this->overlap_  << endl;
   cout << "this.overlap_.basisSTO = " << this->overlap_->basisSTO  << endl;
+  */
 
   #pragma acc parallel loop present(this[0:1],infoAOs_,parameter_,all2CenterIntegral_,overlap_,overlap_->basisSTO)
   for (size_t i=0;i<array1DSize_;++i) {

@@ -5,7 +5,7 @@ using std::endl;
 using std::setw;
 #include <vector>
 using std::vector;
-#include <time.h>
+#include <chrono>
 /***************************************************************************************/ 
 #include "screenutils.h"
 #include "readxyzfile.h"
@@ -19,10 +19,11 @@ using std::vector;
 /***************************************************************************************/ 
 int main (int argc, char *argv[]) {
 
-  clock_t start, end;
-  start = clock();
-
+  auto start = std::chrono::high_resolution_clock::now();
+  
   string filename_molecule = argv[argc-1];
+
+  cout << "XYZ file : " << filename_molecule << endl;
 
   // Read xyz file
   ReadXYZFile reader;
@@ -36,12 +37,14 @@ int main (int argc, char *argv[]) {
 
   Atom::PrintGeometry(molecule);
 
+  ScreenUtils::PrintScrStarLine();
+  
   // Construct all Atomic Orbitals
   ListAtomicOrbitals infoAOs;
   infoAOs.SetOrbitals(molecule);
   // Start for compute all two center integrals
   // First alloc memory
-  double**** all2CenterIntegrals;
+  double**** all2CenterIntegrals = NULL;
   if( ! (TwoCenterIntegral::Alloc4AllTwoCenterIntegral(molecule,all2CenterIntegrals))){
     cout << "Problem to alloc all2CenterIntegrals" << endl;
     return EXIT_FAILURE;
@@ -53,6 +56,7 @@ int main (int argc, char *argv[]) {
   // Compute all two center integrals
   TwoCenterIntegral twoCenInt(parameters);
   twoCenInt.ComputeAllTwoCenterIntegral(infoAOs,all2CenterIntegrals);
+  TwoCenterIntegral::To_device(molecule,all2CenterIntegrals);
 
   // Start for compute Hcore
   Hcore hcore(parameters,infoAOs,all2CenterIntegrals);
@@ -73,6 +77,8 @@ int main (int argc, char *argv[]) {
     cout << "Bad Alloc: SCFData " << endl;
     return EXIT_FAILURE;
   }
+  
+  ScreenUtils::PrintScrStarLine();
 
   SCFprocess.ComputeSCF();
 
@@ -97,10 +103,14 @@ int main (int argc, char *argv[]) {
   cout << "Dealloc array: all2CenterIntegral" << endl;
   TwoCenterIntegral::Dealloc4AllTwoCenterIntegral(molecule,all2CenterIntegrals);
 
-  double cpu_time_used;
-  end = clock();
-  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-  cout << "Time taken for calculation: " << cpu_time_used << endl;
+  auto end = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+  ScreenUtils::PrintScrStarLine();
+  double duration_sec = static_cast<double> ( duration.count());
+  duration_sec /= 1000.0;
+  cout << "Time taken for calculation: " << duration_sec << " s" << endl;
 
   return EXIT_SUCCESS;
 }

@@ -16,9 +16,12 @@ double TwoElectronMatrix::ComputeGMatrix_UV(const AtomicOrbital &orbitalU,\
        const DensityMatrix &Pmatrix,double**** &all2CenterIntegral){
 
   double value = 0.0e-10;
+  double valueTmp = 0.0e-10;
+  #pragma acc loop independent private(valueTmp,value)  reduction(+:value) 
   for (size_t i=0;i<infoAOs.size();++i) {
+    #pragma acc loop independent private(valueTmp) vector
     for (size_t j=0;j<infoAOs.size();++j) {
-      double valueTmp = 0.0e-10;
+      valueTmp = 0.0e-10;
       valueTmp = TwoCenterIntegral::GetValueFromArray(orbitalU,orbitalV,\
               infoAOs.orbital[i],infoAOs.orbital[j],all2CenterIntegral);
       valueTmp -= 0.5 * TwoCenterIntegral::GetValueFromArray(orbitalU,infoAOs.orbital[i],\

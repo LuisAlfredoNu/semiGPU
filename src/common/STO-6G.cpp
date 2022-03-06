@@ -1,8 +1,6 @@
 #ifndef _STO_6G_CPP_
 #define _STO_6G_CPP_
 
-#include <iostream>
-
 #include "STO-6G.h"
 
 STO_6G::STO_6G(){
@@ -254,7 +252,7 @@ void STO_6G::SetParameterValues(){
 }
 /***************************************************************************************/
 void STO_6G::To_device(){
-  printf ("STO_6G To_device this = %p\n",this);
+ // printf ("STO_6G To_device this = %p\n",this);
   #pragma acc enter data copyin(this[0:1])
   #pragma acc enter data copyin(this->value[0:countAtomValues_])
   for (unsigned int i=0;i<countAtomValues_;++i) {
@@ -263,7 +261,7 @@ void STO_6G::To_device(){
         this->value[i].coeffS[0:6],\
         this->value[i].coeffP[0:6])
   }
-  printf ("STO_6G To_device this = %p\n",this);
+  //printf ("STO_6G To_device this = %p\n",this);
 }
 /***************************************************************************************/ 
 void STO_6G::From_device(){

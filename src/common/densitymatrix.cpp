@@ -1,12 +1,6 @@
 #ifndef _DENSITYMATRIX_CPP_
 #define _DENSITYMATRIX_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-#include "screenutils.h"
-
-
 #include "mymemory.h"
 
 #include "densitymatrix.h"
@@ -56,10 +50,12 @@ double  DensityMatrix::ComputeElementMatrix(const size_t &i,const size_t &j){
 /***************************************************************************************/
 #ifdef OPENACC_AVIL
 void DensityMatrix::ComputeMatrix(){
+  /*
   cout << "Stop here" << endl;
   cout << "Pmatrix this = " << this  << endl;
   cout << "Pmatrix this.matrixHold_ = " << this->matrixHold_  << endl;
   cout << "Pmatrix this.infoAOs_ = " << this->infoAOs_  << endl;
+  */
 //  #pragma acc parallel loop present(this[0:1],infoAOs_,parameter_,all2CenterIntegral_,overlap_,overlap_->basisSTO)
   for (size_t i=0;i<array1DSize_;++i) {
     unsigned int index_ij[2] = {0,0};

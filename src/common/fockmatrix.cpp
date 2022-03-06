@@ -1,10 +1,6 @@
 #ifndef _FOCKMATRIX_CPP_
 #define _FOCKMATRIX_CPP_
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 #include "mymemory.h"
 #include "twoelectronmatrix.h"
 
@@ -34,6 +30,7 @@ double FockMatrix::ComputeElementMatrix(const size_t &i, const size_t &j){
 /***************************************************************************************/
 #ifdef OPENACC_AVIL
 void FockMatrix::ComputeMatrix(){
+  /*
   cout << "Stop here" << endl;
   cout << "FockMatrix this = " << this  << endl;
   cout << "FockMatrix this.matrixHold_ = " << this->matrixHold_  << endl;
@@ -41,11 +38,16 @@ void FockMatrix::ComputeMatrix(){
   cout << "FockMatrix this.all2CIntegral_ = " << this->all2CIntegral_  << endl;
   cout << "FockMatrix this.hcore_ = " << this->hcore_  << endl;
   cout << "FockMatrix this.Pmatrix_ = " << this->Pmatrix_  << endl;
-  #pragma acc parallel loop present(this[0:1],infoAOs_,all2CIntegral_,hcore_,Pmatrix_)
+  */
+  #pragma acc parallel loop present(this[0:1],infoAOs_,all2CIntegral_,hcore_,Pmatrix_) vector_length(128)
   for (size_t i=0;i<array1DSize_;++i) {
     unsigned int index_ij[2] = {0,0};
     MyMemory::GetIndex_ij_SymetricMatrix(i,index_ij);
-    matrixHold_[i] = ComputeElementMatrixLocal(index_ij[0],index_ij[1]);
+    matrixHold_[i] = hcore_->matrixHold_[i];
+    matrixHold_[i] += TwoElectronMatrix::ComputeGMatrix_UV(\
+                           infoAOs_->orbital[index_ij[0]],\
+                           infoAOs_->orbital[index_ij[1]],\
+                           *infoAOs_,*Pmatrix_,all2CIntegral_);
   }
   Update_hostMatrix();
 }

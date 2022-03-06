@@ -32,14 +32,23 @@ endif
 CXXFLAGS       += -std=c++11 -fPIC
 OPTIMFLAGS      = -O2 -fast
 
-OPENACCFLAGS := -acc -ta=multicore -Minfo=accel
-
 ARCHIVE      := ar
 ARCHFLAG     := -rc
+
+# OpenACC build flags
+ifeq ($(OPENACC),1)
+  CXXFLAGS     += -acc -ta=$(DEVICE) -Minfo=accel
+  LFLAGS       += -acc
+  CXXFLAGS     += -DOPENACC_AVIL
+endif
 
 # Debug build flags
 ifeq ($(DEBUGVERSION),1)
   CXXFLAGS     += -DDEBUG=1 -g -W -Wall -pedantic -Wno-long-long
+  ifeq ($(OPENACC),1)
+    CXXFLAGS   += -G -ta=$(DEVICE):lineinfo
+    CXXFLAGS   += -DOPENACC_AVIL
+  endif
 else
   CXXFLAGS     += -DDEBUG=0 -Wall -pedantic $(OPTIMFLAGS)
 endif
@@ -61,19 +70,18 @@ TESTEXECS=$(patsubst %.cc,%.x,$(wildcard *.cc))
 
 # -L: FOLDER LIBRARY
 	LFLAGS+=-L$(TOP)/../common/
-	LFLAGS+=-pgf90libs
 
 # -l: LIBRARY
 	lLIBS+=-l$(COMMONSTATICLIBNAME)
+	lLIBS+=-pgf90libs
 	lLIBS+=-llapack -lblas
-	lLIBS+=$(OPENACCFLAGS)
 
 # -I: INCLUDES
 	IFLAGS+=-I. $(INCDEFS) -I$(TOP)/../common/
 
 TARGET=target
 
-$(TARGET): $(OBJS) $(TESTEXECS) $(STATICLIB)
+$(TARGET): $(OBJS) $(STATICLIB) $(TESTEXECS)
 	$(info LINKING: $@)
 
 $(CPPOBJS): %.o: %.cpp
@@ -87,14 +95,16 @@ $(CCOBJS): %.o: %.cc
 $(TESTEXECS): %.x: %.o $(STATICLIB) $(CPPOBJS) $(SOURCES) $(HEADERS) $(COMMONHEADERS) $(COMMONSOURCES)
 	$(info compiling: $@)
 	$(CXX) $(LFLAGS) $< $(CPPOBJS) $(lLIBS) -o $@
+	@cp $(TESTEXECS) $(patsubst %.x,%_$(DEVICE).x,$(TESTEXECS))
 
 $(STATICLIB): $(COMMONHEADERS) $(COMMONSOURCES)
-	@cd $(TOP)/../common/;make
+	@cd $(TOP)/../common/;make DEBUGVERSION=$(DEBUGVERSION) OPENACC=$(OPENACC)
 
 .PHONY: clean
 clean:
 	$(info CLEANING ALL)
 	@$(RM) -f $(TARGET) $(OBJS) $(STATICLIB) $(TESTEXECS) 2>/dev/null || true
+	@$(RM) -f $(patsubst %.x,%,$(TESTEXECS))*.x 2>/dev/null || true
 
 fullclean: clean
 	@cd ../common/;make clean

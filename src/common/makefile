@@ -31,7 +31,7 @@ endif
 
 CXXFLAGS       += -std=c++11 -fPIC
 OPTIMFLAGS      = -O2 -fast
-OPENACCFLAGS := -acc -ta=nvidia -Minfo=accel
+OPENACCFLAGS := -acc -ta=$(DEVICE) -Minfo=accel
 
 ARCHIVE      := ar
 ARCHFLAG     := -rc
@@ -46,7 +46,7 @@ endif
 ifeq ($(DEBUGVERSION),1)
   CXXFLAGS     += -DDEBUG=1 -g -W -Wall -pedantic -Wno-long-long
   ifeq ($(OPENACC),1)
-    CXXFLAGS   += -G -ta=nvidia:lineinfo
+    CXXFLAGS   += -G -ta=$(DEVICE):lineinfo
     CXXFLAGS   += -DOPENACC_AVIL
   endif
 else
