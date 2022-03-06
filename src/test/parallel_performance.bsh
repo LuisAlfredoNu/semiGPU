@@ -1,0 +1,71 @@
+#!/bin/bash
+
+x_seq="../App/semiGPU_seq.x"
+x_cores="../App/semiGPU_multicore.x"
+x_nvidia="../App/semiGPU_nvidia.x"
+
+total_cores=6
+
+
+geo_exemption=''
+geo_exemption=(${geo_exemption[@]} "filetest_4_readxyz_class_1.xyz")
+geo_exemption=(${geo_exemption[@]} "filetest_4_readxyz_class_2.xyz")
+
+printf "%25s \t" "Molecule"
+printf "%10s" "seq"
+for cores in $(seq 2 2 $total_cores); do
+   printf "%9dp" "$cores"
+done
+printf "%10s\n" "GPU"
+
+for i in ../Geometries4Test/*.xyz ; do
+
+   next_geo="true"
+   for exemption in ${geo_exemption[@]};do
+      if [ "$i" == "../Geometries4Test/$exemption" ] ;then
+         next_geo="false"
+      fi
+   done
+   if [ $next_geo == "false" ];then
+    continue
+   fi
+
+   natoms=$(head -n1 $i)
+   natoms=$(echo $natoms)
+
+   if [ "$natoms" -le 10 ];then
+      continue
+   fi
+
+   printf "%25s \n" "${i##*/}"
+   printf "%25s \t" "time"
+   
+   time_seq=$($x_seq $i | tail -n 1 | awk '{print $5}')
+   printf "%10.3f" "$time_seq"
+   full_time=$(printf "%10.3f" "$time_seq")
+
+   performance="1.0 "
+
+   for cores in $(seq 2 2 $total_cores); do
+      export ACC_NUM_CORES=$cores
+      time_cores=$($x_cores $i | tail -n 1 | awk '{print $5}')
+      printf "%10.3f" "$time_cores"
+      full_time="$full_time $(printf "%10.3f" "$time_cores")"
+      performance="$performance $(awk "BEGIN {print $time_seq/($time_cores*$cores)}")"
+   done 
+   time_nvidia=$($x_nvidia $i | tail -n 1 | awk '{print $5}')
+   printf "%10.3f" "$time_nvidia"
+   full_time="$full_time $(printf "%10.3f" "$time_nvidia")"
+
+
+   printf "\n"
+   echo $full_time | tr " " "\n" | \
+      awk 'BEGIN{printf "%25s \t","speedup"}\
+           NR==1{serial=$1} \
+           {speed=$i;printf "%10.3f",serial/speed } '
+   printf "\n"
+   echo $performance | tr " " "\n" | \
+      awk 'BEGIN{printf "%25s \t","performance"}\
+           {printf "%10.3f",$1 } '
+   printf "\n\n"
+done
