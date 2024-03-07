@@ -104,10 +104,11 @@ $(STATICLIB): $(COMMONHEADERS) $(COMMONSOURCES)
 clean:
 	$(info CLEANING ALL)
 	@$(RM) -f $(TARGET) $(OBJS) $(STATICLIB) $(TESTEXECS) 2>/dev/null || true
-	@$(RM) -f $(patsubst %.x,%,$(TESTEXECS))*.x 2>/dev/null || true
+	@$(RM) -f $(patsubst %.x,%,$(TESTEXECS)).x 2>/dev/null || true
 
 fullclean: clean
 	@cd ../common/;make clean
+	@$(RM) -f $(patsubst %.x,%,$(TESTEXECS))*.x 2>/dev/null || true
 
 
 list:
